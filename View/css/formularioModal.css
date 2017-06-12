@@ -1,0 +1,118 @@
+/* The Modal (background) */
+.modalFormulario {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    z-index: 3;
+}
+
+/* Modal Content */
+.modalFormulario .modal-content {
+    position: relative;
+    background-color: lightgray;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    top:5%;
+    width: 50%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    z-index:4;
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:5%; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:5%; opacity:1}
+}
+
+/* The Close Button */
+.modalFormulario .close {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.modalFormulario .close:hover,
+.modalFormulario .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modalFormulario .modal-header {
+    padding: 2px 16px;
+    background-color: #ed7804;
+    color: black;
+    font-family: arial;
+}
+
+.modalFormulario .modal-body {padding: 2px 16px;font-family: arial; height: 300px; overflow:auto;}
+
+.modalFormulario .modal-footer {
+    padding: 2px 16px;
+    background-color: #ed7804;
+    color: black;
+    font-family: arial;
+    text-align:right;
+}
+
+.modalFormulario .modal-body p{
+    font-size:18px;
+}
+
+.modalFormulario .modal-body input{
+    width:80%;
+    font-size: 16px;
+    text-align: center;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+}
+
+.modalFormulario .modal-body select{
+    font-size: 16px;
+    text-align: center;
+    border-style: solid;
+    border-width: 1px;
+    border-color: black;
+}
+
+.modalFormulario .modal-body textArea{
+    font-size: 16px;
+    width:98.5%;
+    height: 180px;
+    resize: none;
+}
+
+.modalFormulario .modal-body select{
+    font-size: 16px;
+}
+
+.modalFormulario .modal-footer button{
+    font-size:18px;
+    margin: 4px 8px;
+}
+
+.modalFormulario .modal-body .error{
+    font-size: 14px;
+    color:red;
+    margin-top:0;
+}

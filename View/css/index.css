@@ -1,0 +1,129 @@
+body{
+	background:grey;
+}
+
+#main{
+	overflow: scroll
+	background:red;
+}
+
+#mainBanner{
+	position:absolute;
+	top:0%;
+	left:0%;
+	background:#ed7804;
+	width: 100%
+}
+
+#mainBanner h1{
+	margin:0px;
+	color: black;
+	font-family: arial;
+	text-align: center;
+	font-size: 38px;
+}
+
+#form{
+	position:absolute;
+	top:25%;
+	left:0%;
+	width:100%;
+	background: #dddddd;
+	color:black;
+	height:60%;
+}
+
+#leftForm{
+	background: #ed7804;
+	float:left;
+	height:100%;
+}
+
+#leftForm h3{
+	text-align: center;
+	color:black;
+	font-size: 80px;
+}
+
+#rightForm h3{
+	text-align: center;
+	font-size: 80px;
+}
+
+#rightForm{
+	float:right;
+}
+
+#form div{
+	width:50%;
+}
+
+#form div h3{
+	font-family:arial;
+	font-weight: bolder;
+	font-size: 38px;
+	color:black;
+}
+
+#form div h1{
+	text-align: center;
+	font-family:arial;
+	font-weight: bolder;
+	color:black;
+	font-size: 80px;
+	margin-top:0;
+	margin-bottom: 0;
+}
+
+#form div h2{
+	text-align: center;
+	font-family:arial;
+	font-weight: bolder;
+	color:black;
+	font-size: 25px;
+	margin-top:0;
+}
+
+.textField{
+	font-size: 25px;
+}
+
+#txts{
+	margin: auto;
+}
+
+#txts p{
+	font-size: 20px;
+	font-family: arial;
+	font-weight: bold;
+	margin:0;
+	text-align: center;
+}
+
+#txts input{
+	margin:1%;
+	width:100%;
+	text-align: center;
+}
+
+#rightForm button{
+	font-size: 25px;
+	border:0;
+	font-family: arial;
+	line-height: 40px;
+	width:35%;
+	margin-top: 20px;
+	margin-left: 34%;
+	background: darkorange;
+	color:black;
+	
+}
+
+#rightForm button:hover{
+	background: orange;
+}
+
+#rightForm button:active{
+	background: red;
+}
+

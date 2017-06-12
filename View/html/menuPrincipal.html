@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang = "es">
+	<head>
+		<meta charset="UTF-8">
+		<title>Sist. Mostacho RRHH. </title>
+		<link href = "http://localhost/MostachoRRHH/View/css/menuPrincipal.css" rel = "stylesheet"/>
+		<link href = "http://localhost/MostachoRRHH/View/css/organigrama.css" rel = "stylesheet"/>
+		<link href = "http://localhost/MostachoRRHH/View/css/mensajeModal.css" rel = "stylesheet"/>
+		<link href = "http://localhost/MostachoRRHH/View/css/formularioModal.css" rel = "stylesheet"/>
+	</head>
+	<body>
+	<!-- Modal Formulario -->
+	<div id="formularioModal" class="modalFormulario">
+
+  <!-- Modal Formulario Content -->
+	  	<div class="modal-content">
+		    <div class="modal-header">
+		      <span class="close" id="close">&times;</span>
+		      <h2 class="titulo-window" id="titulo-window">Titulo</h2>
+		    </div>
+	    	<div class="modal-body">
+	    	</div>
+		   	<div class="modal-footer">
+		    </div>
+	  	</div>
+  	</div>
+
+  	<!-- Modal Mensaje -->
+	<div id="mensajeModal" class="modalMensaje">
+
+	  <!-- Modal Mensaje Content -->
+	  <div class="modal-content">
+	  
+	  </div>
+
+	</div>
+	<div id = mainBanner class="generalone">
+		<h1> Mostacho RRHH </h1>
+	</div>
+	<div id = "menuBar" class="generalone">
+		<nav class>
+			<ul class = "menu">
+			<li><a href=" " id="iOrganigrama">Organigrama</a></li>
+				<li><a href=" " id="mAreas">Areas</a>
+					<ul>
+						<li><a href="#" id="iNuevaArea">Nueva Area</a></li>
+						<li><a href=" " id="iAreas">Reg. Areas</a></li>
+					</ul>
+				</li>
+				<li><a href=" " id="mPuestos">Puestos</a>
+					<ul>
+						<li><a href="#" id="iNuevoPuesto">Nuevo Puesto</a></li>
+						<li><a href=" " id="iPuestos">Reg. Puestos</a></li>
+					</ul>
+				</li>
+				<li><a href=" " id="mPersonas">Personas</a>
+					<ul>
+						<li><a href="#" id="iNuevaPersona">Nueva Persona</a></li>
+						<li><a href=" " id="iPersonas">Reg. Personas</a></li>
+					</ul>
+				</li>
+				<li><a href=" " id="mUsuarios">Usuarios</a>
+					<ul>
+						<li><a href="#" id="iNuevoUsuario">Nuevo Usuario</a></li>
+						<li><a href=" " id="iUsuarios">Reg. Usuarios</a></li>
+					</ul>
+				</li>
+				<li><a href=" " id="iCerrarSesion">Cerrar Sesion</a></li>
+			</ul>
+		</nav>
+	</div>
+	<div id="main" class = "generalone">
+		<p id="titulo">Organigrama de Mostacho Bancario</p>
+		<div class="organigrama">
+			<ul>
+		       <li>
+		          <a href="#">Director</a>
+		            <ul>
+		                <li>
+		                    <a href="#">Director Ejecutivo</a>
+		                </li>
+		                <li>
+		                    <a href="#">Coordinador</a>
+		                </li>
+		                <li><a href="#">Vicepresidente</a>
+		                	<ul>
+			                	<li><a href="#">Vicepresidente</a>
+			                	<ul>
+				                	<li><a href="#">Vicepresidente</a></li>
+				                	<li><a href="#">Vicepresidente</a>
+				                	<ul>
+					                	<li><a href="#">Vicepresidente</a>
+					                		<ul>
+							                	<li><a href="#">Vicepresidente</a>
+							                	<ul>
+							                	<li><a href="#">Vicepresidente</a></li>
+							                	<li><a href="#">Vicepresidente</a></li>
+			                				</ul></li>
+							                	<li><a href="#">Vicepresidente</a></li>
+			                				</ul>
+					                	</li>
+					                	<li><a href="#">Vicepresidente</a></li>
+			                		</ul>
+				                	</li>
+			                	</ul>
+			                	</li>
+			                	<li><a href="#">Vicepresidente</a></li>
+			                </ul>
+		                </li>
+		                <li><a href="#">Vicepresidente</a></li>
+		                <li><a href="#">Vicepresidente</a></li>
+		            </ul>
+	        	</li>
+	        </ul>
+		</div>
+	</div>
+	<footer id = footer class="generalone">
+		<h2 id = "lblUserInfo">UserInfo</h2>
+		<h2 id = "lblReloj">Solicitando Hora del Servidor</h2>
+	</footer>
+	<script src="jquery-1.10.2.min.js"></script>
+	<script type = "text/javascript" src="http://localhost/MostachoRRHH/View/js/menuPrincipal.js"></script>
+	</body>
+</html>

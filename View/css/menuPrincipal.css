@@ -1,0 +1,183 @@
+/*ESTILO DE PAGINA WEB*/
+html,
+body { 
+  height: 100%; 
+  margin: 0; 
+  padding: 0; 
+  text-align: center;
+}
+ 
+body {
+  background:#dddddd;
+  display: table;
+  width: 100%;
+}
+.generalone{
+  display: table-row;
+  font-family: arial;
+}
+
+/*BANNER SUPERIOR (NOMBRE DE LA APLICACION WEB)*/
+
+#mainBanner{
+	position:absolute;
+	top:0%;
+	left:0%;
+	background:#ed7804;
+	width: 100%
+}
+
+#mainBanner h1{
+	margin:0px;
+	color: black;
+	font-family: arial;
+	text-align: center;
+	font-size: 38px;
+}
+/*
+/*BARRA DE MENUS*/
+
+/*ESTILOS GENERALES*/
+
+#menuBar{
+	position:absolute;
+	top:27px;
+	margin:0;
+	width:100%;
+	z-index: 2;
+}
+
+#menuBar nav ul{
+	list-style: none;
+	padding:0;
+}
+
+#menuBar nav li{
+	line-height: 2.4rem;
+	position:relative;
+}
+
+#menuBar .menu a{
+	color:black;
+	display: block;
+	padding: 0 2.5em;
+	text-decoration: none;
+	transition:.4s;
+}
+
+#menuBar .menu a:hover{
+	background: orange;
+}
+
+#menuBar .menu ul{
+	position:absolute;
+}
+/*
+nav li ul{
+	display: none;
+}
+
+nav li:hover > ul{
+	display:block;
+}
+*/
+/*PRIMER NIVEL*/
+
+#menuBar .menu{
+	background: #eeeeee;
+	display:table;
+	width:100%;
+}
+#menuBar .menu > li{
+	float:left;
+	width:200px;
+	font-weight: bold;
+	text-align:center;
+	border-right: 1px solid #d7d8de;
+}
+
+#menuBar .menu > li:last-child{
+	float:left;
+	width:200px;
+	font-weight: bold;
+	text-align:center;
+	border-right:0;
+}
+
+/*SEGUNDO NIVEL*/
+
+#menuBar nav li li{
+	background:white;
+	max-height: 0;
+	transition:all .8s;
+	overflow: hidden;
+	width:200px;
+}
+
+#menuBar nav li:hover > ul > li{
+	max-height:500px;
+	overflow:visible;
+}
+
+#menuBar .menu > li > ul{
+	top: 100%;
+}
+
+/*TERCER NIVEL*/
+
+#menuBar .menu  ul  ul{
+left:100%;
+top:0;
+}
+
+/**/
+
+/*TITULO*/
+
+#titulo{
+	position:absolute;
+	display: inline-block;
+	width:100%;
+	left:0;
+	color:black;
+	font-size: 28px;
+	text-align: center;
+	top:65px;
+	z-index: 1;
+}
+
+/*ORGANIGRAMA*/
+
+#main{
+	display:inline-block;
+	top:0;
+	height:100%;
+	width:100%;
+	overflow-x: auto;
+	margin-top: 150px;
+	text-align: center;
+}
+
+/*FOOTER INFERIOR (FECHA-HORA E INFORMACION DEL USUARIO)*/
+
+ footer {
+   background: #ed7804; height: 10px;
+ }
+
+ footer h2{
+ 	color:black;
+ 	font-family: arial;
+ 	font-size: 20px;
+ 	margin:0;
+ }
+
+ footer #lblReloj{
+ 	text-align: right;
+ 	float:right;
+ }
+
+ footer #lblUserInfo{
+ 	text-align: left;
+ 	float:left;
+ }
+
