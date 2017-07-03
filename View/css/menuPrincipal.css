@@ -1,17 +1,19 @@
 /*ESTILO DE PAGINA WEB*/
 html,
 body { 
-  height: 100%; 
+  display: table;
   margin: 0; 
   padding: 0; 
   text-align: center;
-}
- 
-body {
   background:#dddddd;
-  display: table;
   width: 100%;
 }
+
+#content{
+	display:none;
+}
+
+ 
 .generalone{
   display: table-row;
   font-family: arial;
@@ -20,11 +22,12 @@ body {
 /*BANNER SUPERIOR (NOMBRE DE LA APLICACION WEB)*/
 
 #mainBanner{
-	position:absolute;
+	position:fixed;
 	top:0%;
 	left:0%;
 	background:#ed7804;
-	width: 100%
+	width: 100%;
+	z-index:5;
 }
 
 #mainBanner h1{
@@ -40,7 +43,7 @@ body {
 /*ESTILOS GENERALES*/
 
 #menuBar{
-	position:absolute;
+	position:fixed;
 	top:27px;
 	margin:0;
 	width:100%;
@@ -161,7 +164,10 @@ top:0;
 /*FOOTER INFERIOR (FECHA-HORA E INFORMACION DEL USUARIO)*/
 
  footer {
-   background: #ed7804; height: 10px;
+   position:fixed;
+   background: #ed7804; 
+   width:100%;
+   bottom: 0;
  }
 
  footer h2{

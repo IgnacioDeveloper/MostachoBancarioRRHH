@@ -6,6 +6,10 @@ function Mensaje(parent,contenidoMensaje,tipo){
 	this.modalBody = this.modal.getElementsByClassName("modal-content")[0];
 	this.botones = [];
 
+	this.show=function(){
+		this.modal.style.display = "block";
+	}
+
 	this.openMessage=function(){
 		this.clearPreviousMessage();
 		var ans;
@@ -14,14 +18,14 @@ function Mensaje(parent,contenidoMensaje,tipo){
 			case "error": this.startErrorMessage();break;
 			case "condicion": this.startConditionMessage();break;
 		}
-		
+		this.show();
 	}
 
 	this.createMessageContent=function(contenido){
 		var mensaje = document.createElement("p");
 		mensaje.id = "contenidoMensaje";
 		mensaje.innerHTML = contenido;
-		this.modal.appendChild(mensaje);
+		this.modalBody.appendChild(mensaje);
 	}
 
 
@@ -31,15 +35,16 @@ function Mensaje(parent,contenidoMensaje,tipo){
 		var botonOk = document.createElement("button");
 		botonOk.id = "botonOk";
 		botonOk.innerHTML = "OK";
-		this.modal.appendChild(botonOk);
+		this.modalBody.appendChild(botonOk);
 		botonOk.onclick=function(){mensaje.closeMessage();}
+		this.show();
 	}
 
 	this.startErrorMessage=function(){
 		var botonOk = document.createElement("button");
 		botonOk.id = "botonOk";
 		botonOk.innerHTML = "OK";
-		this.modal.appendChild(botonOk);
+		this.modalBody.appendChild(botonOk);
 		botonOk.onclick=function(){mensaje.closeMessage();}
 	}
 
@@ -47,11 +52,11 @@ function Mensaje(parent,contenidoMensaje,tipo){
 		var botonYes = document.createElement("button");
 		botonYes.id = "botonYes";
 		botonYes.innerHTML = "Si";
-		this.modal.appendChild(botonYes);
+		this.modalBody.appendChild(botonYes);
 		var botonNo = document.createElement("button");
 		botonNo.id = "botonNo";
 		botonNo.innerHTML = "No";
-		this.modal.appendChild(botonNo);
+		this.modalBody.appendChild(botonNo);
 		botonYes.onclick=function(){mensaje.returnResponse(true);mensaje.closeMessage();}
 		botonNo.onclick=function(){mensaje.returnResponse(false);mensaje.closeMessage();}
 	}

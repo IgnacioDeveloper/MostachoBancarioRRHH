@@ -15,8 +15,8 @@ function Servidor(){
 				switch(operacion){
 					case "getNowUser": setUserInfo(ajax_request.responseText); break;
 					case "destroySession": closeMenuPrincipal(ajax_request.responseText); break;
-					case "saveUsuario":break; 
-					case "modifyUsuario":break;
+					case "saveUsuario": usuarioHandler();break; 
+					case "modifyUsuario":usuarioHandler();break;
 					case "deleteUsuario":break; 
 					case "getUsuario":break;
 					case "getUsuarios":break;

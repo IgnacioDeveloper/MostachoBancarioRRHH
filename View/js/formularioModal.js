@@ -231,7 +231,7 @@ function FormUsuario(conf){
 			var usuario = this.getJSonData();
 			var params="metodo=saveUsuario&params="+usuario;
 			new Mensaje(this,"Los datos del Usuario han sido guardados con exito","confirmacion");
-		}
+		}this.closeForm();
 	}
 
 	this.modificarDatos=function(){
@@ -253,6 +253,10 @@ function FormUsuario(conf){
 
 	this.getJSonData=function(){
 		return '{nombre:"'+this.txtNombre.element.value+'",username:"'+this.txtUsername.element.value+'",password:"'+this.txtPassword.element.value+'",usertype:"'+this.selectUsertype.element.value.charAt(0)+'"estado:"'+this.selectEstado.element.value.charAt(0)+'"}';
+	}
+
+	this.closeForm = function(){
+		this.FMWM.setWindow(this.FMWM,false);
 	}
 
 
