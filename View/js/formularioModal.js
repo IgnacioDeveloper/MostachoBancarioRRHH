@@ -129,9 +129,10 @@ function Formulario(modal){
 
 }
 
-function FormUsuario(conf){
+function FormUsuario(servidor,conf){
 	//Elementos del Formulario
 	//Formulario.call(this,conf.modal);
+	//this.servidor = servidor;
 	this.prototype = new Formulario(conf.modal);
 	this.Form = this.prototype;
 	this.FMWM = this.Form.MWM;
@@ -230,8 +231,8 @@ function FormUsuario(conf){
 		if(val){
 			var usuario = this.getJSonData();
 			var params="metodo=saveUsuario&params="+usuario;
-			new Mensaje(this,"Los datos del Usuario han sido guardados con exito","confirmacion");
-		}this.closeForm();
+
+		}
 	}
 
 	this.modificarDatos=function(){
@@ -259,6 +260,11 @@ function FormUsuario(conf){
 			case 2: messageContent = "Los datos del Usuario han sido modificados con exito";break;
 		}
 		new Mensaje(this,messageContent,"confirmacion")
+		this.closeForm();
+	}
+
+	this.operacionFallida=function(){
+		new Mensaje(this,"Ha ocurrido un error y la operacion no pudo realizarse.\nIntente realizarla nuevamente en un rato.\nSi el problema persiste contactese con el Area de Informatica e informe de la situacion.",confirmacion);
 	}
 
 	this.getJSonData=function(){

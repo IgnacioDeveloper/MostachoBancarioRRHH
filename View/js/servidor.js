@@ -3,6 +3,8 @@ function Servidor(){
 	if(Servidor.singleInstance) return Servidor.singleInstance;  
    	Servidor.singleInstance = this;
 
+   	this.hi="hi servidor";
+
    	this.ejecutarOperacionAJAX=function(operacion,params,postFuncion){
 	   	var resultado = "";
 		var ajax_url  = "http://localhost/MostachoRRHH/Controller/Controlador.php";

@@ -22,18 +22,19 @@ function MenuPrincipal(){
 	this.body;
 	this.modal;
 	this.content;
-	this.servidor;
+	this.servidor=null;
 
 	this.startMenuPrincipal=function(){
 		this.initComponents();
 		this.loadAllScripts();
+		this.startServidorMainOperations();
 		this.setEvents();
 		this.lblUser.innerHTML = "Nombre de Usuario: "+this.usuario.nombre+" // Tipo de Usuario: "+this.translateProfile(this.usuario.usertype);
 	}
 
 	this.loadAllScripts=function(){
 		this.loadScript("http://localhost/MostachoRRHH/View/js/reloj.js");
-		//this.loadScript("http://localhost/MostachoRRHH/View/js/servidor.js");
+		this.loadScript("http://localhost/MostachoRRHH/View/js/servidor.js");
 		this.loadScript("http://localhost/MostachoRRHH/View/js/mensajeModal.js");
 		this.loadScript("http://localhost/MostachoRRHH/View/js/validacion.js");
 		this.loadScript("http://localhost/MostachoRRHH/View/js/formularioModal.js");
@@ -92,7 +93,7 @@ function MenuPrincipal(){
 			case "areas":break;
 			case "puestos":break;
 			case "personas":break;
-			case "usuarios":new FormUsuario(Configuracion); break;
+			case "usuarios":new FormUsuario(this.servidor,Configuracion); break;
 		}
 	}
 
@@ -136,6 +137,13 @@ function MenuPrincipal(){
 				}
 			}
 		}.bind(this);
+	}
+
+	this.startServidorMainOperations=function(){
+		//Intervalo de para esperar la carga del archivvo script que tiene las funciones principales de nuestro servidor.
+		var interval = setInterval(function(){
+			this.servidor = new Servidor();
+			if(this.servidor!=null)clearInterval(interval);},100);
 	}
 
 	this.solicitudServidorAJAX("metodo=getNowUser",1);
