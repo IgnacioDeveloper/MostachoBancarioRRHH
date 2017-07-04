@@ -243,12 +243,22 @@ function FormUsuario(conf){
 
 	}
 
-	this.operacionExitosa = function(exito,tipo){
-		var mensaje;
-		switch(tipo){
-			case 1: 
-			case 2:
+	this.confirmacion=function(resultado,tipo){
+		if(resultado){
+			this.operacionExitosa(tipo);
 		}
+		else{
+			this.operacionFallida();
+		}
+	}
+
+	this.operacionExitosa = function(tipo){
+		var messageContent;
+		switch(tipo){ 
+			case 1: messageContent = "Los datos del Usuario han sido guardados con exito";break;
+			case 2: messageContent = "Los datos del Usuario han sido modificados con exito";break;
+		}
+		new Mensaje(this,messageContent,"confirmacion")
 	}
 
 	this.getJSonData=function(){

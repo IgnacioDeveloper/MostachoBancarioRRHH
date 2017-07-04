@@ -115,6 +115,7 @@ nav li:hover > ul{
 	transition:all .8s;
 	overflow: hidden;
 	width:200px;
+	z-index:8;
 }
 
 #menuBar nav li:hover > ul > li{
