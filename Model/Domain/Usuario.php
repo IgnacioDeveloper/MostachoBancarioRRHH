@@ -113,8 +113,8 @@ class Usuario{
 	}
 
 	function guardar(){
-		$valores = '\'$this->idUsuario\',$this->nombre
-		\',\'$this->username\',\'$this->password\',\'$this->usertype\'';
+		$valores = "'$this->nombre','$this->username','$this->password','$this->usertype','$this->estado','0'";
+		echo($valores."<br/>");
 		$this->persistencia->aniadir('USUARIO',$valores);
 	}
 

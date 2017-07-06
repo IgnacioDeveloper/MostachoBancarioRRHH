@@ -68,8 +68,11 @@
 
 		function aniadir($tabla,$values){
 			$arrayColumnas = $this->nombreColumnas($tabla);
+			unset($arrayColumnas[0]);
+			var_dump($arrayColumnas);
 			$columnNames = implode(",",$arrayColumnas);
 			$sql_query = 'INSERT INTO '.$tabla.' ('.$columnNames.') VALUES ('.$values.')';
+			echo("<br/>".$sql_query);
 			//echo $sql_query.'<br/>';
 			try{
 				$this->connectionDB->exec($sql_query);

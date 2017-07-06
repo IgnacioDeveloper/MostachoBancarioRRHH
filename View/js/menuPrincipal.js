@@ -10,6 +10,7 @@ function MenuPrincipal(){
 	this.menuUsuarios;
 	this.iCerrarSesion;
 	this.lblUser;
+	this.lblReloj;
 	this.usuario=null;
 	this.iNuevaArea;
 	this.iNuevoPuesto;
@@ -27,8 +28,7 @@ function MenuPrincipal(){
 	this.startMenuPrincipal=function(){
 		this.initComponents();
 		this.loadAllScripts();
-		this.startServidorMainOperations();
-		this.setEvents();
+		this.startServidorMainOperations(); //Enlaza con el archivo servidor.js y setea los eventos
 		this.lblUser.innerHTML = "Nombre de Usuario: "+this.usuario.nombre+" // Tipo de Usuario: "+this.translateProfile(this.usuario.usertype);
 	}
 
@@ -63,6 +63,7 @@ function MenuPrincipal(){
 		this.iUsuarios=document.getElementById("iUsuarios");
 		this.iCerrarSesion=document.getElementById("iCerrarSesion");
 		this.lblUser = document.getElementById("lblUserInfo");
+		this.lblReloj=document.getElementById("lblReloj");
 		this.body = document.getElementsByTagName('body')[0];
 		this.modal = document.getElementById("formularioModal");
 		this.content = document.getElementById("content");
@@ -140,10 +141,18 @@ function MenuPrincipal(){
 	}
 
 	this.startServidorMainOperations=function(){
-		//Intervalo de para esperar la carga del archivvo script que tiene las funciones principales de nuestro servidor.
-		var interval = setInterval(function(){
-			this.servidor = new Servidor();
-			if(this.servidor!=null)clearInterval(interval);},100);
+		//Intervalo de para esperar la carga del archivo script que tiene las funciones principales de nuestro servidor.
+		try{
+			this.servidor=new Servidor();
+			this.setEvents();
+		}catch(e){
+			if(e instanceof ReferenceError){
+				setTimeout(function(){this.startServidorMainOperations();}.bind(this),100);
+			}
+			else{
+				alert("Error");
+			}
+		}
 	}
 
 	this.solicitudServidorAJAX("metodo=getNowUser",1);

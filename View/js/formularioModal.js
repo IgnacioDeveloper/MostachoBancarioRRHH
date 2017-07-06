@@ -94,11 +94,7 @@ function FormBodyElement(element, errorMessage, valType, must){
 
 function Formulario(modal){
 	//Elementos del Formulario
-	//ModalWindowModel.call(this,modal);
-
-	this.prototype = new ModalWindowModel(modal);
-	this.MWM = this.prototype;
-	this.title = this.MWM.title;
+	ModalWindowModel.call(this,modal);
 	this.button1;
 	this.button2;
 	this.formBodyElements;
@@ -107,14 +103,14 @@ function Formulario(modal){
 
 
 	this.startForm=function(){
-		//this.MWM.modal.scroll(0,0);
+		//this.modal.scroll(0,0);
 		this.setButtons();
 	}
 
 	this.setButtons=function(){
-		this.MWM.footerElements = this.MWM.appendElements(this.footerNodes,this.MWM.modalFooter);
-		this.button1=this.MWM.footerElements[0];
-		this.button2=this.MWM.footerElements[1];
+		this.footerElements = this.appendElements(this.footerNodes,this.modalFooter);
+		this.button1=this.footerElements[0];
+		this.button2=this.footerElements[1];
 	}
 
 	this.startValidacion=function(){
@@ -131,13 +127,9 @@ function Formulario(modal){
 
 function FormUsuario(servidor,conf){
 	//Elementos del Formulario
-	//Formulario.call(this,conf.modal);
-	//this.servidor = servidor;
-	this.prototype = new Formulario(conf.modal);
-	this.Form = this.prototype;
-	this.FMWM = this.Form.MWM;
+	Formulario.call(this,conf.modal);
+	this.servidor = servidor;
 	this.dialogResponse;
-
 	this.txtNombre;this.txtUsername;this.txtPassword;this.selectUsertype;this.selectEstado;
 	this.bodyNodes=[new Node("lblNombre","p","Nombre y Apellido"),
 			new Node("txtNombre","input_text",""),
@@ -161,20 +153,20 @@ function FormUsuario(servidor,conf){
 
 	this.startUserForm=function(){
 		//Maquetacion y referenciacion de Elementos del Formulario
-		this.FMWM.bodyElements = this.FMWM.appendElements(this.bodyNodes,this.FMWM.modalBody);
-		this.txtNombre = new FormBodyElement(this.FMWM.bodyElements[1],this.FMWM.bodyElements[2],"textOnly",true);
-		this.txtUsername = new FormBodyElement(this.FMWM.bodyElements[4],this.FMWM.bodyElements[5],"alphanumericSs",true);
-		this.txtPassword = new FormBodyElement(this.FMWM.bodyElements[7],this.FMWM.bodyElements[8],"password",true);
-		this.selectUsertype = new FormBodyElement(this.FMWM.bodyElements[10],this.FMWM.bodyElements[11],undefined,true);
-		this.selectEstado = new FormBodyElement(this.FMWM.bodyElements[13],this.FMWM.bodyElements[14],undefined,true);
-		this.Form.button1 = this.FMWM.footerElements[0];
-		this.Form.button2 = this.FMWM.footerElements[1];
-		this.Form.formBodyElements = [this.txtNombre,this.txtUsername,this.txtPassword,this.selectUsertype, this.selectEstado];
+		this.bodyElements = this.appendElements(this.bodyNodes,this.modalBody);
+		this.txtNombre = new FormBodyElement(this.bodyElements[1],this.bodyElements[2],"textOnly",true);
+		this.txtUsername = new FormBodyElement(this.bodyElements[4],this.bodyElements[5],"alphanumericSs",true);
+		this.txtPassword = new FormBodyElement(this.bodyElements[7],this.bodyElements[8],"password",true);
+		this.selectUsertype = new FormBodyElement(this.bodyElements[10],this.bodyElements[11],undefined,true);
+		this.selectEstado = new FormBodyElement(this.bodyElements[13],this.bodyElements[14],undefined,true);
+		this.button1 = this.footerElements[0];
+		this.button2 = this.footerElements[1];
+		this.formBodyElements = [this.txtNombre,this.txtUsername,this.txtPassword,this.selectUsertype, this.selectEstado];
 		//End Maquetacion y referenciacion de ELementos del Formulario
 		this.prepareSelects();
-		this.Form.startValidacion();
+		this.startValidacion();
 		this.setConf();
-		this.FMWM.show();
+		this.show();
 	}
 
 	this.prepareSelects=function(){
@@ -199,19 +191,19 @@ function FormUsuario(servidor,conf){
 
 	this.setConfAlta=function(){
 		var form = this;
-		this.Form.title.innerHTML = "Nuevo Usuario";
-		this.Form.button1.innerHTML = "Guardar Usuario";
-		this.Form.button2.innerHTML = "Cancelar";
-		this.Form.button1.onclick=function(){
+		this.title.innerHTML = "Nuevo Usuario";
+		this.button1.innerHTML = "Guardar Usuario";
+		this.button2.innerHTML = "Cancelar";
+		this.button1.onclick=function(){
 			form.guardarDatos();
 		}
-		this.FMWM.setCloseButton(this.FMWM,this.Form.button2);
+		this.setCloseButton(this,this.button2);
 	}
 
 	this.setConfModificacion=function(){
-		this.Form.title.innerHTML = "Modificar Informacion de Usuario";
-		this.Form.button1.innerHTML = "Modificar Usuario";
-		this.Form.button2.innerHTML = "Cancelar";
+		this.title.innerHTML = "Modificar Informacion de Usuario";
+		this.button1.innerHTML = "Modificar Usuario";
+		this.button2.innerHTML = "Cancelar";
 		//this.validacion = new Validacion(this);
 		this.button1.onclick=function(){
 			this.modificarDatos();
@@ -227,11 +219,11 @@ function FormUsuario(servidor,conf){
 	}
 
 	this.guardarDatos=function(){
-		var val = this.Form.validacion.fullCheck()
+		var val = this.validacion.fullCheck()
 		if(val){
 			var usuario = this.getJSonData();
 			var params="metodo=saveUsuario&params="+usuario;
-
+			this.servidor.ejecutarOperacionAJAX(this,"saveUsuario",params);
 		}
 	}
 
@@ -268,11 +260,11 @@ function FormUsuario(servidor,conf){
 	}
 
 	this.getJSonData=function(){
-		return '{nombre:"'+this.txtNombre.element.value+'",username:"'+this.txtUsername.element.value+'",password:"'+this.txtPassword.element.value+'",usertype:"'+this.selectUsertype.element.value.charAt(0)+'"estado:"'+this.selectEstado.element.value.charAt(0)+'"}';
+		return '{"nombre":"'+this.txtNombre.element.value+'","username":"'+this.txtUsername.element.value+'","password":"'+this.txtPassword.element.value+'","usertype":"'+this.selectUsertype.element.value.charAt(0)+'","estado":"'+this.selectEstado.element.value.charAt(0)+'"}';
 	}
 
 	this.closeForm = function(){
-		this.FMWM.setWindow(this.FMWM,false);
+		this.setWindow(this,false);
 	}
 
 

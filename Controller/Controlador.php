@@ -1,9 +1,12 @@
 <?php
 $controlador = Controlador::getInstance();
+//$resultado = $controlador->executeMethod('saveUsuario',array('{"nombre":"Rene Astorga","username":"rene1234","password":"rene1234","usertype":"J","estado":"H"}'));
 $resultado = $controlador->executeMethod(isset($_POST["metodo"]) ? $_POST["metodo"] : "",isset($_POST["params"]) ? array($_POST["params"]) : "");
 if($resultado != "ERROR"){
-	echo $resultado;
+	echo ($resultado);
 }
+
+//metodo=saveUsuario&params={nombre:"Rene Astorga",username:"rene1234",password:"rene1234",usertype:"J"estado:"H"}
 
 class Controlador{
 
@@ -71,9 +74,10 @@ class Controlador{
 	}
 
 	private function saveUsuario($params){
+		echo($params."<br/>");
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
 		$params = json_decode($params);
-		$usuario = new Usuario($params->nombre,$params->username,$password,$params->usertype,$params->estado);
+		$usuario = new Usuario($params->nombre,$params->username,$params->password,$params->usertype,$params->estado);
 		$usuario->guardar();
 		return true;
 	}
@@ -81,7 +85,7 @@ class Controlador{
 	private function modifyUsuario($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
 		$params = json_decode($params);
-		$usuario = new Usuario($params->idUsuario,$params->nombre,$params->username,$password,$params->usertype,$params->estado);
+		$usuario = new Usuario($params->idUsuario,$params->nombre,$params->username,$params->password,$params->usertype,$params->estado);
 		$usuario->modificar();
 		return true;
 	}

@@ -3,9 +3,9 @@ function Servidor(){
 	if(Servidor.singleInstance) return Servidor.singleInstance;  
    	Servidor.singleInstance = this;
 
-   	this.hi="hi servidor";
+   	this.response="Ok"
 
-   	this.ejecutarOperacionAJAX=function(operacion,params,postFuncion){
+   	this.ejecutarOperacionAJAX=function(callContext,operacion,params){
 	   	var resultado = "";
 		var ajax_url  = "http://localhost/MostachoRRHH/Controller/Controlador.php";
 		var ajax_request = new XMLHttpRequest();
@@ -17,7 +17,7 @@ function Servidor(){
 				switch(operacion){
 					case "getNowUser": setUserInfo(ajax_request.responseText); break;
 					case "destroySession": closeMenuPrincipal(ajax_request.responseText); break;
-					case "saveUsuario": usuarioHandler();break; 
+					case "saveUsuario": callContext.confirmacion(ajax_request.responseText,1);break; 
 					case "modifyUsuario":usuarioHandler();break;
 					case "deleteUsuario":break; 
 					case "getUsuario":break;
