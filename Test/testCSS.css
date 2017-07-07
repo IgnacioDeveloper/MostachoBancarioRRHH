@@ -1,0 +1,46 @@
+table{
+	margin:auto;
+	width:80%;
+}
+
+tr{
+
+}
+
+td{
+	border:1px solid black;
+}
+
+tr:first-child{
+	background-color:orange;
+	line-height: 25px;
+	font-weight: bold;
+}
+
+tr:first-child td{
+	font-size: 20px;
+}
+
+tr:hover{
+	background-color:lightblue;
+}
+
+tr:active{
+	background-color:blue;
+	color:white;
+}
+
+
+#header1{
+	width:50%;
+}
+
+#header2{
+	width:50%;
+}
+
+tr td:first-child{
+	visibility: hidden;
+}
+
+

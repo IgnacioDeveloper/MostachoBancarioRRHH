@@ -6,6 +6,8 @@ window.onload=function(){
 	var reVacio =/^[ ]*$/;
 	var mensaje =" Hey there ";
 	var elemento = new ElementoHTML(input,errorMessage);
+	var lblValidacion = document.getElementById("lblValidacion");
+	lblValidacion.innerHTML="Validacion: "+reExpression;
 	elemento.input.oninput=function(){
 		elemento.errorMessage="";
 	}

@@ -119,10 +119,11 @@ class Usuario{
 	}
 
 	function modificar(){
-		$set='IDUSUARIO = \'$this->idUsuario\',NOMBRE = \'$this->nombre\', USERNAME = \'$this->username\',
-		PASSWORD =  \'$this->password\', USERTYPE = \'$this->usertype\'';
-		$this->persistencia->modificar('USUARIO',$set);
-		}
+		$set="NOMBRE = '$this->nombre', USERNAME = '$this->username',
+		PASSWORD =  '$this->password', USERTYPE = '$this->usertype'";
+		$condicion = "'IDUSUARIO = '$this->idUsuario'";
+		$this->persistencia->modificar('USUARIO',$set,$condicion);
+	}
 
 	function eliminar(){
 		$condicion='IDUSUARIO = '.$this->idUsuario;
