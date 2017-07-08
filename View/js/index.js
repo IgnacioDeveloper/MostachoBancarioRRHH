@@ -26,11 +26,11 @@ function eventos(){
 		var usuario = new Usuario(txtUsername.value,txtPassword.value);
 		var usuarioJSON = JSON.stringify(usuario);
 		var params="metodo=startUserSession&params="+usuarioJSON;
-		ejecutarServidor(params);
+		ejecutarOperacionesAJAX(params);
 	}
 }
 
-function ejecutarServidor(params){
+function ejecutarOperacionesAJAX(params){
 	var resultado = "";
 	var ajax_url  = "http://localhost/MostachoRRHH/Controller/Controlador.php";
 	var ajax_request = new XMLHttpRequest();

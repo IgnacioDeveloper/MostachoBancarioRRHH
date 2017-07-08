@@ -6,16 +6,24 @@ function TableModel(table,headers){
 	this.selectedRow=undefined;
 
 	this.startTableModel = function(rows){
-		this.clearTableModel();
-		this.addColumns();
-		this.updateTableModel();
-		this.tableModel.style.display='table';
+		this.renderTableModel(rows);
+		this.eventos();
+		this.show(true);
 	}
 
-	this.
+	this.show=function(value){
+		if(value) this.tableModel.style.display='table';
+		else this.tableModel.style.display='none';
+	}
 
-	this.updateTableModel = function(rows){
+	this.renderTableModel = function(rows){
 		this.rows = rows;
+		this.clearTableModel();
+		this.addColumns();
+		this.updateRows(rows);
+	}
+
+	this.updateRows = function(rows){
 		this.removeAllRows();
 		for(r in rows){
 			this.appendRow(r);
@@ -63,7 +71,8 @@ function TableModel(table,headers){
 	}
 
 	this.getSelectedRow=function(e){
-		return e.target.parentNode;
+		this.selectedRow = e.target.parentNode;
+		return this.selectedRow;
 	}
 
 	//En los siguientes metodos el parametro row en la funcion hace referencia al objeto del DOM y n al numero de fila. El parametro column sigue siendo el numero de la columna.
@@ -77,12 +86,13 @@ function TableModel(table,headers){
 	}
 
 	this.setSelectedRow=function(row){
-		this.tableModel.getElementsByClassName('selected')[0].classList.remove('selected');
+		this.clearSelectedRow();
+		this.selectedRow = row;
 		row.classList.add('selected');
 	}
 
-	this.unselectRow(){
-
+	this.clearSelectedRow=function(){
+		this.tableModel.getElementsByClassName('selected')[0].classList.remove('selected');
 	}
 
 	this.getColumnCount=function(){
@@ -104,13 +114,25 @@ function TableModel(table,headers){
 			this.columns[i].style.width=widths[i];
 	}
 
+	this.eventos=function(){
+		tabla.onclick=function(e){
+			clearSelectedRow();
+			getSelectedRow(e);
+		}
+	}
+
 }
 
 function TablaUsuario(table){
 	this.modeloTabla = new TableModel(table,
 		['ID','Nro','Nombre','Apellido','Nombre de Usuario','Tipo de Usuario','Estado']
 		,['0','7%','25%','25%','20%','15%','8%']);
-
+	this.metodoFilter = 'getUsuarios';
+	this.metodoEntity = 'getUsuario';
+	this.dataAdd = 'Nuevo Usuario';
+	this.dataModify = 'Modificar Usuario Seleccionado';
+	this.dataDelete = 'Eliminar Usuario Seleccionado';
+	this.dataConsult = 'Consultar Usuario Seleccionado';
 
 	this.setRows=function(usuarios){
 		var row;
@@ -132,24 +154,83 @@ function TablaUsuario(table){
 	}
 
 	this.updateTable=function(usuarios){
-		this.modeloTabla.updateTableModel(this.setRows(usuarios));
+		this.modeloTabla.updateRows(this.setRows(usuarios));
 	}
 
 }
 
-function tableDataHandler(dataHandler){
-	this.tabla;
+function tableDataHandler(tabla,dataHandler){
+	this.tabla=tabla;
+	this.dataBar;
+	this.modeloTabla = this.tabla.modeloTabla;
 	this.dataHandler = dataHandler;
 
 	this.setTable=function(tabla){
 		this.tabla=tabla;
 	}
 
-	this.filter=function(condicion){
+	this.filter=function(campo,criterio){
+		var condicion = '';
+		var metodo = this.tabla.metodoFilter;
+		condicion+= campo+ "LIKE '"+criterio+"%' ORDER BY "+campo;
+		var params = 'metodo='+metodo+'&params='+condicion;
+		this.dataHandler.ejecutarOperacionAJAX(this,metodo,params);
+	} 
 
+	this.updateTableInfo=function(registros){
+		this.tabla.updateTable(registros);
 	}
 
-	
+}
+
+function dataBar(dataHandler,dataBarElement){
+	this.dataBarModel = dataBarElement;
+	this.tabla = dataHandler.tabla;
+	this.buttons=[]
+
+	this.startDataBar=function(){
+		this.clearDataBar();
+		this.renderDataBar();
+		this.eventos(){
+		}
+	}
+
+	this.clearDataBar=function(){
+		this.buttons = [];
+		while(this.dataBarModel.hasChildNodes()){
+			this.dataBarModel.removeChild(dataBarModel.lastChild);
+		}
+	}
+
+	this.renderDataBar=function(){
+		var button;
+		buttonIds=['buttonAdd','buttonModify','buttonConsult','buttonDelete'];
+		buttonTextInside=[this.tabla.dataAdd,this.tabla.dataModify,this.dataConsult,this.tabla.Delete];
+		for(i=0;i<4;i++){
+			button=document.createElement('button');
+			button.id = buttonIds[i];
+			button.innerHTML = buttonTextInside[i];
+			this.buttons.push(button);
+			dataBarModel.appendChild(button);
+			button=undefined;
+		}
+	}
+
+	this.eventos=function(){
+		this.buttons[0].onclick=function(){
+			var Configuracion = {modal:this.modal,tipo:tipo};
+			new FormUsuario(this.dataHandler,Configuracion);
+		}
+		this.buttons[1].onclick=function(){
+			new FormUsuario(this.dataHandler,Configuracion);
+		}
+		this.buttons[2].onclick=function(){
+			//new FormUsuario(this.dataHandler,Configuracion);
+		}
+		this.buttons[3].onclick=function(){
+			//new FormUsuario(this.dataHandler,Configuracion);
+		}
+	}
 }
 
 

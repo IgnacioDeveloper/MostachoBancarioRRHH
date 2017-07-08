@@ -18,10 +18,10 @@ function DataHandler(){
 					case "getNowUser": setUserInfo(ajax_request.responseText); break;
 					case "destroySession": closeMenuPrincipal(ajax_request.responseText); break;
 					case "saveUsuario": callContext.confirmacion(ajax_request.responseText,1);break; 
-					case "modifyUsuario":usuarioHandler();break;
-					case "deleteUsuario":break; 
+					case "modifyUsuario": callContext.confirmacion(ajax_request.responseText,2);break;
+					case "deleteUsuario": break;
 					case "getUsuario":break;
-					case "getUsuarios":break;
+					case "getUsuarios": callContext.updateTableInfo(ajax_request.responseText);break;
 					case "saveArea":break; 
 					case "modifyArea":break;
 					case "deleteArea":break; 
