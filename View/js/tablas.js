@@ -32,14 +32,14 @@ function TableModel(table,headers){
 
 	this.clearTableModel = function(){
 		while(this.tableModel.hasChildNodes()){
-			this.tableModel.removeChild(tableModel.lastChild);
+			this.tableModel.removeChild(this.tableModel.lastChild);
 		}
 	}
 
 	this.removeAllRows = function(){
 		while(this.tableModel.hasChildNodes()){
 			if(this.tableModel.lastChild.className != 'header')
-				this.tableModel.removeChild(tableModel.lastChild);
+				this.tableModel.removeChild(this.tableModel.lastChild);
 		}
 	}
 
@@ -123,43 +123,7 @@ function TableModel(table,headers){
 
 }
 
-function TablaUsuario(table){
-	this.modeloTabla = new TableModel(table,
-		['ID','Nro','Nombre','Apellido','Nombre de Usuario','Tipo de Usuario','Estado']
-		,['0','7%','25%','25%','20%','15%','8%']);
-	this.metodoFilter = 'getUsuarios';
-	this.metodoEntity = 'getUsuario';
-	this.dataAdd = 'Nuevo Usuario';
-	this.dataModify = 'Modificar Usuario Seleccionado';
-	this.dataDelete = 'Eliminar Usuario Seleccionado';
-	this.dataConsult = 'Consultar Usuario Seleccionado';
-
-	this.setRows=function(usuarios){
-		var row;
-		var rows;
-		var j = 1;
-		for(u in usuarios){
-			row[0]=u.id;
-			row[1]=j;
-			row[2]=u.nombre;
-			row[3]=u.apellido;
-			row[4]=u.username;
-			row[5]=u.tipo;
-			row[6]=u.estado;
-			rows[j-1]=row;	
-			j++;
-			row=[];
-		}
-		return rows;
-	}
-
-	this.updateTable=function(usuarios){
-		this.modeloTabla.updateRows(this.setRows(usuarios));
-	}
-
-}
-
-function tableDataHandler(tabla,dataHandler){
+function TableHandler(tabla,dataHandler){
 	this.tabla=tabla;
 	this.dataBar;
 	this.modeloTabla = this.tabla.modeloTabla;
@@ -183,7 +147,7 @@ function tableDataHandler(tabla,dataHandler){
 
 }
 
-function dataBar(dataHandler,dataBarElement){
+function DataBarModel(dataHandler,dataBarElement){
 	this.dataBarModel = dataBarElement;
 	this.tabla = dataHandler.tabla;
 	this.buttons=[]
@@ -218,7 +182,7 @@ function dataBar(dataHandler,dataBarElement){
 
 	this.eventos=function(){
 		this.buttons[0].onclick=function(){
-			var Configuracion = {modal:this.modal,tipo:tipo};
+			//var Configuracion = {modal:this.modal,tipo:tipo};
 			new FormUsuario(this.dataHandler,Configuracion);
 		}
 		this.buttons[1].onclick=function(){
@@ -231,6 +195,42 @@ function dataBar(dataHandler,dataBarElement){
 			//new FormUsuario(this.dataHandler,Configuracion);
 		}
 	}
+}
+
+function TablaUsuario(table){
+	this.modeloTabla = new TableModel(table,
+		['ID','Nro','Nombre','Apellido','Nombre de Usuario','Tipo de Usuario','Estado']
+		,['0','7%','25%','25%','20%','15%','8%']);
+	this.metodoFilter = 'getUsuarios';
+	this.metodoEntity = 'getUsuario';
+	this.dataAdd = 'Nuevo Usuario';
+	this.dataModify = 'Modificar Usuario Seleccionado';
+	this.dataDelete = 'Eliminar Usuario Seleccionado';
+	this.dataConsult = 'Consultar Usuario Seleccionado';
+
+	this.setRows=function(usuarios){
+		var row;
+		var rows;
+		var j = 1;
+		for(u in usuarios){
+			row[0]=u.id;
+			row[1]=j;
+			row[2]=u.nombre;
+			row[3]=u.apellido;
+			row[4]=u.username;
+			row[5]=u.tipo;
+			row[6]=u.estado;
+			rows[j-1]=row;	
+			j++;
+			row=[];
+		}
+		return rows;
+	}
+
+	this.updateTable=function(usuarios){
+		this.modeloTabla.updateRows(this.setRows(usuarios));
+	}
+
 }
 
 

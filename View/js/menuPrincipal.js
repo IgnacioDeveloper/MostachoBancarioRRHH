@@ -23,7 +23,10 @@ function MenuPrincipal(){
 	this.body;
 	this.modal;
 	this.content;
+	this.tablaContent;
+	this.main;
 	this.dataHandler=null;
+	this.tableHandler=null;
 
 	this.startMenuPrincipal=function(){
 		this.initComponents();
@@ -35,6 +38,7 @@ function MenuPrincipal(){
 	this.loadAllScripts=function(){
 		this.loadScript("http://localhost/MostachoRRHH/View/js/reloj.js");
 		this.loadScript("http://localhost/MostachoRRHH/View/js/dataHandler.js");
+		this.loadScript("http://localhost/MostachoRRHH/View/js/tablas.js");
 		this.loadScript("http://localhost/MostachoRRHH/View/js/mensajeModal.js");
 		this.loadScript("http://localhost/MostachoRRHH/View/js/validacion.js");
 		this.loadScript("http://localhost/MostachoRRHH/View/js/formularioModal.js");
@@ -66,36 +70,58 @@ function MenuPrincipal(){
 		this.lblReloj=document.getElementById("lblReloj");
 		this.body = document.getElementsByTagName('body')[0];
 		this.modal = document.getElementById("formularioModal");
+		this.tablaContent = document.getElementById('tableContent');
 		this.content = document.getElementById("content");
+		this.main = document.getElementById("menu");
 		if(this.usuario!=null)this.content.style.display="table";
 	}
 
 	this.setEvents=function(){
 		var self = this;
 		this.iCerrarSesion.onclick=function(){self.solicitudServidorAJAX("metodo=destroySession",2);};
-		this.iNuevaArea.onclick=function(){self.setForm("areas",1);};
-		this.iNuevoPuesto.onclick=function(){self.setForm("puestos",1);};
-		this.iNuevaPersona.onclick=function(){self.setForm("personas",1);};
-		this.iNuevoUsuario.onclick=function(){self.setForm("usuarios",1);};
-		/*this.iMenuArea.onclick=function(){};
+		this.iNuevaArea.onclick=function(){self.openAddForm("areas");};
+		this.iNuevoPuesto.onclick=function(){self.openAddForm("puestos");};
+		this.iNuevaPersona.onclick=function(){self.openAddForm("personas");};
+		this.iNuevoUsuario.onclick=function(){self.openAddForm("usuarios");};
+		this.iMenuArea.onclick=function(){};
 		this.iMenuPuesto.onclick=function(){};
 		this.iMenuPersona.onclick=function(){};
-		this.iMenuUsuario.onclick=function(){};*/
+		this.iMenuUsuario.onclick=function(){};
 	}
 
-	this.Configuracion=function(modal,tipo){
-		this.modal = modal;
-		this.tipo = tipo;
-	}
-
-	this.setForm=function(modulo,tipo){
-		var Configuracion = {modal:this.modal,tipo:tipo};
+	this.openAddForm=function(modulo){
+		var Configuracion = {modal:this.modal,tipo:1};
 		switch(modulo){
-			case "areas":break;
-			case "puestos":break;
-			case "personas":break;
+			case "areas": new FormAreas(this.dataHandler,Configuracion);break;
+			case "puestos":new FormPuestos(this.dataHandler,Configuracion);break;
+			case "personas":new FormPersona(this.dataHandler,Configuracion);break;
 			case "usuarios":new FormUsuario(this.dataHandler,Configuracion); break;
 		}
+	}
+
+	this.clearMenuPrincipal=function(){
+		while(this.main.hasChildNodes()){
+			this.main.lastChild.class = 'not-visible';
+		}
+	}
+
+	this.renderTabla=function(modulo){
+		this.tablaContent.class = 'not-visible';
+		switch(modulo){
+			case "areas": this.tableHandler = new TableHandler(
+				new TablaArea(this.tablaContent.getElementById('tabla')),
+				this.dataHandler); break;
+			case "puestos":this.tableHandler = new TableHandler(
+				new TablaPuesto(this.tablaContent.getElementById('tabla')),
+				this.dataHandler); break;
+			case "personas":this.tableHandler = new TableHandler(
+				new TablaPersona(this.tablaContent.getElementById('tabla')),
+				this.dataHandler); break;
+			case "usuarios":this.tableHandler = new TableHandler(
+				new TablaUsuario(this.tablaContent.getElementById('tabla')),
+				this.dataHandler); break;
+		}
+		this.tablaContent.class = 'table';
 	}
 
 	this.translateProfile=function(profile){
