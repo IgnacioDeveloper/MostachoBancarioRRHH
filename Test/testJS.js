@@ -7,10 +7,16 @@ window.onload=function(){
 	var mensaje =" Hey there ";
 	var elemento = new ElementoHTML(input,errorMessage);
 	var lblValidacion = document.getElementById("lblValidacion");
+	var tabla = document.getElementById("tabla");
+	var elemento;
+	var filtro = document.getElementById("filtroApellidos");
+
 	lblValidacion.innerHTML="Validacion: "+reExpression;
+
 	elemento.input.oninput=function(){
 		elemento.errorMessage="";
 	}
+
 	boton.onclick=function(){
 		alert(elemento.errorMessage);
 		if(reVacio.test(input.value))alert("Cuadro de texto vacio");
@@ -22,6 +28,13 @@ window.onload=function(){
 		if(!resultadoValidacionTest)setErrorMessage(elemento.errorMessage);else elemento.errorMessage = "";
 		}
 	}
+
+	tabla.onclick=function(e){
+		elemento.className = 'none';
+		elemento = e.target.parentNode;
+		elemento.className = 'selected';
+	}
+
 }
 
 function ElementoHTML(input,errorMessage){
@@ -38,3 +51,4 @@ function loadScript(url){
     script.src = url;
     body.appendChild(script);
 }
+

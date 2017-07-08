@@ -23,18 +23,18 @@ function MenuPrincipal(){
 	this.body;
 	this.modal;
 	this.content;
-	this.servidor=null;
+	this.dataHandler=null;
 
 	this.startMenuPrincipal=function(){
 		this.initComponents();
 		this.loadAllScripts();
-		this.startServidorMainOperations(); //Enlaza con el archivo servidor.js y setea los eventos
+		this.startDataHandlerMainOperations(); //Enlaza con el archivo servidor.js y setea los eventos
 		this.lblUser.innerHTML = "Nombre de Usuario: "+this.usuario.nombre+" // Tipo de Usuario: "+this.translateProfile(this.usuario.usertype);
 	}
 
 	this.loadAllScripts=function(){
 		this.loadScript("http://localhost/MostachoRRHH/View/js/reloj.js");
-		this.loadScript("http://localhost/MostachoRRHH/View/js/servidor.js");
+		this.loadScript("http://localhost/MostachoRRHH/View/js/dataHandler.js");
 		this.loadScript("http://localhost/MostachoRRHH/View/js/mensajeModal.js");
 		this.loadScript("http://localhost/MostachoRRHH/View/js/validacion.js");
 		this.loadScript("http://localhost/MostachoRRHH/View/js/formularioModal.js");
@@ -94,7 +94,7 @@ function MenuPrincipal(){
 			case "areas":break;
 			case "puestos":break;
 			case "personas":break;
-			case "usuarios":new FormUsuario(this.servidor,Configuracion); break;
+			case "usuarios":new FormUsuario(this.dataHandler,Configuracion); break;
 		}
 	}
 
@@ -140,14 +140,14 @@ function MenuPrincipal(){
 		}.bind(this);
 	}
 
-	this.startServidorMainOperations=function(){
-		//Intervalo de para esperar la carga del archivo script que tiene las funciones principales de nuestro servidor.
+	this.startDataHandlerMainOperations=function(){
+		//Intervalo de para esperar la carga del archivo script que tiene nuestro DataHandler.
 		try{
-			this.servidor=new Servidor();
+			this.dataHandler=new DataHandler();
 			this.setEvents();
 		}catch(e){
 			if(e instanceof ReferenceError){
-				setTimeout(function(){this.startServidorMainOperations();}.bind(this),100);
+				setTimeout(function(){this.startDataHandlerMainOperations();}.bind(this),100);
 			}
 			else{
 				alert("Error");

@@ -1,7 +1,7 @@
-function Servidor(){
+function DataHandler(){
 	"use strict";
-	if(Servidor.singleInstance) return Servidor.singleInstance;  
-   	Servidor.singleInstance = this;
+	if(DataHandler.singleInstance) return DataHandler.singleInstance;  
+   	DataHandler.singleInstance = this;
 
    	this.response="Ok"
 

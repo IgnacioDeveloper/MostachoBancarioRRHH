@@ -1,6 +1,7 @@
 table{
 	margin:auto;
 	width:80%;
+	overflow-y: scroll;
 }
 
 tr{
@@ -25,11 +26,10 @@ tr:hover{
 	background-color:lightblue;
 }
 
-tr:active{
+tr.selected{
 	background-color:blue;
 	color:white;
 }
-
 
 #header1{
 	width:50%;
@@ -40,7 +40,8 @@ tr:active{
 }
 
 tr td:first-child{
-	visibility: hidden;
+	/*visibility: hidden;*/
 }
+
 
 
