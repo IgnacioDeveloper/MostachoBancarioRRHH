@@ -1,6 +1,7 @@
-function TableModel(table,headers){
+function TableModel(tableElement,headers,widths){
 	this.headers = headers;
-	this.tableModel = table;
+	this.tableElement = tableElement;
+	this.widths=widths;
 	this.columns=[];
 	this.rows=[];
 	this.selectedRow=undefined;
@@ -12,8 +13,8 @@ function TableModel(table,headers){
 	}
 
 	this.show=function(value){
-		if(value) this.tableModel.style.display='table';
-		else this.tableModel.style.display='none';
+		if(value) this.tableElement.style.display='table';
+		else this.tableElement.style.display='none';
 	}
 
 	this.renderTableModel = function(rows){
@@ -31,31 +32,30 @@ function TableModel(table,headers){
 	}
 
 	this.clearTableModel = function(){
-		while(this.tableModel.hasChildNodes()){
-			this.tableModel.removeChild(this.tableModel.lastChild);
+		while(this.tableElement.hasChildNodes()){
+			this.tableElement.removeChild(this.tableElement.lastChild);
 		}
 	}
 
 	this.removeAllRows = function(){
-		while(this.tableModel.hasChildNodes()){
-			if(this.tableModel.lastChild.className != 'header')
-				this.tableModel.removeChild(this.tableModel.lastChild);
+		while(this.tableElement.hasChildNodes()){
+			if(this.tableElement.lastChild.className != 'header')
+				this.tableElement.removeChild(this.tableElement.lastChild);
 		}
 	}
 
 	this.addColumns=function(){
 		this.columns=[];
-		var rowNode = document.createElement('tr');
-		rowNode.className='headers'
+		var rowNode = this.tableElement.insertRow(0);
+		rowNode.className='headers';
 		var cellNode;
-		for(r in row){
-			cellNode = document.createElement('td');
-			cellNode.className = 'headerCell';
-			cellNode.innerHTML=r.textInside;
-			rowNode.append(cellNode);
+		for(i=0;i<headers.length;i++){
+			cellNode = rowNode.insertCell(i);
+			cellNode.className = 'header-cell';
+			cellNode.innerHTML=headers[i];
 			this.columns.push(cellNode);
 		}
-		this.tableModel.appendChild(rowNode);
+		
 	}
 
 	this.appendRow=function(row,header){
@@ -67,7 +67,7 @@ function TableModel(table,headers){
 			cellNode.innerHTML=r.textInside;
 			rowNode.append(cellNode);
 		}
-		this.tableModel.appendChild(rowNode);
+		this.tableElement.appendChild(rowNode);
 	}
 
 	this.getSelectedRow=function(e){
@@ -92,7 +92,7 @@ function TableModel(table,headers){
 	}
 
 	this.clearSelectedRow=function(){
-		this.tableModel.getElementsByClassName('selected')[0].classList.remove('selected');
+		this.tableElement.getElementsByClassName('selected')[0].classList.remove('selected');
 	}
 
 	this.getColumnCount=function(){
@@ -123,26 +123,15 @@ function TableModel(table,headers){
 
 }
 
-function TableHandler(this,tabla){
-	this.menuPrincipal = this;
-	this.tabla=tabla;
-	this.searchBar=new SearchBar(this,tabla);
-	this.dataBar=new DataBar(this,tabla);
-	this.modeloTabla = this.tabla.modeloTabla;
-	this.dataHandler = this.dataHandler;
+function Registro(sector,dataHandler,modeloTabla){
+	this.sector = sector;
+	this.dataHandler = dataHandler;
+	this.modeloTabla=modeloTabla;
+	this.searchBar=new SearchBar(this,this.modeloTabla.tableElement.previousSibling);
+	this.dataBar=new DataBar(this,this.modeloTabla.tableElement.nextSibling);
 
-	this.setTable=function(tabla,dataBarRequired){
-		this.tabla=tabla;
-		if(dataBarRequired){
-			this.setDataBar();
-		}
-		else{
-			this.dataBar=null;
-		}
-	}
-
-	this.setDataBar=function(){
-
+	this.startRegistro=function(){
+		this.modeloTabla.startTableModel();
 	}
 
 	this.filter=function(campo,criterio){
@@ -157,80 +146,18 @@ function TableHandler(this,tabla){
 		this.tabla.updateTable(registros);
 	}
 
+	this.startRegistro();
+
 }
 
-function DataBar(tableHandler,tabla){
-	this.modeloDataBar = new DataBarModel(tableHandler,tabla.nextSibling());
+function SearchBar(registro,searchBarElement){
+	this.modeloSearchBar = new SearchBarModel(registro,searchBarElement);
 }
 
-function DataBarModel(tableHandler,dataBarElement){
-	this.dataBarModel = dataBarElement;
-	this.tableHandler = tableHandler;
-	this.tabla = tableHandler.tabla;
-	this.buttons=[]
-
-	this.startDataBarModel=function(){
-		this.clearDataBarModel();
-		this.renderDataBarModel();
-		this.eventos(){
-		}
-	}
-
-	this.clearDataBarModel=function(){
-		this.buttons = [];
-		while(this.dataBarModel.hasChildNodes()){
-			this.dataBarModel.removeChild(dataBarModel.lastChild);
-		}
-	}
-
-	this.renderDataBarModel=function(){
-		var button;
-		buttonIds=['buttonAdd','buttonModify','buttonConsult','buttonDelete'];
-		buttonTextInside=[this.tabla.dataAdd,this.tabla.dataModify,this.dataConsult,this.tabla.Delete];
-		for(i=0;i<4;i++){
-			button=document.createElement('button');
-			button.id = buttonIds[i];
-			button.className='button-general';
-			button.innerHTML = buttonTextInside[i];
-			this.buttons.push(button);
-			dataBarModel.appendChild(button);
-			button=undefined;
-		}
-
-		
-	}
-
-	this.eventos=function(){
-		this.buttons[0].onclick=function(){
-			new FormUsuario(this.tableHandler.dataHandler,
-				{modal:this.tableHandler.menuPrincipal,tipo:1});
-		}
-		this.buttons[1].onclick=function(){
-			new FormUsuario(this.tableHandler.dataHandler,
-				{modal:this.tableHandler.menuPrincipal,tipo:2,
-					idBuscado:this.tableHandler.tabla.modeloTabla.selectedRow.firstChild.innerHTML});
-		}
-		this.buttons[2].onclick=function(){
-			new FormUsuario(this.tableHandler.dataHandler,
-				{modal:this.tableHandler.menuPrincipal,tipo:3,
-					idBuscado:this.tableHandler.tabla.modeloTabla.selectedRow.firstChild.innerHTML});
-		}
-		this.buttons[3].onclick=function(){
-			//Eliminar
-		}
-	}
-
-	this.startDataBarModel();
-}
-
-function SearchBar(this,tabla){
-	this.modeloSearchBar = new SearchBarModel(this,tabla.previousSibling());
-}
-
-function SeacrchBarModel(tableHandler,searchBarElement){
+function SearchBarModel(registro,searchBarElement){
 	this.searchBarModel = searchBarElement;
-	this.tableHandler = tableHandler;
-	this.tabla = tableHandler.tabla;
+	this.registro = registro;
+	this.tabla = registro.tabla;
 	this.botonBuscar=null;
 	this.botonUpdate=null;
 	this.lblTotal=null;
@@ -238,8 +165,7 @@ function SeacrchBarModel(tableHandler,searchBarElement){
 	this.startSearchBarModel=function(){
 		this.clearSearchBarModel();
 		this.renderSearchBarModel();
-		this.eventos(){
-		}
+		this.eventos();
 	}
 
 	this.clearSearchBarModel=function(){
@@ -273,10 +199,77 @@ function SeacrchBarModel(tableHandler,searchBarElement){
 	}
 }
 
-function TablaUsuario(table){
-	this.modeloTabla = new TableModel(table,
+function DataBar(registro,dataBarElement){
+	this.modeloDataBar = new DataBarModel(registro,dataBarElement);
+}
+
+function DataBarModel(registro,dataBarElement){
+	this.dataBarElement = dataBarElement;
+	this.registro = registro;
+	this.modeloTabla = registro.modeloTabla;
+	this.buttons=[]
+
+	this.startDataBarModel=function(){
+		this.clearDataBarModel();
+		this.renderDataBarModel();
+		this.eventos();
+	}
+
+	this.clearDataBarModel=function(){
+		this.buttons = [];
+		while(this.dataBarElement.hasChildNodes()){
+			this.dataBarElement.removeChild(dataBarElement.lastChild);
+		}
+	}
+
+	this.renderDataBarModel=function(){
+		var button;
+		buttonIds=['buttonAdd','buttonModify','buttonConsult','buttonDelete'];
+		buttonTextInside=[this.modeloTabla.dataAdd,this.modeloTabla.dataModify,this.dataConsult,this.modeloTabla.Delete];
+		for(i=0;i<4;i++){
+			button=document.createElement('button');
+			button.id = buttonIds[i];
+			button.className='button-general';
+			button.innerHTML = buttonTextInside[i];
+			this.buttons.push(button);
+			dataBarElement.appendChild(button);
+			button=undefined;
+		}
+
+		
+	}
+
+	this.eventos=function(){
+		this.buttons[0].onclick=function(){
+			new FormUsuario(this.registro.dataHandler,
+				{modal:this.registro.menuPrincipal,tipo:1});
+		}
+		this.buttons[1].onclick=function(){
+			new FormUsuario(this.registro.dataHandler,
+				{modal:this.registro.menuPrincipal,tipo:2,
+					idBuscado:this.registro.tabla.modeloTabla.selectedRow.firstChild.innerHTML});
+		}
+		this.buttons[2].onclick=function(){
+			new FormUsuario(this.registro.dataHandler,
+				{modal:this.registro.menuPrincipal,tipo:3,
+					idBuscado:this.registro.tabla.modeloTabla.selectedRow.firstChild.innerHTML});
+		}
+		this.buttons[3].onclick=function(){
+			//Eliminar
+		}
+	}
+
+	this.startDataBarModel();
+}
+
+
+
+function TableModelUsuario(tableElement){
+	TableModel.call(this,tableElement,
 		['ID','Nro','Nombre','Apellido','Nombre de Usuario','Tipo de Usuario','Estado']
 		,['0','7%','25%','25%','20%','15%','8%']);
+	console.log('TableElement');
+	console.log(this.tableElement);
 	this.modulo = 'Usuarios';
 	this.titulo = 'Registros de Usuarios del Sistema'
 	this.metodoFilter = 'getUsuarios';
@@ -306,7 +299,7 @@ function TablaUsuario(table){
 	}
 
 	this.updateTable=function(usuarios){
-		this.modeloTabla.updateRows(this.setRows(usuarios));
+		this.updateRows(this.setRows(usuarios));
 	}
 
 }

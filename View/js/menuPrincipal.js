@@ -25,7 +25,7 @@ function MenuPrincipal(){
 	this.content;
 	this.main;
 	this.dataHandler=null;
-	this.tableHandler=null;
+	this.registers=[];
 
 	this.startMenuPrincipal=function(){
 		this.initComponents();
@@ -71,7 +71,7 @@ function MenuPrincipal(){
 		this.body = document.getElementsByTagName('body')[0];
 		this.modal = document.getElementById('formularioModal');
 		this.content = document.getElementById('content');
-		this.main = document.getElementById('menu');
+		this.main = document.getElementById('main');
 		if(this.usuario!=null)this.content.style.display='table';
 	}
 
@@ -83,9 +83,9 @@ function MenuPrincipal(){
 		this.iNuevaPersona.onclick=function(){self.openAddForm('personas');};
 		this.iNuevoUsuario.onclick=function(){self.openAddForm('usuarios');};
 		this.iAreas.onclick=function(){self.renderTabla('areas');};
-		this.iPuestos.onclick=function(){self.renderTabla('puestos');};
-		this.iPersonas.onclick=function(){self.renderTabla('personas');};
-		this.iUsuarios.onclick=function(){self.renderTabla('usuarios');};
+		this.iPuestos.onclick=function(){self.renderTabla(this.main,'puestos');};
+		this.iPersonas.onclick=function(){self.renderTabla(this.main,'personas');};
+		this.iUsuarios.onclick=function(){self.renderMainMenu('usuarios');};
 	}
 
 
@@ -101,29 +101,36 @@ function MenuPrincipal(){
 
 	this.clearMain=function(){
 		while(this.main.hasChildNodes()){
-			this.main.lastChild.class = 'not-visible';
+			this.main.removeChild(this.main.lastChild);
 		}
+		//console.log(this.main);
+		//console.log(this.main.hasChildNodes());
 	}
 
 	this.renderTabla=function(sector,modulo){
-		this.addElement(sector,'div','tabla','search'+modulo)
-		this.addElement(sector,'table','tabla','tabla'+modulo);
-		this.addElement(sector,'div','dataBar','dataBar'+modulo);
+		this.addElement(sector,'div','searchBar','searchBar-'+modulo)
+		this.addElement(sector,'table','tabla','tabla-'+modulo);
+		this.addElement(sector,'div','dataBar','dataBar-'+modulo);
 		var searchBar = document.getElementById('searchBar');
 		var tabla = document.getElementById('tabla');
 		var dataBar = document.getElementById('dataBar');
+		console.log(dataBar.parentNode);
 		switch(modulo){
-			case 'areas': this.tableHandler = new TableHandler(this.dataHandler,
-							new TablaArea(tabla)); break;
-			case 'puestos':this.tableHandler = new TableHandler(this.dataHandler,
-							new TablaPuesto(tabla)); break;
-			case 'personas':this.tableHandler = new TableHandler(this.dataHandler,
-							new TablaPersona(tabla)); break;
-			case 'usuarios':this.tableHandler = new TableHandler(this.dataHandler,				
-							new TablaUsuario(tabla)); break;
+			case 'areas': this.registers.push(new Registro(this.main,
+							this.dataHandler,
+							new TableModelArea(tabla))); break;
+			case 'puestos':this.registers.push(new Registro(this.main,
+							this.dataHandler,
+							new TableModelPuesto(tabla))); break;
+			case 'personas':this.registers.push(new Registro(this.main,
+							this.dataHandler,
+							new TableModelPersona(tabla))); break;
+			case 'usuarios':this.registers.push(new Registro(this.main,
+							this.dataHandler,				
+							new TableModelUsuario(tabla))); break;
 		}
 		this.addElement(sector,'p','titulo',
-			undefined,this.tableHandler.tabla.titulo,{where:'before',from:'searchBar'});
+			undefined,this.registers[this.registers.length-1].modeloTabla.titulo,{where:'before',from:'searchBar'});
 	}
 
 	this.renderMainMenu=function(modulo){
