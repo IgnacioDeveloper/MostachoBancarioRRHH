@@ -23,7 +23,6 @@ function MenuPrincipal(){
 	this.body;
 	this.modal;
 	this.content;
-	this.tablaContent;
 	this.main;
 	this.dataHandler=null;
 	this.tableHandler=null;
@@ -32,16 +31,17 @@ function MenuPrincipal(){
 		this.initComponents();
 		this.loadAllScripts();
 		this.startDataHandlerMainOperations(); //Enlaza con el archivo servidor.js y setea los eventos
-		this.lblUser.innerHTML = "Nombre de Usuario: "+this.usuario.nombre+" // Tipo de Usuario: "+this.translateProfile(this.usuario.usertype);
+		this.lblUser.innerHTML = 'Nombre de Usuario: '+this.usuario.nombre+' // Tipo de Usuario: '+this.translateProfile(this.usuario.usertype);
+
 	}
 
 	this.loadAllScripts=function(){
-		this.loadScript("http://localhost/MostachoRRHH/View/js/reloj.js");
-		this.loadScript("http://localhost/MostachoRRHH/View/js/dataHandler.js");
-		this.loadScript("http://localhost/MostachoRRHH/View/js/tablas.js");
-		this.loadScript("http://localhost/MostachoRRHH/View/js/mensajeModal.js");
-		this.loadScript("http://localhost/MostachoRRHH/View/js/validacion.js");
-		this.loadScript("http://localhost/MostachoRRHH/View/js/formularioModal.js");
+		this.loadScript('http://localhost/MostachoRRHH/View/js/reloj.js');
+		this.loadScript('http://localhost/MostachoRRHH/View/js/dataHandler.js');
+		this.loadScript('http://localhost/MostachoRRHH/View/js/tablas.js');
+		this.loadScript('http://localhost/MostachoRRHH/View/js/mensajeModal.js');
+		this.loadScript('http://localhost/MostachoRRHH/View/js/validacion.js');
+		this.loadScript('http://localhost/MostachoRRHH/View/js/formularioModal.js');
 	}
 
 	this.loadScript=function(url){    
@@ -52,76 +52,125 @@ function MenuPrincipal(){
 	}
 
 	this.initComponents=function(){
-		this.iOrganigrama=document.getElementById("iOrganigrama");
-		this.menuAreas = document.getElementById("mAreas");
-		this.menuPuestos=document.getElementById("mPuestos");
-		this.menuPersonas=document.getElementById("mPersonas");
-		this.menuUsuarios=document.getElementById("mUsuarios");
-		this.iNuevaArea = document.getElementById("iNuevaArea");
-		this.iNuevoPuesto=document.getElementById("iNuevoPuesto");
-		this.iNuevaPersona=document.getElementById("iNuevaPersona");
-		this.iNuevoUsuario=document.getElementById("iNuevoUsuario");
-		this.iAreas = document.getElementById("iAreas");
-		this.iPuestos=document.getElementById("iPuestos");
-		this.iPersonas=document.getElementById("iPersonas");
-		this.iUsuarios=document.getElementById("iUsuarios");
-		this.iCerrarSesion=document.getElementById("iCerrarSesion");
-		this.lblUser = document.getElementById("lblUserInfo");
-		this.lblReloj=document.getElementById("lblReloj");
+		this.iOrganigrama=document.getElementById('iOrganigrama');
+		this.menuAreas = document.getElementById('mAreas');
+		this.menuPuestos=document.getElementById('mPuestos');
+		this.menuPersonas=document.getElementById('mPersonas');
+		this.menuUsuarios=document.getElementById('mUsuarios');
+		this.iNuevaArea = document.getElementById('iNuevaArea');
+		this.iNuevoPuesto=document.getElementById('iNuevoPuesto');
+		this.iNuevaPersona=document.getElementById('iNuevaPersona');
+		this.iNuevoUsuario=document.getElementById('iNuevoUsuario');
+		this.iAreas = document.getElementById('iAreas');
+		this.iPuestos=document.getElementById('iPuestos');
+		this.iPersonas=document.getElementById('iPersonas');
+		this.iUsuarios=document.getElementById('iUsuarios');
+		this.iCerrarSesion=document.getElementById('iCerrarSesion');
+		this.lblUser = document.getElementById('lblUserInfo');
+		this.lblReloj=document.getElementById('lblReloj');
 		this.body = document.getElementsByTagName('body')[0];
-		this.modal = document.getElementById("formularioModal");
-		this.tablaContent = document.getElementById('tableContent');
-		this.content = document.getElementById("content");
-		this.main = document.getElementById("menu");
-		if(this.usuario!=null)this.content.style.display="table";
+		this.modal = document.getElementById('formularioModal');
+		this.content = document.getElementById('content');
+		this.main = document.getElementById('menu');
+		if(this.usuario!=null)this.content.style.display='table';
 	}
 
 	this.setEvents=function(){
 		var self = this;
-		this.iCerrarSesion.onclick=function(){self.solicitudServidorAJAX("metodo=destroySession",2);};
-		this.iNuevaArea.onclick=function(){self.openAddForm("areas");};
-		this.iNuevoPuesto.onclick=function(){self.openAddForm("puestos");};
-		this.iNuevaPersona.onclick=function(){self.openAddForm("personas");};
-		this.iNuevoUsuario.onclick=function(){self.openAddForm("usuarios");};
-		this.iMenuArea.onclick=function(){};
-		this.iMenuPuesto.onclick=function(){};
-		this.iMenuPersona.onclick=function(){};
-		this.iMenuUsuario.onclick=function(){};
+		this.iCerrarSesion.onclick=function(){self.solicitudServidorAJAX('metodo=destroySession',2);};
+		this.iNuevaArea.onclick=function(){self.openAddForm('areas');};
+		this.iNuevoPuesto.onclick=function(){self.openAddForm('puestos');};
+		this.iNuevaPersona.onclick=function(){self.openAddForm('personas');};
+		this.iNuevoUsuario.onclick=function(){self.openAddForm('usuarios');};
+		this.iAreas.onclick=function(){self.renderTabla('areas');};
+		this.iPuestos.onclick=function(){self.renderTabla('puestos');};
+		this.iPersonas.onclick=function(){self.renderTabla('personas');};
+		this.iUsuarios.onclick=function(){self.renderTabla('usuarios');};
 	}
+
 
 	this.openAddForm=function(modulo){
 		var Configuracion = {modal:this.modal,tipo:1};
 		switch(modulo){
-			case "areas": new FormAreas(this.dataHandler,Configuracion);break;
-			case "puestos":new FormPuestos(this.dataHandler,Configuracion);break;
-			case "personas":new FormPersona(this.dataHandler,Configuracion);break;
-			case "usuarios":new FormUsuario(this.dataHandler,Configuracion); break;
+			case 'areas': new FormAreas(this.dataHandler,Configuracion);break;
+			case 'puestos':new FormPuestos(this.dataHandler,Configuracion);break;
+			case 'personas':new FormPersona(this.dataHandler,Configuracion);break;
+			case 'usuarios':new FormUsuario(this.dataHandler,Configuracion); break;
 		}
 	}
 
-	this.clearMenuPrincipal=function(){
+	this.clearMain=function(){
 		while(this.main.hasChildNodes()){
 			this.main.lastChild.class = 'not-visible';
 		}
 	}
 
-	this.renderTabla=function(modulo){
-		this.tablaContent.class = 'not-visible';
+	this.renderTabla=function(sector,modulo){
+		this.addElement(sector,'div','tabla','search'+modulo)
+		this.addElement(sector,'table','tabla','tabla'+modulo);
+		this.addElement(sector,'div','dataBar','dataBar'+modulo);
+		var searchBar = document.getElementById('searchBar');
+		var tabla = document.getElementById('tabla');
+		var dataBar = document.getElementById('dataBar');
 		switch(modulo){
-			case "areas": this.tableHandler = new TableHandler(
-				new TablaArea(this.tablaContent.getElementById('tabla')),
-				this.dataHandler); break;
-			case "puestos":this.tableHandler = new TableHandler(
-				new TablaPuesto(this.tablaContent.getElementById('tabla')),
-				this.dataHandler); break;
-			case "personas":this.tableHandler = new TableHandler(
-				new TablaPersona(this.tablaContent.getElementById('tabla')),
-				this.dataHandler); break;
-			case "usuarios":this.tableHandler = new TableHandler(
-				new TablaUsuario(this.tablaContent.getElementById('tabla')),
-				this.dataHandler); break;
+			case 'areas': this.tableHandler = new TableHandler(this.dataHandler,
+							new TablaArea(tabla)); break;
+			case 'puestos':this.tableHandler = new TableHandler(this.dataHandler,
+							new TablaPuesto(tabla)); break;
+			case 'personas':this.tableHandler = new TableHandler(this.dataHandler,
+							new TablaPersona(tabla)); break;
+			case 'usuarios':this.tableHandler = new TableHandler(this.dataHandler,				
+							new TablaUsuario(tabla)); break;
 		}
-		this.tablaContent.class = 'table';
+		this.addElement(sector,'p','titulo',
+			undefined,this.tableHandler.tabla.titulo,{where:'before',from:'searchBar'});
+	}
+
+	this.renderMainMenu=function(modulo){
+		this.clearMain();
+		switch(modulo){
+			case 'puestos':
+			case 'personas':
+			case 'usuarios':this.renderTabla(this.main,modulo);break;
+			case 'areas':this.renderAreaRegisters();break;
+		}
+	}
+
+	this.renderAreaRegisters=function(){
+		
+	}
+
+	this.addElement = function(contexto,elementType,id,className,elementContent,position){
+		var elemento = document.createElement(elementType);
+		var elementoReferencia;
+		if(id!=undefined)elemento.id=id;
+		if(className!=undefined)elemento.className=className;
+		if(elementContent!=undefined)elemento.innerHTML=elementContent;
+		if(position!=undefined){
+			elementoReferencia = document.getElementById(position.from)
+			switch(position.where){
+				case 'before': contexto.insertBefore(elemento,elementoReferencia);
+				case 'after': this.insertAfter(elemento,elementoReferencia);
+			}
+		}
+		else contexto.appendChild(elemento);
+	}
+
+	this.addTitle=function(textInside){
+		var titulo = document.createElement('p');
+		titulo.id='titulo';
+		titulo.innerHTML=textInside;
+		this.addMain(titulo);
+	}
+
+	this.insertAfter=function(elemento,elementoReferencia){
+		var contexto = elementoReferencia.parentNode;
+		if(elementoReferencia.nextSibling){
+			contexto.insertBefore(elemento,elementoReferencia);
+		}
+		else{
+			contexto.appendChild(elemento);
+		}
 	}
 
 	this.translateProfile=function(profile){
@@ -139,22 +188,22 @@ function MenuPrincipal(){
 	}
 
 	this.closeMenuPrincipal=function(resultado){
-		if(resultado == "true")
+		if(resultado == 'true')
 			this.goIndex();
 		else
-			alert("No se pudo cerrar la Sesion!");
+			alert('No se pudo cerrar la Sesion!');
 	}
 
 	this.goIndex=function(){
-		location.href = "index.html";
+		location.href = 'index.html';
 	}	
 
 	this.solicitudServidorAJAX=function(params,postFuncion){
-		var resultado = "";
-		var ajax_url  = "http://localhost/MostachoRRHH/Controller/Controlador.php";
+		var resultado = '';
+		var ajax_url  = 'http://localhost/MostachoRRHH/Controller/Controlador.php';
 		var ajax_request = new XMLHttpRequest();
-		ajax_request.open("POST",ajax_url,true);
-		ajax_request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		ajax_request.open('POST',ajax_url,true);
+		ajax_request.setRequestHeader('Content-type','application/x-www-form-urlencoded');
 		ajax_request.send(params);
 		ajax_request.onreadystatechange=function(){
 			if(ajax_request.readyState == 4 && ajax_request.status == 200){
@@ -176,11 +225,11 @@ function MenuPrincipal(){
 				setTimeout(function(){this.startDataHandlerMainOperations();}.bind(this),100);
 			}
 			else{
-				alert("Error");
+				alert('Error');
 			}
 		}
 	}
 
-	this.solicitudServidorAJAX("metodo=getNowUser",1);
+	this.solicitudServidorAJAX('metodo=getNowUser',1);
 
 }

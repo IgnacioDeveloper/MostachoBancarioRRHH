@@ -116,21 +116,33 @@ function TableModel(table,headers){
 
 	this.eventos=function(){
 		tabla.onclick=function(e){
-			clearSelectedRow();
-			getSelectedRow(e);
+			this.clearSelectedRow();
+			this.getSelectedRow(e);
 		}
 	}
 
 }
 
-function TableHandler(tabla,dataHandler){
+function TableHandler(this,tabla){
+	this.menuPrincipal = this;
 	this.tabla=tabla;
-	this.dataBar;
+	this.searchBar=new SearchBar(this,tabla);
+	this.dataBar=new DataBar(this,tabla);
 	this.modeloTabla = this.tabla.modeloTabla;
-	this.dataHandler = dataHandler;
+	this.dataHandler = this.dataHandler;
 
-	this.setTable=function(tabla){
+	this.setTable=function(tabla,dataBarRequired){
 		this.tabla=tabla;
+		if(dataBarRequired){
+			this.setDataBar();
+		}
+		else{
+			this.dataBar=null;
+		}
+	}
+
+	this.setDataBar=function(){
+
 	}
 
 	this.filter=function(campo,criterio){
@@ -147,30 +159,104 @@ function TableHandler(tabla,dataHandler){
 
 }
 
-function DataBarModel(dataHandler,dataBarElement){
+function DataBar(tableHandler,tabla){
+	this.modeloDataBar = new DataBarModel(tableHandler,tabla.nextSibling());
+}
+
+function DataBarModel(tableHandler,dataBarElement){
 	this.dataBarModel = dataBarElement;
-	this.tabla = dataHandler.tabla;
+	this.tableHandler = tableHandler;
+	this.tabla = tableHandler.tabla;
 	this.buttons=[]
 
-	this.startDataBar=function(){
-		this.clearDataBar();
-		this.renderDataBar();
+	this.startDataBarModel=function(){
+		this.clearDataBarModel();
+		this.renderDataBarModel();
 		this.eventos(){
 		}
 	}
 
-	this.clearDataBar=function(){
+	this.clearDataBarModel=function(){
 		this.buttons = [];
 		while(this.dataBarModel.hasChildNodes()){
 			this.dataBarModel.removeChild(dataBarModel.lastChild);
 		}
 	}
 
-	this.renderDataBar=function(){
+	this.renderDataBarModel=function(){
 		var button;
 		buttonIds=['buttonAdd','buttonModify','buttonConsult','buttonDelete'];
 		buttonTextInside=[this.tabla.dataAdd,this.tabla.dataModify,this.dataConsult,this.tabla.Delete];
 		for(i=0;i<4;i++){
+			button=document.createElement('button');
+			button.id = buttonIds[i];
+			button.className='button-general';
+			button.innerHTML = buttonTextInside[i];
+			this.buttons.push(button);
+			dataBarModel.appendChild(button);
+			button=undefined;
+		}
+
+		
+	}
+
+	this.eventos=function(){
+		this.buttons[0].onclick=function(){
+			new FormUsuario(this.tableHandler.dataHandler,
+				{modal:this.tableHandler.menuPrincipal,tipo:1});
+		}
+		this.buttons[1].onclick=function(){
+			new FormUsuario(this.tableHandler.dataHandler,
+				{modal:this.tableHandler.menuPrincipal,tipo:2,
+					idBuscado:this.tableHandler.tabla.modeloTabla.selectedRow.firstChild.innerHTML});
+		}
+		this.buttons[2].onclick=function(){
+			new FormUsuario(this.tableHandler.dataHandler,
+				{modal:this.tableHandler.menuPrincipal,tipo:3,
+					idBuscado:this.tableHandler.tabla.modeloTabla.selectedRow.firstChild.innerHTML});
+		}
+		this.buttons[3].onclick=function(){
+			//Eliminar
+		}
+	}
+
+	this.startDataBarModel();
+}
+
+function SearchBar(this,tabla){
+	this.modeloSearchBar = new SearchBarModel(this,tabla.previousSibling());
+}
+
+function SeacrchBarModel(tableHandler,searchBarElement){
+	this.searchBarModel = searchBarElement;
+	this.tableHandler = tableHandler;
+	this.tabla = tableHandler.tabla;
+	this.botonBuscar=null;
+	this.botonUpdate=null;
+	this.lblTotal=null;
+
+	this.startSearchBarModel=function(){
+		this.clearSearchBarModel();
+		this.renderSearchBarModel();
+		this.eventos(){
+		}
+	}
+
+	this.clearSearchBarModel=function(){
+		this.botonBuscar=null;
+		this.botonUpdate=null;
+		this.lblTotal=null;
+		while(this.searchBarModel.hasChildNodes()){
+			this.searchBarModel.removeChild(searchBarModel.lastChild);
+		}
+	}
+
+	this.renderSearchBarModel=function(){
+		var button;
+		elementsIds=['lblBusqueda','selectCampo','','buttonBusqueda','buttonUpdate','lblTotalFilas'];
+		btnClass = []
+		buttonTextInside=['Filtrar resultados por',this.tabla.dataModify];
+		for(i<0;i<2;i++){
 			button=document.createElement('button');
 			button.id = buttonIds[i];
 			button.innerHTML = buttonTextInside[i];
@@ -178,22 +264,12 @@ function DataBarModel(dataHandler,dataBarElement){
 			dataBarModel.appendChild(button);
 			button=undefined;
 		}
+		
+
 	}
 
 	this.eventos=function(){
-		this.buttons[0].onclick=function(){
-			//var Configuracion = {modal:this.modal,tipo:tipo};
-			new FormUsuario(this.dataHandler,Configuracion);
-		}
-		this.buttons[1].onclick=function(){
-			new FormUsuario(this.dataHandler,Configuracion);
-		}
-		this.buttons[2].onclick=function(){
-			//new FormUsuario(this.dataHandler,Configuracion);
-		}
-		this.buttons[3].onclick=function(){
-			//new FormUsuario(this.dataHandler,Configuracion);
-		}
+
 	}
 }
 
@@ -201,6 +277,8 @@ function TablaUsuario(table){
 	this.modeloTabla = new TableModel(table,
 		['ID','Nro','Nombre','Apellido','Nombre de Usuario','Tipo de Usuario','Estado']
 		,['0','7%','25%','25%','20%','15%','8%']);
+	this.modulo = 'Usuarios';
+	this.titulo = 'Registros de Usuarios del Sistema'
 	this.metodoFilter = 'getUsuarios';
 	this.metodoEntity = 'getUsuario';
 	this.dataAdd = 'Nuevo Usuario';

@@ -104,6 +104,7 @@ function Formulario(modal){
 
 	this.startForm=function(){
 		//this.modal.scroll(0,0);
+		this.lockInfo(false);
 		this.setButtons();
 	}
 
@@ -116,6 +117,10 @@ function Formulario(modal){
 	this.startValidacion=function(){
 		this.validacion.formBodyElements = this.formBodyElements;
 		this.validacion.setVal();
+	}
+
+	this.lockInfo=function(){
+
 	}
 
 	
@@ -202,9 +207,8 @@ function FormUsuario(servidor,conf){
 
 	this.setConfModificacion=function(){
 		this.title.innerHTML = "Modificar Informacion de Usuario";
-		this.button1.innerHTML = "Modificar Usuario";
+		this.button1.innerHTML = "Guardar cambios";
 		this.button2.innerHTML = "Cancelar";
-		//this.validacion = new Validacion(this);
 		this.button1.onclick=function(){
 			this.modificarDatos();
 		}
