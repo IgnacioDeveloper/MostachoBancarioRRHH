@@ -38,7 +38,7 @@ function MenuPrincipal(){
 	this.loadAllScripts=function(){
 		this.loadScript('http://localhost/MostachoRRHH/View/js/reloj.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/dataHandler.js');
-		this.loadScript('http://localhost/MostachoRRHH/View/js/tablas.js');
+		this.loadScript('http://localhost/MostachoRRHH/View/js/registros.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/mensajeModal.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/validacion.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/formularioModal.js');
@@ -103,8 +103,6 @@ function MenuPrincipal(){
 		while(this.main.hasChildNodes()){
 			this.main.removeChild(this.main.lastChild);
 		}
-		//console.log(this.main);
-		//console.log(this.main.hasChildNodes());
 	}
 
 	this.renderTabla=function(sector,modulo){
@@ -113,8 +111,8 @@ function MenuPrincipal(){
 		this.addElement(sector,'div','dataBar','dataBar-'+modulo);
 		var searchBar = document.getElementById('searchBar');
 		var tabla = document.getElementById('tabla');
+		tabla.className = 'table';
 		var dataBar = document.getElementById('dataBar');
-		console.log(dataBar.parentNode);
 		switch(modulo){
 			case 'areas': this.registers.push(new Registro(this.main,
 							this.dataHandler,

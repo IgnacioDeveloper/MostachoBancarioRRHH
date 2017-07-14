@@ -1,0 +1,30 @@
+.table{
+	width:80%;
+	margin:auto;
+}
+
+.table tr{
+	background-color:#fff;
+}
+
+.table .headers{
+	background-color:#ed7804;
+	font-family: arial;
+	font-weight:bold;
+	font-size:16px;
+}
+
+#dataBar, #searchBar{
+	position:relative;
+	width:80%;
+	margin:auto;
+	background-color:#ed7804;
+}
+
+#searchBar *{
+	float:left;
+}
+
+
+
+

@@ -1,33 +1,27 @@
 function TableModel(tableElement,headers,widths){
+	this.titulo = 'there';
 	this.headers = headers;
 	this.tableElement = tableElement;
 	this.widths=widths;
 	this.columns=[];
 	this.rows=[];
-	this.selectedRow=undefined;
+	this.selectedRow=null;
 
-	this.startTableModel = function(rows){
-		this.renderTableModel(rows);
-		this.eventos();
-		this.show(true);
+	this.startTableModel = function(){
+		this.renderTableModel();
+		//this.eventos();
 	}
 
-	this.show=function(value){
-		if(value) this.tableElement.style.display='table';
-		else this.tableElement.style.display='none';
-	}
-
-	this.renderTableModel = function(rows){
-		this.rows = rows;
+	this.renderTableModel = function(){
 		this.clearTableModel();
 		this.addColumns();
-		this.updateRows(rows);
+		this.setColumnsWidth(widths);
 	}
 
 	this.updateRows = function(rows){
-		this.removeAllRows();
-		for(r in rows){
-			this.appendRow(r);
+		this.removeAllDataRows();
+		for(i=0;i<rows.length;i++){
+			this.appendRow(rows[i]);
 		}
 	}
 
@@ -37,10 +31,9 @@ function TableModel(tableElement,headers,widths){
 		}
 	}
 
-	this.removeAllRows = function(){
-		while(this.tableElement.hasChildNodes()){
-			if(this.tableElement.lastChild.className != 'header')
-				this.tableElement.removeChild(this.tableElement.lastChild);
+	this.removeAllDataRows = function(){
+		for(i=this.rows.length;i>0;i--){
+			this.tableElement.deleteRow(i);
 		}
 	}
 
@@ -55,16 +48,15 @@ function TableModel(tableElement,headers,widths){
 			cellNode.innerHTML=headers[i];
 			this.columns.push(cellNode);
 		}
-		
 	}
 
-	this.appendRow=function(row,header){
+	this.appendRow=function(row){
+		//alert(row);
 		var rowNode = document.createElement('tr');
 		var cellNode;
-		for(r in row){
+		for(j=0;j<row.length;j++){
 			cellNode = document.createElement('td');
-			cellNode.className = r.tipo;
-			cellNode.innerHTML=r.textInside;
+			cellNode.innerHTML=row[j];
 			rowNode.append(cellNode);
 		}
 		this.tableElement.appendChild(rowNode);
@@ -110,6 +102,7 @@ function TableModel(tableElement,headers,widths){
 	}
 
 	this.setColumnsWidth=function(widths){
+		//Padres en el siguiente orden --> fila, tbody, table, main;
 		for(i=0;i<widths.length;i++)
 			this.columns[i].style.width=widths[i];
 	}
@@ -131,19 +124,22 @@ function Registro(sector,dataHandler,modeloTabla){
 	this.dataBar=new DataBar(this,this.modeloTabla.tableElement.nextSibling);
 
 	this.startRegistro=function(){
+		this.searchBar.modeloSearchBar.startSearchBarModel();
 		this.modeloTabla.startTableModel();
+		this.dataBar.modeloDataBar.startDataBarModel();
+		this.getData();
 	}
 
-	this.filter=function(campo,criterio){
-		var condicion = '';
-		var metodo = this.tabla.metodoFilter;
-		condicion+= campo+ "LIKE '"+criterio+"%' ORDER BY "+campo;
+	this.getData=function(campo,criterio){
+		var metodo = this.modeloTabla.metodoEntities;
+		var condicion = '1';
 		var params = 'metodo='+metodo+'&params='+condicion;
 		this.dataHandler.ejecutarOperacionAJAX(this,metodo,params);
 	} 
 
 	this.updateTableInfo=function(registros){
-		this.tabla.updateTable(registros);
+		registros = JSON.parse(registros);
+		this.modeloTabla.updateTable(registros);
 	}
 
 	this.startRegistro();
@@ -158,19 +154,21 @@ function SearchBarModel(registro,searchBarElement){
 	this.searchBarModel = searchBarElement;
 	this.registro = registro;
 	this.tabla = registro.tabla;
-	this.botonBuscar=null;
-	this.botonUpdate=null;
+	this.btnBuscar=null;
+	this.btnUpdate=null;
+	this.selectCampo=null;
 	this.lblTotal=null;
 
 	this.startSearchBarModel=function(){
 		this.clearSearchBarModel();
 		this.renderSearchBarModel();
-		this.eventos();
+		//this.eventos();
 	}
 
 	this.clearSearchBarModel=function(){
-		this.botonBuscar=null;
-		this.botonUpdate=null;
+		this.btnBuscar=null;
+		this.btnUpdate=null;
+		this.selectCampo=null;
 		this.lblTotal=null;
 		while(this.searchBarModel.hasChildNodes()){
 			this.searchBarModel.removeChild(searchBarModel.lastChild);
@@ -178,20 +176,20 @@ function SearchBarModel(registro,searchBarElement){
 	}
 
 	this.renderSearchBarModel=function(){
-		var button;
-		elementsIds=['lblBusqueda','selectCampo','','buttonBusqueda','buttonUpdate','lblTotalFilas'];
-		btnClass = []
-		buttonTextInside=['Filtrar resultados por',this.tabla.dataModify];
-		for(i<0;i<2;i++){
-			button=document.createElement('button');
-			button.id = buttonIds[i];
-			button.innerHTML = buttonTextInside[i];
-			this.buttons.push(button);
-			dataBarModel.appendChild(button);
-			button=undefined;
+		var elementsType = ['p','input','button','hr','p','select','hr','p','button'];
+		var elementsIds = ['lblBusqueda','inputBuscar','btnBuscar','','selectCampo','','lblTotal','','btnUpdate'];
+		var elementsTextInside=['Criterio de Busqueda: ', '', 'Buscar','Buscar por: ','','','Resultados','','Actualizar']
+		var element;
+		for(i=0;i<elementsType.length;i++){
+			element=document.createElement(elementsType[i]);
+			if(elementsIds[i]!=='')element.id = elementsIds[i];
+			if(elementsTextInside[i]!=='')element.innerHTML = elementsTextInside[i];
+			this.searchBarModel.appendChild(element);
 		}
-		
-
+		this.btnBuscar=document.getElementById('btnBuscar');
+		this.btnUpdate=document.getElementById('btnUpdate');
+		this.selectCampo  = document.getElementById('selectCampo');
+		this.lblTotal = document.getElementById('lblTotal');
 	}
 
 	this.eventos=function(){
@@ -224,8 +222,8 @@ function DataBarModel(registro,dataBarElement){
 
 	this.renderDataBarModel=function(){
 		var button;
-		buttonIds=['buttonAdd','buttonModify','buttonConsult','buttonDelete'];
-		buttonTextInside=[this.modeloTabla.dataAdd,this.modeloTabla.dataModify,this.dataConsult,this.modeloTabla.Delete];
+		buttonIds=['btnAdd','btnModify','btnConsult','btnDelete'];
+		buttonTextInside=[this.modeloTabla.dataAdd,this.modeloTabla.dataModify,this.modeloTabla.dataConsult,this.modeloTabla.dataDelete];
 		for(i=0;i<4;i++){
 			button=document.createElement('button');
 			button.id = buttonIds[i];
@@ -233,7 +231,6 @@ function DataBarModel(registro,dataBarElement){
 			button.innerHTML = buttonTextInside[i];
 			this.buttons.push(button);
 			dataBarElement.appendChild(button);
-			button=undefined;
 		}
 
 		
@@ -259,20 +256,17 @@ function DataBarModel(registro,dataBarElement){
 		}
 	}
 
-	this.startDataBarModel();
 }
 
 
 
 function TableModelUsuario(tableElement){
 	TableModel.call(this,tableElement,
-		['ID','Nro','Nombre','Apellido','Nombre de Usuario','Tipo de Usuario','Estado']
-		,['0','7%','25%','25%','20%','15%','8%']);
-	console.log('TableElement');
-	console.log(this.tableElement);
+		['ID','Nro','Nombre','Nombre de Usuario','Tipo de Usuario','Estado']
+		,['0','7%','50%','20%','15%','8%']);
 	this.modulo = 'Usuarios';
 	this.titulo = 'Registros de Usuarios del Sistema'
-	this.metodoFilter = 'getUsuarios';
+	this.metodoEntities = 'getUsuarios';
 	this.metodoEntity = 'getUsuario';
 	this.dataAdd = 'Nuevo Usuario';
 	this.dataModify = 'Modificar Usuario Seleccionado';
@@ -280,20 +274,17 @@ function TableModelUsuario(tableElement){
 	this.dataConsult = 'Consultar Usuario Seleccionado';
 
 	this.setRows=function(usuarios){
-		var row;
-		var rows;
-		var j = 1;
-		for(u in usuarios){
-			row[0]=u.id;
-			row[1]=j;
-			row[2]=u.nombre;
-			row[3]=u.apellido;
-			row[4]=u.username;
-			row[5]=u.tipo;
-			row[6]=u.estado;
-			rows[j-1]=row;	
+		var i=0,j=0;
+		var rows=[];
+		for(i=0;i<usuarios.length;i++){
+			rows[i]=new Array(6);
+			rows[i][0]=usuarios[i].idUsuario;
+			rows[i][1]=j;
+			rows[i][2]=usuarios[i].nombre;
+			rows[i][3]=usuarios[i].username;
+			rows[i][4]=usuarios[i].usertype;
+			rows[i][5]=usuarios[i].estado;
 			j++;
-			row=[];
 		}
 		return rows;
 	}

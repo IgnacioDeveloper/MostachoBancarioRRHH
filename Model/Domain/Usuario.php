@@ -130,9 +130,14 @@ class Usuario{
 		$this->persistencia->eliminar('USUARIO',$condicion);
 	}
 
-	function obtenerUsuarios($condicion){
+	function getUsuarios($condicion){
 		$registros = $this->persistencia->leer('USUARIO','*','',$condicion);
+		$registros = json_encode($registros);
 		return $registros;
+	}
+
+	function getUsuario($condicion){
+
 	}
 
 	function getJSON(){

@@ -1,5 +1,15 @@
 /*ESTILO DE PAGINA WEB*/
 html,
+
+#content{
+	width:100%;
+}
+
+main{
+	margin:auto;
+	width:100%;
+}
+
 body { 
   display: table;
   margin: 0; 
