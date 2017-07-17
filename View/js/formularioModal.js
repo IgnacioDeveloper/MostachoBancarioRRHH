@@ -130,10 +130,10 @@ function Formulario(modal){
 
 }
 
-function FormUsuario(servidor,conf){
+function FormUsuario(dataHandler,conf){
 	//Elementos del Formulario
 	Formulario.call(this,conf.modal);
-	this.servidor = servidor;
+	this.dataHandler = dataHandler;
 	this.dialogResponse;
 	this.txtNombre;this.txtUsername;this.txtPassword;this.selectUsertype;this.selectEstado;
 	this.bodyNodes=[new Node("lblNombre","p","Nombre y Apellido"),
@@ -195,22 +195,24 @@ function FormUsuario(servidor,conf){
 	}
 
 	this.setConfAlta=function(){
-		var form = this;
+		var self = this;
 		this.title.innerHTML = "Nuevo Usuario";
 		this.button1.innerHTML = "Guardar Usuario";
 		this.button2.innerHTML = "Cancelar";
 		this.button1.onclick=function(){
-			form.guardarDatos();
+			self.guardarDatos();
 		}
 		this.setCloseButton(this,this.button2);
 	}
 
 	this.setConfModificacion=function(){
+		var self = this;
+		this.getData(this.conf.idBuscado);
 		this.title.innerHTML = "Modificar Informacion de Usuario";
 		this.button1.innerHTML = "Guardar cambios";
 		this.button2.innerHTML = "Cancelar";
 		this.button1.onclick=function(){
-			this.modificarDatos();
+			self.modificarDatos(this.conf.idBuscado);
 		}
 	}
 
@@ -227,7 +229,7 @@ function FormUsuario(servidor,conf){
 		if(val){
 			var usuario = this.getJSonData();
 			var params="metodo=saveUsuario&params="+usuario;
-			this.servidor.ejecutarOperacionAJAX(this,"saveUsuario",params);
+			this.dataHandler.ejecutarOperacionAJAX(this,"saveUsuario",params);
 		}
 	}
 
@@ -236,7 +238,7 @@ function FormUsuario(servidor,conf){
 		var params="metodo=modifyUsuario&params="+usuario;
 	}
 
-	this.mutarConf=function(){
+	this.mutarTipo=function(){
 
 	}
 
@@ -265,6 +267,21 @@ function FormUsuario(servidor,conf){
 
 	this.getJSonData=function(){
 		return '{"nombre":"'+this.txtNombre.element.value+'","username":"'+this.txtUsername.element.value+'","password":"'+this.txtPassword.element.value+'","usertype":"'+this.selectUsertype.element.value.charAt(0)+'","estado":"'+this.selectEstado.element.value.charAt(0)+'"}';
+	}
+
+	this.getData=function(idBuscado){
+		var params="metodo=getUsuario&params="+idBuscado;
+		this.dataHandler.ejecutarOperacionAJAX(this,"getUsuario",params);
+	}
+
+	this.setFormData=function(usuario){
+		usuario = JSON.parse(usuario);
+		console.log(usuario);
+		this.txtNombre.element.value=usuario.nombre; 
+		this.txtUsername.element.value=usuario.username; 
+		this.txtPassword.element.value='***';
+		this.selectUsertype.element.value=usuario.usertype;
+		this.selectEstado.element.value=usuario.estado;
 	}
 
 	this.closeForm = function(){

@@ -72,7 +72,7 @@ function MenuPrincipal(){
 		this.modal = document.getElementById('formularioModal');
 		this.content = document.getElementById('content');
 		this.main = document.getElementById('main');
-		if(this.usuario!=null)this.content.style.display='table';
+		if(this.usuario!=null)this.content.style.visibility='visible';
 	}
 
 	this.setEvents=function(){

@@ -26,6 +26,7 @@ function eventos(){
 		var usuario = new Usuario(txtUsername.value,txtPassword.value);
 		var usuarioJSON = JSON.stringify(usuario);
 		var params="metodo=startUserSession&params="+usuarioJSON;
+		//console.log(params);
 		ejecutarOperacionesAJAX(params);
 	}
 }
@@ -40,6 +41,7 @@ function ejecutarOperacionesAJAX(params){
 	ajax_request.onreadystatechange=function(){
 		if(ajax_request.readyState == 4 && ajax_request.status == 200){
 			resultado = ajax_request.responseText;
+			console.log(resultado);
 			if(resultado == 1){
 				abrirMenuPrincipal();
 			}

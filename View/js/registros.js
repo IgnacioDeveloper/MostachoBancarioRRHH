@@ -9,7 +9,7 @@ function TableModel(tableElement,headers,widths){
 
 	this.startTableModel = function(){
 		this.renderTableModel();
-		//this.eventos();
+		this.eventos();
 	}
 
 	this.renderTableModel = function(){
@@ -52,14 +52,14 @@ function TableModel(tableElement,headers,widths){
 
 	this.appendRow=function(row){
 		//alert(row);
-		var rowNode = document.createElement('tr');
+		var rowNode = this.tableElement.insertRow(this.tableElement.length);
 		var cellNode;
 		for(j=0;j<row.length;j++){
-			cellNode = document.createElement('td');
+			cellNode = rowNode.insertCell(j);
 			cellNode.innerHTML=row[j];
-			rowNode.append(cellNode);
+			//rowNode.append(cellNode);
 		}
-		this.tableElement.appendChild(rowNode);
+		//this.tableElement.appendChild(rowNode);
 	}
 
 	this.getSelectedRow=function(e){
@@ -78,13 +78,14 @@ function TableModel(tableElement,headers,widths){
 	}
 
 	this.setSelectedRow=function(row){
-		this.clearSelectedRow();
+		if(this.selectedRow!=null)this.clearSelectedRow();
 		this.selectedRow = row;
 		row.classList.add('selected');
 	}
 
 	this.clearSelectedRow=function(){
-		this.tableElement.getElementsByClassName('selected')[0].classList.remove('selected');
+		this.selectedRow.classList.remove('selected');
+		this.selectedRow = null
 	}
 
 	this.getColumnCount=function(){
@@ -108,10 +109,10 @@ function TableModel(tableElement,headers,widths){
 	}
 
 	this.eventos=function(){
-		tabla.onclick=function(e){
-			this.clearSelectedRow();
-			this.getSelectedRow(e);
-		}
+		console.log(this.tableElement.firstChild);
+		this.tableElement.onclick=function(e){
+			this.setSelectedRow(e.target.parentNode);
+		}.bind(this);
 	}
 
 }
@@ -127,12 +128,18 @@ function Registro(sector,dataHandler,modeloTabla){
 		this.searchBar.modeloSearchBar.startSearchBarModel();
 		this.modeloTabla.startTableModel();
 		this.dataBar.modeloDataBar.startDataBarModel();
-		this.getData();
+		this.getData(1);
 	}
 
 	this.getData=function(campo,criterio){
 		var metodo = this.modeloTabla.metodoEntities;
-		var condicion = '1';
+		var condicion;
+		if(campo === 1){
+			condicion = '1';
+		} 
+		else {
+			condicion = '"'+campo+' = '+criterio+'"';
+		}
 		var params = 'metodo='+metodo+'&params='+condicion;
 		this.dataHandler.ejecutarOperacionAJAX(this,metodo,params);
 	} 
@@ -151,11 +158,12 @@ function SearchBar(registro,searchBarElement){
 }
 
 function SearchBarModel(registro,searchBarElement){
-	this.searchBarModel = searchBarElement;
+	this.searchBarElement = searchBarElement;
 	this.registro = registro;
 	this.tabla = registro.tabla;
 	this.btnBuscar=null;
 	this.btnUpdate=null;
+	this.inputCriterio=null;
 	this.selectCampo=null;
 	this.lblTotal=null;
 
@@ -170,27 +178,56 @@ function SearchBarModel(registro,searchBarElement){
 		this.btnUpdate=null;
 		this.selectCampo=null;
 		this.lblTotal=null;
-		while(this.searchBarModel.hasChildNodes()){
-			this.searchBarModel.removeChild(searchBarModel.lastChild);
+		while(this.searchBarElement.hasChildNodes()){
+			this.searchBarElement.removeChild(searchBarElement.lastChild);
 		}
 	}
 
 	this.renderSearchBarModel=function(){
-		var elementsType = ['p','input','button','hr','p','select','hr','p','button'];
-		var elementsIds = ['lblBusqueda','inputBuscar','btnBuscar','','selectCampo','','lblTotal','','btnUpdate'];
-		var elementsTextInside=['Criterio de Busqueda: ', '', 'Buscar','Buscar por: ','','','Resultados','','Actualizar']
-		var element;
-		for(i=0;i<elementsType.length;i++){
-			element=document.createElement(elementsType[i]);
-			if(elementsIds[i]!=='')element.id = elementsIds[i];
-			if(elementsTextInside[i]!=='')element.innerHTML = elementsTextInside[i];
-			this.searchBarModel.appendChild(element);
+		var sector1 = document.createElement('div');
+		var sector2 = document.createElement('div');
+		var subSector1 = document.createElement('div');
+		var subSector2 = document.createElement('div');
+		sector1.id='sbUpper';
+		sector2.id='sbLower';
+		subSector1.id = 'sblLeft';
+		subSector2.id = 'sblRight';
+		this.btnBuscar = document.createElement('button');
+		this.btnUpdate = document.createElement('button');
+		this.selectCampo = document.createElement('select');
+		this.inputCriterio = document.createElement('input');
+		var lblCriterio = document.createElement('p');
+		var lblCampo = document.createElement('p');
+		this.lblTotal = document.createElement('p');
+		lblCriterio.id = 'lblCriterio';
+		this.inputCriterio.id = 'inputCriterio';
+		this.btnBuscar.id = 'btnBuscar';
+		this.btnBuscar.innerHTML = 'Buscar';
+		this.btnUpdate.id = 'btnUpdate';
+		this.btnUpdate.innerHTML = 'Actualizar';
+		this.selectCampo.id = 'selectCampo';
+		var options=this.registro.modeloTabla.options;
+		var option;
+		for(i=0;i<options.length;i++){
+			option = document.createElement('option');
+			option.text = options[i];
+			this.selectCampo.add(option);
 		}
-		this.btnBuscar=document.getElementById('btnBuscar');
-		this.btnUpdate=document.getElementById('btnUpdate');
-		this.selectCampo  = document.getElementById('selectCampo');
-		this.lblTotal = document.getElementById('lblTotal');
-	}
+		lblCriterio.innerHTML = 'Criterio de Busqueda:';
+		lblCampo.innerHTML = 'Buscar por:';
+		this.lblTotal.innerHTML = 'Resultados:';
+		sector1.appendChild(lblCriterio);
+		sector1.appendChild(this.inputCriterio);
+		sector1.appendChild(this.btnBuscar);
+		subSector1.appendChild(lblCampo);
+		subSector1.appendChild(this.selectCampo);
+		subSector2.appendChild(this.lblTotal);
+		subSector2.appendChild(this.btnUpdate);
+		sector2.appendChild(subSector1);
+		sector2.appendChild(subSector2);
+		this.searchBarElement.appendChild(sector1);
+		this.searchBarElement.appendChild(sector2);
+		}
 
 	this.eventos=function(){
 
@@ -222,6 +259,10 @@ function DataBarModel(registro,dataBarElement){
 
 	this.renderDataBarModel=function(){
 		var button;
+		var sector1 = document.createElement('div');
+		var sector2 = document.createElement('div');
+		sector1.id='dbUpper';
+		sector2.id='dbLower';
 		buttonIds=['btnAdd','btnModify','btnConsult','btnDelete'];
 		buttonTextInside=[this.modeloTabla.dataAdd,this.modeloTabla.dataModify,this.modeloTabla.dataConsult,this.modeloTabla.dataDelete];
 		for(i=0;i<4;i++){
@@ -230,26 +271,32 @@ function DataBarModel(registro,dataBarElement){
 			button.className='button-general';
 			button.innerHTML = buttonTextInside[i];
 			this.buttons.push(button);
-			dataBarElement.appendChild(button);
 		}
-
-		
+		sector1.appendChild(this.buttons[0]);
+		sector1.appendChild(this.buttons[1]);
+		sector2.appendChild(this.buttons[2]);
+		sector2.appendChild(this.buttons[3]);
+		this.dataBarElement.appendChild(sector1);
+		this.dataBarElement.appendChild(sector2);
 	}
 
 	this.eventos=function(){
+		var self = this;
+		var modal = document.getElementById('formularioModal');
 		this.buttons[0].onclick=function(){
-			new FormUsuario(this.registro.dataHandler,
-				{modal:this.registro.menuPrincipal,tipo:1});
+			new FormUsuario(self.registro.dataHandler,
+				{modal:modal,tipo:1});
 		}
 		this.buttons[1].onclick=function(){
-			new FormUsuario(this.registro.dataHandler,
-				{modal:this.registro.menuPrincipal,tipo:2,
-					idBuscado:this.registro.tabla.modeloTabla.selectedRow.firstChild.innerHTML});
+			//console.log(self.registro.modeloTabla.selectedRow.firstChild.innerHTML);
+			new FormUsuario(self.registro.dataHandler,
+				{modal:modal,tipo:2,
+					idBuscado:self.registro.modeloTabla.getValueAt(self.registro.modeloTabla.getValue)});
 		}
 		this.buttons[2].onclick=function(){
-			new FormUsuario(this.registro.dataHandler,
-				{modal:this.registro.menuPrincipal,tipo:3,
-					idBuscado:this.registro.tabla.modeloTabla.selectedRow.firstChild.innerHTML});
+			new FormUsuario(self.registro.dataHandler,
+				{modal:modal,tipo:3,
+					idBuscado:self.registro.modeloTabla.selectedRow.firstChild.innerHTML});
 		}
 		this.buttons[3].onclick=function(){
 			//Eliminar
@@ -268,10 +315,11 @@ function TableModelUsuario(tableElement){
 	this.titulo = 'Registros de Usuarios del Sistema'
 	this.metodoEntities = 'getUsuarios';
 	this.metodoEntity = 'getUsuario';
-	this.dataAdd = 'Nuevo Usuario';
+	this.dataAdd = 'Agregar Nuevo Usuario';
 	this.dataModify = 'Modificar Usuario Seleccionado';
 	this.dataDelete = 'Eliminar Usuario Seleccionado';
 	this.dataConsult = 'Consultar Usuario Seleccionado';
+	this.options = ['Codigo','Nombre','Username','UserType','Estado'];
 
 	this.setRows=function(usuarios){
 		var i=0,j=0;
@@ -279,12 +327,11 @@ function TableModelUsuario(tableElement){
 		for(i=0;i<usuarios.length;i++){
 			rows[i]=new Array(6);
 			rows[i][0]=usuarios[i].idUsuario;
-			rows[i][1]=j;
+			rows[i][1]=++j;
 			rows[i][2]=usuarios[i].nombre;
 			rows[i][3]=usuarios[i].username;
-			rows[i][4]=usuarios[i].usertype;
-			rows[i][5]=usuarios[i].estado;
-			j++;
+			rows[i][4]=(usuarios[i].usertype==='J')?'Jefe de RRHH.' : 'Empleado RRHH.';
+			rows[i][5]=(usuarios[i].estado==='H')?'Hab.':'Deshab.';
 		}
 		return rows;
 	}

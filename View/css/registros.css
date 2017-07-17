@@ -1,10 +1,25 @@
+/*TABLA MAIN*/
 .table{
 	width:80%;
+	height:80%;
+	margin-bottom:0;
+	
 	margin:auto;
 }
 
-.table tr{
-	background-color:#fff;
+.table tbody{
+	height:70%;
+	width:100%;
+	display:block;
+	overflow:auto;
+}
+
+.table tbody tr td:first-child{
+
+}
+
+.table tbody tr td:last-child{
+
 }
 
 .table .headers{
@@ -14,17 +29,108 @@
 	font-size:16px;
 }
 
-#dataBar, #searchBar{
-	position:relative;
+.table tr{
+	background-color:#fff;
+}
+
+.table tr:hover:not(.headers){
+	background-color:lightblue;
+	color:black;
+}
+
+.table tr.selected:not(.headers){
+	background-color:blue;
+	color:white;
+}
+
+/*SEARCH BAR*/
+#searchBar{
+	height:10%;
 	width:80%;
 	margin:auto;
+	background-color:darkgrey;
+	background-color:#dddddd;
+}
+
+#sbUpper{
+	float:left;
+	width:100%;
 	background-color:#ed7804;
 }
 
-#searchBar *{
+
+#sbUpper *{
 	float:left;
 }
 
+#sbLower{
+	width:100%;
+}
 
+#inputCriterio{
+	margin-right:0.5em;
+	width:50%;
+}
+
+#searchBar p{
+	/*margin-top:0;*/
+	
+	font-weight: bold;
+	font-size:1em;
+	margin-left:1em;
+	margin-right:0.5em;
+}
+
+#searchBar input{
+	margin-top:0.8em;
+	font-size:1em;
+}
+
+#searchBar select{
+	margin-top:0.8em;
+	font-size:1.1em;
+	width:50%;
+}
+#searchBar button{
+	margin-top:0.8em;
+	font-size:1em;
+	margin-right:1em;
+}
+
+#sbLower *{
+	float:left;
+}
+
+#sblLeft{
+	float:left;
+	width:50%;
+	background-color:gray;
+}
+
+#sblRight{
+	float:left;
+	width:50%;
+	background-color:green;
+}
+
+#btnUpdate{
+	float:right;
+}
+
+/*DATA BAR*/
+
+#dataBar{
+	position:fixed;
+	bottom:23%;
+	position:relative;
+	width:80%;
+	margin:auto;
+}
+
+#dataBar button{
+	width:50%;
+	font-size:1em;
+	line-height:1.3em;
+}
 
 

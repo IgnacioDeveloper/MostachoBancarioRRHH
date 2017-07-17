@@ -22,7 +22,11 @@ class Usuario{
 	}
 
 	function __construct0(){
+		
+	}
 
+	function _construct1($idUsuario){
+		$this->idUsuario=$idUsuario;
 	}
 
 	function __construct2($username,$password){
@@ -99,16 +103,19 @@ class Usuario{
 	function autenticar(){
 		$funcion = "FX_USEROK('$this->username','$this->password')";
 		$resultado = $this->persistencia->ejecutarFuncion($funcion);
-		if($resultado == 1) $this->autocompletar();
+		if($resultado == 1) $this->autocompletar("USERNAME = '$this->username'");
 		return $resultado;
 	}
 
-	function autocompletar(){
-		$registro = $this->obtenerUsuarios("USERNAME = '$this->username'");
-		$this->idUsuario = $registro[0]["idUsuario"];
-		$this->nombre = $registro[0]["nombre"];
-		$this->usertype = $registro[0]["usertype"];
-		$this->estado = $registro[0]["estado"];
+	function autocompletar($condicion){
+		$registro = $this->getUsuarios($condicion);
+		//[{"idUsuario":"1","nombre":"Ignacio Matias Aramburu","username":"ignaciodeveloper","password":"753f34fd0d965f463506cb6ba85a30cd","usertype":"J","estado":"H","token":"0"}]
+		$registro = json_decode($registro);
+		$this->idUsuario = $registro[0]->idUsuario;
+		$this->nombre = $registro[0]->nombre;
+		$this->username = $registro[0]->username;
+		$this->usertype = $registro[0]->usertype;
+		$this->estado = $registro[0]->estado;
 		unset($registro);
 	}
 
@@ -134,10 +141,6 @@ class Usuario{
 		$registros = $this->persistencia->leer('USUARIO','*','',$condicion);
 		$registros = json_encode($registros);
 		return $registros;
-	}
-
-	function getUsuario($condicion){
-
 	}
 
 	function getJSON(){

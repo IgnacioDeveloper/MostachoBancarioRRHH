@@ -1,14 +1,5 @@
 /*ESTILO DE PAGINA WEB*/
-html,
-
-#content{
-	width:100%;
-}
-
-main{
-	margin:auto;
-	width:100%;
-}
+html
 
 body { 
   display: table;
@@ -20,7 +11,10 @@ body {
 }
 
 #content{
-	display:none;
+	width:100%;
+	display:table;
+	overflow:auto;
+	visibility: hidden;
 }
 
  
@@ -149,27 +143,26 @@ top:0;
 /*TITULO*/
 
 #titulo{
-	position:absolute;
+	position:relative;
 	display: inline-block;
 	width:100%;
 	left:0;
 	color:black;
 	font-size: 28px;
 	text-align: center;
-	top:65px;
 	z-index: 1;
 }
 
-/*ORGANIGRAMA*/
+/*MAIN*/
 
 #main{
-	display:inline-block;
-	top:0;
-	height:100%;
+	position:fixed;
 	width:100%;
-	overflow-x: auto;
-	margin-top: 150px;
+	height:80%;
+	top:13.5%;
+	bottom:13.5%;
 	text-align: center;
+	/*background-color:green;*/
 }
 
 /*FOOTER INFERIOR (FECHA-HORA E INFORMACION DEL USUARIO)*/

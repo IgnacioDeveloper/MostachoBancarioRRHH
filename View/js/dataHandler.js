@@ -20,7 +20,7 @@ function DataHandler(){
 					case "saveUsuario": callContext.confirmacion(ajax_request.responseText,1);break; 
 					case "modifyUsuario": callContext.confirmacion(ajax_request.responseText,2);break;
 					case "deleteUsuario": break;
-					case "getUsuario":break;
+					case "getUsuario": callContext.setFormData(ajax_request.responseText);break;
 					case "getUsuarios": callContext.updateTableInfo(ajax_request.responseText);break;
 					case "saveArea":break; 
 					case "modifyArea":break;
