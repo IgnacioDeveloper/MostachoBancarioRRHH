@@ -49,6 +49,8 @@ function Mensaje(parent,contenidoMensaje,tipo){
 	}
 
 	this.startConditionMessage=function(){
+		var mensaje = this;
+		this.createMessageContent(this.contenidoMensaje);
 		var botonYes = document.createElement("button");
 		botonYes.id = "botonYes";
 		botonYes.innerHTML = "Si";
@@ -72,7 +74,7 @@ function Mensaje(parent,contenidoMensaje,tipo){
 	}
 
 	this.returnResponse=function(ans){
-		this.parent.dialogResponse = ans;
+		this.parent.catchResponse(ans,operacion);
 	}
 
 	this.openMessage();

@@ -3,8 +3,17 @@
 	<head>
 		<title>This just a Test!</title>
 		<link href = "http://localhost/MostachoRRHH/Test/testCSS.css" rel="stylesheet"/>
+		<link href = "http://localhost/MostachoRRHH/View/css/mensajeModal.css" rel = "stylesheet"/>
 	</head>
 	<body style = "background:black">
+		<div id="mensajeModal" class="modalMensaje">
+
+		  <!-- Modal Mensaje Content -->
+		  <div class="modal-content">
+		  
+		  </div>
+
+		</div>
 		<h1 style ="color:orange">Hola, esto es Testing Area</h1>
 		<h2 id='lblValidacion' style ="color:orange"></h2>
 		<input type="text" style="margin:10px;margin-left: 0; width:50%"><br/>
@@ -20,29 +29,35 @@
 					<td id="header1">Nombre</td>
 					<td id="header2">Apellido</td>
 				</tr>
-					<tr class = 'none'>
+					<tr class = 'none' value='0'>
 						<td>0</td>
 						<td>Ignacio Matias</td>
 						<td>Aramburu</td>
 					</tr>
-					<tr>
-						<td>1</td>
+					<tr data-value='1'>
+						<td >1</td>
 						<td>Gustavo</td>
 						<td>Maigua</td>
 					</tr>
-					<tr class = 'none'>
+					<tr class = 'none' data-value='2'>
 						<td>2</td>
 						<td>Rene Alejandro</td>
 						<td>Astorga</td>
 					</tr>
-					<tr class = 'none'>
+					<tr class = 'none' data-value='3'>
 						<td>3</td>
 						<td>Mario Sergio</td>
 						<td>Alberto</td>
 					</tr>
 			</table>
 		</div>
+		<div id='mensajeModal' style='background:#001;'>
+			<h1 style='color:orange'>Mensaje de prueba</h1>
+			<button id='btnMensaje'>Activar mensaje condicional</button>
+			<p style='color:orange'>La respuesta de su mensaje es: <input id ="inputRespuestaMensaje" type="text" style="margin:10px;margin-left: 0; width:10%"></p>
+		</div>
 		<script type = "text/javascript" src="http://localhost/MostachoRRHH/Test/testJS.js"></script>
+		<script type = "text/javascript" src="http://localhost/MostachoRRHH/View/js/mensajeModal.js"></script>
 	</body>
 	</html>
 </html>

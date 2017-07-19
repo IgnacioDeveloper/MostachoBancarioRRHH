@@ -1,4 +1,7 @@
 <?php
+
+	require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/PersistenciaPDO/PersistenciaPDO.php';
+
 	class Puesto{
 		private $idPuesto;
 		private $codigo;
@@ -10,12 +13,25 @@
 		private $conocimientosRequeridos;
 		private $idArea;
 
-		function Puesto(){
-
+		function __construct(){
+			$params = func_get_args();
+			$numParams = func_num_args();
+			$fConstructor = '__construct'.$numParams;
+			if(method_exists($this,$fConstructor)){
+				call_user_func_array(array($this,$fConstructor),$params);
+				$this->persistencia = new PersistenciaPDO();
+			}
 		}
 
+		function __construct0(){
+			
+		}
 
-		function Puesto($idPuesto,$codigo,$nombre,$descripcion,$objetivoGeneral,$funcionesEspecificas,
+		function _construct1($idPuesto){
+			$this->idPuesto=$idPuesto;
+		}
+
+		function __construct9($idPuesto,$codigo,$nombre,$descripcion,$objetivoGeneral,$funcionesEspecificas,
 			$competenciasRequeridas,$conocimientosRequeridos,$idArea){
 			$this->idPuesto=$idPuesto;
 			$this->codigo = $codigo;
@@ -100,38 +116,47 @@
 			$this->idArea = $valor;
 		}
 
+		function autocompletar($condicion){
+			$registro = $this->getPersonas($condicion);
+			$registro = json_decode($registro);
+			$this->idPuesto =$registro[0]->idPuesto;
+			$this->codigo =$registro[0]->codigo;
+			$this->nombre =$registro[0]->nombre;
+			$this->descripcion =$registro[0]->descripcion;
+			$this->objetivoGeneral =$registro[0]->objetivoGeneral;
+			$this->funcionesEpecificas =$registro[0]->funcionesEspecificas;
+			$this->competenciasRequeridas =$registro[0]->competenciasRequeridas;
+			$this->conocimientosRequeridos =$registro[0]->conocimientosRequeridos;
+			$this->idArea =$registro[0]-> idArea;
+			unset($registro);
+		}
+
 		function guardar(){
-			$valores = '\'$this->idPuesto\',$this->codigo
-			\',\'$this->nombre\',\'$this->descripcion\',\'$this->objetivoGeneral\'
-			,\'$this->funcionesEpecificas\',\'$this->competenciasRequeridas\'
-			,\'$this->conocimientosRequeridos\',\'$this->idArea\'';
-			$persistencia->aniadir('PUESTO',$valores);
+			$valores = "'$this->idPuesto',$this->codigo
+			','$this->nombre','$this->descripcion','$this->objetivoGeneral'
+			,'$this->funcionesEpecificas','$this->competenciasRequeridas'
+			,'$this->conocimientosRequeridos','$this->idArea'";
+			$this->persistencia->aniadir('PUESTO',$valores);
 		}
 
 		function modificar(){
-			$set='IDPUESTO = \'$this->idPuesto\',CODIGO = \'$this->codigo\', NOMBRE = \'$this->nombre\',
-			DESCRIPCION =  \'$this->descripcion\', OBJETIVOGENERAL = \'$this->objetivoGeneral\',
-			FUNCIONESESPECIFICAS = \'$this->funcionesEpecificas\',
-			COMPETENCIASREQUERIDAS = \'$this->competenciasRequeridas\', 
-			CONOCIMIENTOSREQUERIDOS = \'$this->conocimientosRequeridos\', IDAREA = \'$this->idArea\'';
-			$persistencia->modificar('PUESTO',$set);
+			$set="IDPUESTO = '$this->idPuesto',CODIGO = '$this->codigo', NOMBRE = '$this->nombre',
+			DESCRIPCION =  '$this->descripcion', OBJETIVOGENERAL = '$this->objetivoGeneral',
+			FUNCIONESESPECIFICAS = '$this->funcionesEpecificas',
+			COMPETENCIASREQUERIDAS = '$this->competenciasRequeridas', 
+			CONOCIMIENTOSREQUERIDOS = '$this->conocimientosRequeridos', IDAREA = '$this->idArea'";
+			$this->persistencia->modificar('PUESTO',$set);
 		}
 
 		function eliminar(){
-			$condicion='IDPUESTO = $idPuesto';
-			$persistencia->eliminar('PUESTO',$condicion);
+			$condicion='IDPUESTO ='. $this->idPuesto;
+			$this->persistencia->eliminar('PUESTO',$condicion);
 		}
 
-		static function obtenerPuestos($condicion){
-			$registros = $persistencia->leer('PUESTO','*','',$condicion);
-			$puestos = array();
-			$i=0;
-			foreach($registros as $registro){
-				$puestos[$i]=new Puesto($registro[0],$registro[1],$registro[2],$registro[3],$registro[4]
-					,$registro[5],$registro[6],$registro[7],$registro[8]);
-			}
-			unset($registros);
-			return $puestos;
+		function getPuestos($condicion){
+			$registros = $this->persistencia->leer('PUESTO','*','',$condicion);
+			$registros = json_encode($registros);
+			return $registros;
 		}
 
 	}

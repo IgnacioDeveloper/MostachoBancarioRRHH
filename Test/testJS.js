@@ -10,6 +10,8 @@ window.onload=function(){
 	var tabla = document.getElementById("tabla");
 	var elemento;
 	var filtro = document.getElementById("filtroApellidos");
+	var btnMensaje = document.getElementById("btnMensaje");
+	var inputMensaje = document.getElementById('inputRespuestaMensaje');
 
 	lblValidacion.innerHTML="Validacion: "+reExpression;
 
@@ -33,9 +35,15 @@ window.onload=function(){
 		elemento.className = 'none';
 		elemento = e.target.parentNode;
 		elemento.className = 'selected';
+		console.log(e.target.parentNode.getAttribute('data-value'));
 	}
 
+	btnMensaje.onclick=function(){
+		new Mensaje(this,'Entonces cual es tu respuesta?','condicion');
+		
+	}
 }
+
 
 function ElementoHTML(input,errorMessage){
 	this.input = input;

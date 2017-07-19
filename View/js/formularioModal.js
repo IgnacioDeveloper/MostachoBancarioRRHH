@@ -17,6 +17,11 @@ function ModalWindowModel(modal){
 
 	this.show=function(){
 		this.setWindow(this,true);
+		this.goTop();
+	}
+
+	this.goTop=function(){
+		this.modalBody.scrollTop=0;
 	}
 
 	this.appendElements=function(elements,modalSector){
@@ -103,8 +108,7 @@ function Formulario(modal){
 
 
 	this.startForm=function(){
-		//this.modal.scroll(0,0);
-		this.lockInfo(false);
+		this.lockInfo();
 		this.setButtons();
 	}
 
@@ -119,8 +123,33 @@ function Formulario(modal){
 		this.validacion.setVal();
 	}
 
-	this.lockInfo=function(){
+	this.unlockInfo=function(node){
+		if(node==undefined){
+			for(i=0;i<this.bodyElements.length;i++){
+				if(this.bodyElements[i].nodeName!=='P')this.bodyElements[i].disabled=false;
+			}
+		}
+		else if(node instanceof FormBodyElement){
+				node.element.disabled=false;
+		}
+		else{
+			node.disabled=false;
+		}
+	}
 
+	this.lockInfo=function(node){
+		if(node==undefined){
+			for(i=0;i<this.bodyElements.length;i++){
+				console.log(this.bodyElements[i]);
+				if(this.bodyElements[i].nodeName!=='P')this.bodyElements[i].disabled=true;
+			}
+		}
+		else if(node instanceof FormBodyElement){
+				node.element.disabled=true;
+		}
+		else{
+			node.disabled=true;
+		}
 	}
 
 	
@@ -158,6 +187,7 @@ function FormUsuario(dataHandler,conf){
 
 	this.startUserForm=function(){
 		//Maquetacion y referenciacion de Elementos del Formulario
+		console.log(conf);
 		this.bodyElements = this.appendElements(this.bodyNodes,this.modalBody);
 		this.txtNombre = new FormBodyElement(this.bodyElements[1],this.bodyElements[2],"textOnly",true);
 		this.txtUsername = new FormBodyElement(this.bodyElements[4],this.bodyElements[5],"alphanumericSs",true);
@@ -205,27 +235,34 @@ function FormUsuario(dataHandler,conf){
 		this.setCloseButton(this,this.button2);
 	}
 
-	this.setConfModificacion=function(){
+	this.setConfModificacion=function(flag){
 		var self = this;
-		this.getData(this.conf.idBuscado);
+		if(!flag)this.getData(this.conf.idBuscado);
+		this.unlockInfo();
 		this.title.innerHTML = "Modificar Informacion de Usuario";
 		this.button1.innerHTML = "Guardar cambios";
 		this.button2.innerHTML = "Cancelar";
 		this.button1.onclick=function(){
 			self.modificarDatos(this.conf.idBuscado);
 		}
+		this.setCloseButton(this,this.button2);
 	}
 
 	this.setConfConsulta=function(){
+		var self = this;
+		this.lockInfo();
+		this.getData(this.conf.idBuscado);
 		this.title.innerHTML = "Consulta de Informacion de Usuario";
-		//this.validacion = undefined;
+		this.button1.innerHTML = "Habilitar Modificaciones";
+		this.button2.innerHTML = "Ok";
 		this.button1.onclick=function(){
-			this.mutarConf();
+			self.mutarConf();
 		}
+		this.setCloseButton(this,this.button2);
 	}
 
 	this.guardarDatos=function(){
-		var val = this.validacion.fullCheck()
+		var val = this.validacion.fullCheck();
 		if(val){
 			var usuario = this.getJSonData();
 			var params="metodo=saveUsuario&params="+usuario;
@@ -234,12 +271,16 @@ function FormUsuario(dataHandler,conf){
 	}
 
 	this.modificarDatos=function(){
-		var usuario = this.getJSonData();
-		var params="metodo=modifyUsuario&params="+usuario;
+		var val = this.validacion.fullCheck();
+		if(val){
+			var usuario = this.getJSonData();
+			var params="metodo=modifyUsuario&params="+usuario;
+			this.dataHandler.ejecutarOperacionAJAX(this,"modifyUsuario",params);
+		}
 	}
 
-	this.mutarTipo=function(){
-
+	this.mutarConf=function(){
+		this.setConfModificacion(true);
 	}
 
 	this.confirmacion=function(resultado,tipo){
@@ -266,7 +307,11 @@ function FormUsuario(dataHandler,conf){
 	}
 
 	this.getJSonData=function(){
-		return '{"nombre":"'+this.txtNombre.element.value+'","username":"'+this.txtUsername.element.value+'","password":"'+this.txtPassword.element.value+'","usertype":"'+this.selectUsertype.element.value.charAt(0)+'","estado":"'+this.selectEstado.element.value.charAt(0)+'"}';
+		var password = '';
+		var regExp = /^[*]*$/;//Expresion regular de contraseña secreta sin modificaciones
+		if(!regExp.test(this.txtPassword.element.value))
+			password = '"password":"'+this.txtPassword.element.value+'",';
+		return '{"nombre":"'+this.txtNombre.element.value+'","username":"'+this.txtUsername.element.value+'",'+password+'""usertype":"'+this.selectUsertype.element.value.charAt(0)+'","estado":"'+this.selectEstado.element.value.charAt(0)+'"}';
 	}
 
 	this.getData=function(idBuscado){
@@ -276,7 +321,6 @@ function FormUsuario(dataHandler,conf){
 
 	this.setFormData=function(usuario){
 		usuario = JSON.parse(usuario);
-		console.log(usuario);
 		this.txtNombre.element.value=usuario.nombre; 
 		this.txtUsername.element.value=usuario.username; 
 		this.txtPassword.element.value='***';

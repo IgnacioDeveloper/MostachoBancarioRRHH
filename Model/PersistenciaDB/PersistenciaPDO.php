@@ -87,7 +87,7 @@
 
 		function modificar($tabla,$set,$condicion){
 			$sql_query = 'UPDATE '.$tabla.' SET '.$set.' WHERE '.$condicion;
-			//echo $sql_query.'<br/>';
+			echo $sql_query.'<br/>';
 			try{
 				$this->connectionDB->exec($sql_query);
 			}

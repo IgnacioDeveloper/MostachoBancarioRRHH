@@ -64,7 +64,12 @@
     font-family: arial;
 }
 
-.modalFormulario .modal-body {padding: 2px 16px;font-family: arial; height: 300px; overflow:auto;}
+.modalFormulario .modal-body {
+    padding: 2px 16px;
+    font-family: arial;
+    height: 300px;
+    overflow:auto;
+}
 
 .modalFormulario .modal-footer {
     padding: 2px 16px;

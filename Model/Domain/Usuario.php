@@ -15,9 +15,9 @@ class Usuario{
 		$params = func_get_args();
 		$numParams = func_num_args();
 		$fConstructor = '__construct'.$numParams;
+		$this->persistencia = new PersistenciaPDO();
 		if(method_exists($this,$fConstructor)){
 			call_user_func_array(array($this,$fConstructor),$params);
-			$this->persistencia = new PersistenciaPDO();
 		}
 	}
 
@@ -51,6 +51,8 @@ class Usuario{
 		$this->usertype=$usertype;
 		$this->estado=$estado;
 	}
+
+
 
 	function getIdUsuario(){
 		return $this->idUsuario;		
@@ -126,8 +128,8 @@ class Usuario{
 	}
 
 	function modificar(){
-		$set="NOMBRE = '$this->nombre', USERNAME = '$this->username',
-		PASSWORD =  '$this->password', USERTYPE = '$this->usertype'";
+		$password=($this->password!=null)?"PASSWORD ='$this->password',":"";
+		$set="NOMBRE = '$this->nombre', USERNAME = '$this->username',".$password." USERTYPE = '$this->usertype', ESTADO = '$this->estado'";
 		$condicion = "'IDUSUARIO = '$this->idUsuario'";
 		$this->persistencia->modificar('USUARIO',$set,$condicion);
 	}
@@ -143,9 +145,22 @@ class Usuario{
 		return $registros;
 	}
 
+	function habilitarUsuario(){
+		$set="ESTADO = 'H'";
+		$condicion = "'IDUSUARIO = '$this->idUsuario'";
+		$this->persistencia->modificar('USUARIO',$set,$condicion);
+	}
+
+	function deshabilitarUsuario(){
+		$set="ESTADO = 'D'";
+		$condicion = "IDUSUARIO = '$this->idUsuario'";
+		$this->persistencia->modificar('USUARIO',$set,$condicion);
+	}
+
 	function getJSON(){
 		return '{"idUsuario":"'.$this->idUsuario.'","nombre":"'.$this->nombre.'","username":"'.$this->username.'","password":"'.$this->password.'","usertype":"'.$this->usertype.'","estado":"'.$this->estado.'"}';
 	}
+
 }
 
 ?>

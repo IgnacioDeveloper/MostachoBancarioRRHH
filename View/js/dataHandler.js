@@ -19,7 +19,7 @@ function DataHandler(){
 					case "destroySession": closeMenuPrincipal(ajax_request.responseText); break;
 					case "saveUsuario": callContext.confirmacion(ajax_request.responseText,1);break; 
 					case "modifyUsuario": callContext.confirmacion(ajax_request.responseText,2);break;
-					case "deleteUsuario": break;
+					case "setUsuarioPermit":callContext.updateInfo();break;
 					case "getUsuario": callContext.setFormData(ajax_request.responseText);break;
 					case "getUsuarios": callContext.updateTableInfo(ajax_request.responseText);break;
 					case "saveArea":break; 

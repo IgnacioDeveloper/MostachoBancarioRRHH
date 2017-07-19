@@ -18,27 +18,39 @@ function TableModel(tableElement,headers,widths){
 		this.setColumnsWidth(widths);
 	}
 
-	this.updateRows = function(rows){
+	this.updateRows = function(rows,isId){
 		this.removeAllDataRows();
-		for(i=0;i<rows.length;i++){
-			this.appendRow(rows[i]);
+		if(isId){	
+			for(i=0;i<rows.length;i++){
+				this.appendRow(rows[i].splice(1));
+				this.rows[i].setAttribute('data-value',rows[i][0]);
+			}	
+		}
+		else{
+			for(i=0;i<rows.length;i++){
+				this.appendRow(rows[i]);
+			}	
 		}
 	}
 
 	this.clearTableModel = function(){
+		this.columns=[];
+		this.rows=[];
 		while(this.tableElement.hasChildNodes()){
 			this.tableElement.removeChild(this.tableElement.lastChild);
 		}
 	}
 
 	this.removeAllDataRows = function(){
+		console.log('removeAllDataRows');
 		for(i=this.rows.length;i>0;i--){
+			console.log('row:'+i);
 			this.tableElement.deleteRow(i);
 		}
+		this.rows=[];
 	}
 
 	this.addColumns=function(){
-		this.columns=[];
 		var rowNode = this.tableElement.insertRow(0);
 		rowNode.className='headers';
 		var cellNode;
@@ -53,12 +65,13 @@ function TableModel(tableElement,headers,widths){
 	this.appendRow=function(row){
 		//alert(row);
 		var rowNode = this.tableElement.insertRow(this.tableElement.length);
-		var cellNode;
+		var cellNode,start;
 		for(j=0;j<row.length;j++){
 			cellNode = rowNode.insertCell(j);
 			cellNode.innerHTML=row[j];
 			//rowNode.append(cellNode);
 		}
+		this.rows.push(rowNode);
 		//this.tableElement.appendChild(rowNode);
 	}
 
@@ -128,7 +141,7 @@ function Registro(sector,dataHandler,modeloTabla){
 		this.searchBar.modeloSearchBar.startSearchBarModel();
 		this.modeloTabla.startTableModel();
 		this.dataBar.modeloDataBar.startDataBarModel();
-		this.getData(1);
+		this.updateInfo();
 	}
 
 	this.getData=function(campo,criterio){
@@ -144,7 +157,13 @@ function Registro(sector,dataHandler,modeloTabla){
 		this.dataHandler.ejecutarOperacionAJAX(this,metodo,params);
 	} 
 
+	this.updateInfo=function(){
+		console.log('updateInfo');
+		this.getData(1);
+	}
+
 	this.updateTableInfo=function(registros){
+		console.log(registros);
 		registros = JSON.parse(registros);
 		this.modeloTabla.updateTable(registros);
 	}
@@ -291,35 +310,33 @@ function DataBarModel(registro,dataBarElement){
 			//console.log(self.registro.modeloTabla.selectedRow.firstChild.innerHTML);
 			new FormUsuario(self.registro.dataHandler,
 				{modal:modal,tipo:2,
-					idBuscado:self.registro.modeloTabla.getValueAt(self.registro.modeloTabla.getValue)});
+					idBuscado:self.registro.modeloTabla.selectedRow.getAttribute('data-value')});
 		}
 		this.buttons[2].onclick=function(){
 			new FormUsuario(self.registro.dataHandler,
 				{modal:modal,tipo:3,
-					idBuscado:self.registro.modeloTabla.selectedRow.firstChild.innerHTML});
+					idBuscado:self.registro.modeloTabla.selectedRow.getAttribute('data-value')});
 		}
 		this.buttons[3].onclick=function(){
-			//Eliminar
+			self.registro.modeloTabla.confirmDeleteOperation(self.registro);
 		}
 	}
 
 }
 
-
-
 function TableModelUsuario(tableElement){
 	TableModel.call(this,tableElement,
-		['ID','Nro','Nombre','Nombre de Usuario','Tipo de Usuario','Estado']
-		,['0','7%','50%','20%','15%','8%']);
+		['Nro','Nombre','Nombre de Usuario','Tipo de Usuario','Estado']
+		,['7%','53%','20%','15%','8%']);
 	this.modulo = 'Usuarios';
 	this.titulo = 'Registros de Usuarios del Sistema'
 	this.metodoEntities = 'getUsuarios';
 	this.metodoEntity = 'getUsuario';
 	this.dataAdd = 'Agregar Nuevo Usuario';
 	this.dataModify = 'Modificar Usuario Seleccionado';
-	this.dataDelete = 'Eliminar Usuario Seleccionado';
+	this.dataDelete = 'Habilitar/Deshabilitar Usuario Seleccionado';
 	this.dataConsult = 'Consultar Usuario Seleccionado';
-	this.options = ['Codigo','Nombre','Username','UserType','Estado'];
+	this.options = ['Nombre','Username','UserType','Estado'];
 
 	this.setRows=function(usuarios){
 		var i=0,j=0;
@@ -337,7 +354,26 @@ function TableModelUsuario(tableElement){
 	}
 
 	this.updateTable=function(usuarios){
-		this.updateRows(this.setRows(usuarios));
+		this.updateRows(this.setRows(usuarios),true);
+	}
+
+	this.confirmDeleteOperation=function(registro){
+		console.log(this.selectedRow.cells[4].innerHTML);
+		if(this.selectedRow.cells[4].innerHTML==='Hab.')
+			this.deshabilitarUsuario(this.selectedRow.getAttribute('data-value'),registro);
+		else 
+			this.habilitarUsuario(this.selectedRow.getAttribute('data-value'),registro);
+	}
+
+	this.habilitarUsuario=function(id,registro){
+		var params='metodo=setUsuarioPermit&params={"idUsuario":'+id+',"permit":1}';
+		registro.dataHandler.ejecutarOperacionAJAX(registro,'setUsuarioPermit',params);
+	}
+
+	this.deshabilitarUsuario=function(id,registro){
+		console.log(registro);
+		var params='metodo=setUsuarioPermit&params={"idUsuario":'+id+',"permit":2}';
+		registro.dataHandler.ejecutarOperacionAJAX(registro,'setUsuarioPermit',params);
 	}
 
 }
