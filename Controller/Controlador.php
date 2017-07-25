@@ -1,11 +1,11 @@
 <?php
 $controlador = Controlador::getInstance();
+//metodo=modifyUsuario&params={"idUsuario":2,"nombre":"Rene Astorgaa","username":"rene1234","usertype":"J","estado":"H"}
+//$resultado = $controlador->executeMethod('getUsuarios',array('UPPER(NOMBRE) LIKE "r%"'));
 $resultado = $controlador->executeMethod(isset($_POST["metodo"]) ? $_POST["metodo"] : "",isset($_POST["params"]) ? array($_POST["params"]) : "");
-if($resultado != "ERROR"){
+if($resultado !== "ERROR"){
 	echo ($resultado);
 }
-
-
 
 class Controlador{
 
@@ -84,24 +84,23 @@ class Controlador{
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
 		$params = json_decode($params);
 		$usuario = new Usuario();
-		$registros = $usuario->getUsuarios($params);
+		$registros = $usuario->getUsuarios($params->condicion);
 		return $registros;
 	}
 
 	private function getUsuario($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
-		//$params = json_decode($params);
+		$params = json_decode($params);
 		$usuario = new Usuario();
 		$usuario->autocompletar('IDUSUARIO = '.$params);
 		$registro=$usuario->getJSON();
-		$_SESSION['usuarioInteres'] = $usuario;
 		return $registro;
 	}
 
 	private function modifyUsuario($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
 		$params = json_decode($params);
-		$usuario = $_SESSION['usuarioInteres'];
+		$usuario= new Usuario($params->idUsuario);
 		$usuario->setNombre($params->nombre);
 		$usuario->setUsername($params->username);
 		if(isset($params->password))$usuario->setPassword($params->password);
@@ -115,7 +114,7 @@ class Controlador{
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
 		$params = json_decode($params);
 		$usuario = new Usuario($params->idUsuario);
-		if($params->permit == 1) $usuario->habilitarUsuario();
+		if($params->permit === 1) $usuario->habilitarUsuario();
 		else $usuario->deshabilitarUsuario();
 		return true;
 	}

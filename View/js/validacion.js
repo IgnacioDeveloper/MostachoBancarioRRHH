@@ -59,7 +59,7 @@ function Validacion(formulario){
 				case "mail" : txt.element.addEventListener("blur",function(){if(!validacion.reExpVacio.test(this.value))validacion.valMail(this);else validacion.setNormal(this);},false);break;
 				case "phone" : txt.element.addEventListener("blur",function(){if(!validacion.reExpVacio.test(this.value))validacion.valPhone(this);else validacion.setNormal(this);},false);break;
 				case "cuil" : txt.element.addEventListener("blur",function(){if(!validacion.reExpVacio.test(this.value))validacion.valCuil(this);else validacion.setNormal(this);},false);break;
-				case "integer": txt.element.addEventListenener("blur",function(){if(!validacion.reExpVacio.test(this.value))validacion.valInteger(this);else validacion.setNormal(this);},false);break;
+				case "integer": txt.element.addEventListener("blur",function(){if(!validacion.reExpVacio.test(this.value))validacion.valInteger(this);else validacion.setNormal(this);},false);break;
 				case "double": txt.element.addEventListener("blur",function(){if(!validacion.reExpVacio.test(this.value))validacion.valDouble(this);else validacion.setNormal(this);},false);break;
 			}
 		}

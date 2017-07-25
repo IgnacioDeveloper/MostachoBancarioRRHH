@@ -42,9 +42,7 @@ function TableModel(tableElement,headers,widths){
 	}
 
 	this.removeAllDataRows = function(){
-		console.log('removeAllDataRows');
 		for(i=this.rows.length;i>0;i--){
-			console.log('row:'+i);
 			this.tableElement.deleteRow(i);
 		}
 		this.rows=[];
@@ -141,7 +139,7 @@ function Registro(sector,dataHandler,modeloTabla){
 		this.searchBar.modeloSearchBar.startSearchBarModel();
 		this.modeloTabla.startTableModel();
 		this.dataBar.modeloDataBar.startDataBarModel();
-		this.updateInfo();
+		this.updateFullInfo();
 	}
 
 	this.getData=function(campo,criterio){
@@ -151,21 +149,25 @@ function Registro(sector,dataHandler,modeloTabla){
 			condicion = '1';
 		} 
 		else {
-			condicion = '"'+campo+' = '+criterio+'"';
+			criterio = criterio.toUpperCase();
+			condicion = "UPPER("+campo+") LIKE '"+criterio+"%'";
 		}
-		var params = 'metodo='+metodo+'&params='+condicion;
+		var params = 'metodo='+metodo+'&params={"condicion":"'+condicion+'"}';
 		this.dataHandler.ejecutarOperacionAJAX(this,metodo,params);
 	} 
 
-	this.updateInfo=function(){
-		console.log('updateInfo');
+	this.updateFullInfo=function(){
 		this.getData(1);
 	}
 
+	this.updateInfo=function(){
+		this.getData(self.selectCampo.options[selectCampo.selectedIndex].value,self.inputCriterio.value);
+	}
+
 	this.updateTableInfo=function(registros){
-		console.log(registros);
 		registros = JSON.parse(registros);
 		this.modeloTabla.updateTable(registros);
+		this.searchBar.modeloSearchBar.updateResultInfo(this.modeloTabla.getRowCount());
 	}
 
 	this.startRegistro();
@@ -180,16 +182,16 @@ function SearchBarModel(registro,searchBarElement){
 	this.searchBarElement = searchBarElement;
 	this.registro = registro;
 	this.tabla = registro.tabla;
-	this.btnBuscar=null;
-	this.btnUpdate=null;
-	this.inputCriterio=null;
-	this.selectCampo=null;
-	this.lblTotal=null;
+	this.btnBuscar;
+	this.btnUpdate;
+	this.inputCriterio;
+	this.selectCampo;
+	this.lblTotal;
 
 	this.startSearchBarModel=function(){
 		this.clearSearchBarModel();
 		this.renderSearchBarModel();
-		//this.eventos();
+		this.eventos();
 	}
 
 	this.clearSearchBarModel=function(){
@@ -200,6 +202,10 @@ function SearchBarModel(registro,searchBarElement){
 		while(this.searchBarElement.hasChildNodes()){
 			this.searchBarElement.removeChild(searchBarElement.lastChild);
 		}
+	}
+
+	this.updateResultInfo=function(cantFilas){
+		this.lblTotal.innerHTML = 'Resultados: '+cantFilas;
 	}
 
 	this.renderSearchBarModel=function(){
@@ -226,10 +232,13 @@ function SearchBarModel(registro,searchBarElement){
 		this.btnUpdate.innerHTML = 'Actualizar';
 		this.selectCampo.id = 'selectCampo';
 		var options=this.registro.modeloTabla.options;
+		var optionsValue=this.registro.modeloTabla.optionsValue;
+		console.log(optionsValue);
 		var option;
 		for(i=0;i<options.length;i++){
 			option = document.createElement('option');
 			option.text = options[i];
+			option.value = optionsValue[i];
 			this.selectCampo.add(option);
 		}
 		lblCriterio.innerHTML = 'Criterio de Busqueda:';
@@ -249,7 +258,13 @@ function SearchBarModel(registro,searchBarElement){
 		}
 
 	this.eventos=function(){
-
+		self = this;
+		this.btnUpdate.onclick=function(){
+			self.registro.getData(self.selectCampo.options[selectCampo.selectedIndex].value,self.inputCriterio.value);
+		}
+		this.btnBuscar.onclick=function(){
+			self.registro.getData(self.selectCampo.options[selectCampo.selectedIndex].value,self.inputCriterio.value);
+		}
 	}
 }
 
@@ -307,15 +322,16 @@ function DataBarModel(registro,dataBarElement){
 				{modal:modal,tipo:1});
 		}
 		this.buttons[1].onclick=function(){
-			//console.log(self.registro.modeloTabla.selectedRow.firstChild.innerHTML);
 			new FormUsuario(self.registro.dataHandler,
 				{modal:modal,tipo:2,
-					idBuscado:self.registro.modeloTabla.selectedRow.getAttribute('data-value')});
+					idBuscado:self.registro.modeloTabla.selectedRow.getAttribute('data-value')},
+					self.registro);
 		}
 		this.buttons[2].onclick=function(){
 			new FormUsuario(self.registro.dataHandler,
 				{modal:modal,tipo:3,
-					idBuscado:self.registro.modeloTabla.selectedRow.getAttribute('data-value')});
+					idBuscado:self.registro.modeloTabla.selectedRow.getAttribute('data-value')},
+					self.registro);
 		}
 		this.buttons[3].onclick=function(){
 			self.registro.modeloTabla.confirmDeleteOperation(self.registro);
@@ -337,6 +353,7 @@ function TableModelUsuario(tableElement){
 	this.dataDelete = 'Habilitar/Deshabilitar Usuario Seleccionado';
 	this.dataConsult = 'Consultar Usuario Seleccionado';
 	this.options = ['Nombre','Username','UserType','Estado'];
+	this.optionsValue = ['NOMBRE','USERNAME','USERTYPE','ESTADO'];
 
 	this.setRows=function(usuarios){
 		var i=0,j=0;
@@ -372,7 +389,7 @@ function TableModelUsuario(tableElement){
 
 	this.deshabilitarUsuario=function(id,registro){
 		console.log(registro);
-		var params='metodo=setUsuarioPermit&params={"idUsuario":'+id+',"permit":2}';
+		var params='metodo=setUsuarioPermit&params={"idUsuario":'+id+',"permit":0}';
 		registro.dataHandler.ejecutarOperacionAJAX(registro,'setUsuarioPermit',params);
 	}
 

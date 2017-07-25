@@ -3,8 +3,8 @@ function DataHandler(){
 	if(DataHandler.singleInstance) return DataHandler.singleInstance;  
    	DataHandler.singleInstance = this;
 
-   	this.response="Ok"
-
+   	
+   	
    	this.ejecutarOperacionAJAX=function(callContext,operacion,params){
 	   	var resultado = "";
 		var ajax_url  = "http://localhost/MostachoRRHH/Controller/Controlador.php";

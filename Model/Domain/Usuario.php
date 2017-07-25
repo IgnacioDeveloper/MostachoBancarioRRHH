@@ -15,8 +15,8 @@ class Usuario{
 		$params = func_get_args();
 		$numParams = func_num_args();
 		$fConstructor = '__construct'.$numParams;
-		$this->persistencia = new PersistenciaPDO();
 		if(method_exists($this,$fConstructor)){
+			$this->persistencia = new PersistenciaPDO();
 			call_user_func_array(array($this,$fConstructor),$params);
 		}
 	}
@@ -25,7 +25,7 @@ class Usuario{
 		
 	}
 
-	function _construct1($idUsuario){
+	function __construct1($idUsuario){
 		$this->idUsuario=$idUsuario;
 	}
 
@@ -130,7 +130,7 @@ class Usuario{
 	function modificar(){
 		$password=($this->password!=null)?"PASSWORD ='$this->password',":"";
 		$set="NOMBRE = '$this->nombre', USERNAME = '$this->username',".$password." USERTYPE = '$this->usertype', ESTADO = '$this->estado'";
-		$condicion = "'IDUSUARIO = '$this->idUsuario'";
+		$condicion = "IDUSUARIO = '$this->idUsuario'";
 		$this->persistencia->modificar('USUARIO',$set,$condicion);
 	}
 
@@ -147,7 +147,7 @@ class Usuario{
 
 	function habilitarUsuario(){
 		$set="ESTADO = 'H'";
-		$condicion = "'IDUSUARIO = '$this->idUsuario'";
+		$condicion = "IDUSUARIO = '$this->idUsuario'";
 		$this->persistencia->modificar('USUARIO',$set,$condicion);
 	}
 

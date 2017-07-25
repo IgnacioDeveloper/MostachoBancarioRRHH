@@ -92,10 +92,10 @@ function MenuPrincipal(){
 	this.openAddForm=function(modulo){
 		var Configuracion = {modal:this.modal,tipo:1};
 		switch(modulo){
-			case 'areas': new FormAreas(this.dataHandler,Configuracion);break;
+			case 'areas': new FormArea(this.dataHandler,Configuracion);break;
 			case 'puestos':new FormPuestos(this.dataHandler,Configuracion);break;
 			case 'personas':new FormPersona(this.dataHandler,Configuracion);break;
-			case 'usuarios':new FormUsuario(this.dataHandler,Configuracion); break;
+			case 'usuarios':new FormUsuario(this.dataHandler,Configuracion);break;
 		}
 	}
 
