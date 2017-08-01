@@ -342,8 +342,8 @@ function DataBarModel(registro,dataBarElement){
 
 function TableModelUsuario(tableElement){
 	TableModel.call(this,tableElement,
-		['Nro','Nombre','Nombre de Usuario','Tipo de Usuario','Estado']
-		,['7%','53%','20%','15%','8%']);
+		['Nro','Nombre','Nombre de Usuario','Tipo de Usuario','Estado'],
+		['7%','53%','20%','15%','8%']);
 	this.modulo = 'Usuarios';
 	this.titulo = 'Registros de Usuarios del Sistema'
 	this.metodoEntities = 'getUsuarios';
@@ -372,6 +372,61 @@ function TableModelUsuario(tableElement){
 
 	this.updateTable=function(usuarios){
 		this.updateRows(this.setRows(usuarios),true);
+	}
+
+	this.confirmDeleteOperation=function(registro){
+		console.log(this.selectedRow.cells[4].innerHTML);
+		if(this.selectedRow.cells[4].innerHTML==='Hab.')
+			this.deshabilitarUsuario(this.selectedRow.getAttribute('data-value'),registro);
+		else 
+			this.habilitarUsuario(this.selectedRow.getAttribute('data-value'),registro);
+	}
+
+	this.habilitarUsuario=function(id,registro){
+		var params='metodo=setUsuarioPermit&params={"idUsuario":'+id+',"permit":1}';
+		registro.dataHandler.ejecutarOperacionAJAX(registro,'setUsuarioPermit',params);
+	}
+
+	this.deshabilitarUsuario=function(id,registro){
+		console.log(registro);
+		var params='metodo=setUsuarioPermit&params={"idUsuario":'+id+',"permit":0}';
+		registro.dataHandler.ejecutarOperacionAJAX(registro,'setUsuarioPermit',params);
+	}
+
+}
+
+function TableModelPersona(tableElement){
+	TableModel.call(this,tableElement,
+		['Nro','Legajo','Cuil','Apellido','Nombre'],
+		['7%','13%','20%','30%','38%']);
+	this.modulo = 'Persona';
+	this.titulo = 'Registros de Personas del Sistema'
+	this.metodoEntities = 'getPersonas';
+	this.metodoEntity = 'getPersona';
+	this.dataAdd = 'Agregar Nueva Persona';
+	this.dataModify = 'Modificar Persona Seleccionada';
+	this.dataDelete = 'Eliminar Persona Seleccionada';
+	this.dataConsult = 'Consultar Persona Seleccionada';
+	this.options = ['Legajo','Cuil','Apellido','Nombre'];
+	this.optionsValue = ['LEGAJO','CUIL','APELLIDO','NOMBRE'];
+
+	this.setRows=function(personas){
+		var i=0,j=0;
+		var rows=[];
+		for(i=0;i<personas.length;i++){
+			rows[i]=new Array(6);
+			rows[i][0]=personas[i].idPersona;
+			rows[i][1]=++j;
+			rows[i][2]=personas[i].legajo;
+			rows[i][3]=personas[i].cuil;
+			rows[i][4]=personas[i].apellido;
+			rows[i][5]=personas[i].nombre;
+		}
+		return rows;
+	}
+
+	this.updateTable=function(personas){
+		this.updateRows(this.setRows(personas),true);
 	}
 
 	this.confirmDeleteOperation=function(registro){

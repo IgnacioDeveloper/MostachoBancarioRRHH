@@ -1,7 +1,5 @@
 <?php
 $controlador = Controlador::getInstance();
-//metodo=modifyUsuario&params={"idUsuario":2,"nombre":"Rene Astorgaa","username":"rene1234","usertype":"J","estado":"H"}
-//$resultado = $controlador->executeMethod('getUsuarios',array('UPPER(NOMBRE) LIKE "r%"'));
 $resultado = $controlador->executeMethod(isset($_POST["metodo"]) ? $_POST["metodo"] : "",isset($_POST["params"]) ? array($_POST["params"]) : "");
 if($resultado !== "ERROR"){
 	echo ($resultado);
@@ -119,6 +117,8 @@ class Controlador{
 		return true;
 	}
 
+	//METODO ORIENTATIVO, NO SE ENCUENTRA EN USO TODAVIA
+
 	private function deleteUsuario($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
 		$params = json_decode($params);
@@ -126,6 +126,55 @@ class Controlador{
 		$usuario->eliminar();
 		return true;
 	}
+
+	//
+
+	private function savePersona($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
+		$params = json_decode($params);
+		$usuario = new Persona($params->legajo,$params->cuil,$params->nombre,$params->apellido,$params->fechaNacimiento,$params->mail,$params->telefono,$params->domicilio,$params->localidad,$params->provincia,$params->cv);
+		//$usuario->guardar();
+		return true;
+	}
+
+	private function getPersonas($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
+		$params = json_decode($params);
+		$usuario = new Usuario();
+		$registros = $usuario->getUsuarios($params->condicion);
+		return $registros;
+	}
+
+	private function getPersona($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
+		$params = json_decode($params);
+		$usuario = new Usuario();
+		$usuario->autocompletar('IDUSUARIO = '.$params);
+		$registro=$usuario->getJSON();
+		return $registro;
+	}
+
+	private function modifyPersona($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
+		$params = json_decode($params);
+		$usuario= new Usuario($params->idUsuario);
+		$usuario->setNombre($params->nombre);
+		$usuario->setUsername($params->username);
+		if(isset($params->password))$usuario->setPassword($params->password);
+		$usuario->setUsertype($params->usertype);
+		$usuario->setEstado($params->estado);
+		$usuario->modificar();
+		return true;
+	}
+
+	private function deletePersona($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
+		$params = json_decode($params);
+		$usuario = new Usuario($params->idUsuario); 
+		$usuario->eliminar();
+		return true;
+	}
+
 
 	private function saveArea($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Area.php';

@@ -121,3 +121,58 @@
     color:red;
     margin-top:0;
 }
+
+/*SELECTORES ESPECIFICOS*/
+
+/*Elementos de tipo Date*/
+
+.dates{
+    position:relative;
+    margin:auto;
+}
+
+.dates select{
+    margin:auto;
+}
+
+.dates select:not(:last-child){
+    margin-right:1%;
+}
+
+/*Elementos de tipo File*/
+
+.file-path{
+    position:relative;
+    margin:auto;
+    padding:10px;
+    width:30%;
+    height:5%;
+    background-color:darkorange;
+}
+
+.file-path:active{
+    background-color:red;
+}
+
+#texto-archivo{
+    font-style:italic;
+}
+
+.file-path #textoBoton{
+    position:absolute;
+    color:black;
+    margin:auto;
+    right:0;
+    left:0;
+}
+
+.file-path #buttonSendFile{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100%;
+    height:100%;
+    opacity:0;
+}

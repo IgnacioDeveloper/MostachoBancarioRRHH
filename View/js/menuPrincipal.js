@@ -39,6 +39,7 @@ function MenuPrincipal(){
 		this.loadScript('http://localhost/MostachoRRHH/View/js/reloj.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/dataHandler.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/registros.js');
+		this.loadScript('http://localhost/MostachoRRHH/View/js/dateActions.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/mensajeModal.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/validacion.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/formularioModal.js');
@@ -91,6 +92,7 @@ function MenuPrincipal(){
 
 	this.openAddForm=function(modulo){
 		var Configuracion = {modal:this.modal,tipo:1};
+		if(modulo === 'personas') Configuracion.dateActions = new DateActions();
 		switch(modulo){
 			case 'areas': new FormArea(this.dataHandler,Configuracion);break;
 			case 'puestos':new FormPuestos(this.dataHandler,Configuracion);break;
@@ -179,7 +181,7 @@ function MenuPrincipal(){
 	}
 
 	this.translateProfile=function(profile){
-		if(profile == 'J') return "Jefe de RRRHH";
+		if(profile == 'J') return "Jefe de RRHH";
 		else return "Empleado de RRHH";
 	}
 

@@ -3,14 +3,8 @@ function DataHandler(){
 	if(DataHandler.singleInstance) return DataHandler.singleInstance;  
    	DataHandler.singleInstance = this;
 
-   	
-   	
    	this.ejecutarOperacionAJAX=function(callContext,operacion,params){
-	   	var resultado = "";
-		var ajax_url  = "http://localhost/MostachoRRHH/Controller/Controlador.php";
-		var ajax_request = new XMLHttpRequest();
-		ajax_request.open("POST",ajax_url,true);
-		ajax_request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+   		var ajax_request = this.getAjaxRequest("http://localhost/MostachoRRHH/Controller/Controlador.php","POST");
 		ajax_request.send(params);
 		ajax_request.onreadystatechange=function(){
 			if(ajax_request.readyState == 4 && ajax_request.status == 200){
@@ -32,13 +26,29 @@ function DataHandler(){
 					case "deletePuesto":break; 
 					case "getPuesto":break;
 					case "getPuestos":break;
-					case "savePersona":break; 
-					case "modifyPersona":break;
-					case "deletePersona":break; 
-					case "getPersona":break;
-					case "getPersonas":break;
+					case "savePersona":callContext.confirmacion(ajax_request.responseText,1);break; 
+					case "modifyPersona":callContext.confirmacion(ajax_request.responseText,2);break;
+					case "deletePersona":callContext.updateInfo();break; 
+					case "getPersona":callContext.setFormData(ajax_request.responseText);break;
+					case "getPersonas":callContext.updateTableInfo(ajax_request.responseText);break;
 				}
 			}
 		}
    	}
+
+
+   	this.subirArchivoAJAX=function(archivo){
+   		var ajax_request = this.getAjaxRequest("http://localhost/MostachoRRHH/Controller/Controlador.php","POST");
+   		formData = new FormData(); //establecida la codificacion "multi-part/form-data por default"
+   		formData.append('cvFile',archivo);
+   		ajax_request.send(formData);
+   	}
+
+   	this.getAjaxRequest=function(ajax_url,method){
+   		var ajax_request = new XMLHttpRequest();
+		ajax_request.open(method,ajax_url,true);
+		ajax_request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		return ajax_request;
+   	}
+
 }

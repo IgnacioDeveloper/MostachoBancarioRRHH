@@ -19,6 +19,7 @@ function Validacion(formulario){
 	//ValValues
 	this.txts=new Array();
 	this.selects=new Array();
+	this.specialElements=new Array();
 	this.submitButton;
 	//End ValValues
 
@@ -27,6 +28,30 @@ function Validacion(formulario){
 		this.setValValues();
 		if(this.txts.length != 0) this.aplicarLostFocusTxtVal();
 		if(this.selects.length != 0) this.setAutoRecSelects();
+		if(this.specialElements.length!=0)this.setSpecialVal();
+	}
+
+	this.setSpecialVal=function(){
+		for(i=0;i<this.specialElements.length;i++){
+			var type = this.specialElements[i].valType;
+			switch(type){
+				case 'date-selects':  this.setDateElementDefaultValues(this.specialElements[i]);
+			}
+		}
+	}
+
+	this.setDateElementDefaultValues=function(dateElement){
+		var setNormal = function(element){
+			element.style.borderColor="black";
+			element.style.borderWidth="1px";
+		}
+		var self = this;
+		var selectDia = dateElement.element.firstChild;
+		var selectMes = selectDia.nextSibling;
+		var selectAnio = dateElement.element.lastChild;
+		selectDia.addEventListener('blur',function(){setNormal(this);});
+		selectMes.addEventListener('blur',function(){setNormal(this);});
+		selectAnio.addEventListener('blur',function(){setNormal(this);});
 	}
 
 	this.setValValues=function(){
@@ -35,6 +60,7 @@ function Validacion(formulario){
 			switch(node){
 				case "INPUT":this.txts.push(this.formBodyElements[i]);break;
 				case "SELECT": this.selects.push(this.formBodyElements[i]);break;
+				case "DIV":this.specialElements.push(this.formBodyElements[i]);break;
 			}
 		}
 		this.submitButton=this.formulario.button1;
@@ -295,7 +321,7 @@ function Validacion(formulario){
 				case "alphanumeric" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valAlphanumeric(txt.element); else sbans=invBool(this.must);break;
 				case "alphanumericSc" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valAlphanumericSc(txt.element); else sbans=invBool(this.must);break;
 				case "alphanumericSs" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valAlphanumericSs(txt.element); else sbans=invBool(this.must);break;
-				case "password" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valPassword(txt.element); else sbans=invBool(this.must);;break;
+				case "password" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valPassword(txt.element); else sbans=invBool(this.must);break;
 				case "mail" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valMail(txt.element); else sbans=invBool(this.must);break;
 				case "phone" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valPhone(txt.element); else sbans=invBool(this.must);break;
 				case "cuil" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valCuil(txt.element); else sbans=invBool(this.must);break;
@@ -324,6 +350,29 @@ function Validacion(formulario){
 		//alert("La respuesta del check de las opciones es: "+ ans);
 		return ans;
 	}
+
+	this.fullSpecialElementsCheck=function(){
+		var ans = true;
+		for(se in this.specialElements){
+			var sbans;
+			switch(se.valType){
+				case 'date-selects':sbans=this.checkFullDateSelect(se);
+			}
+			if(sbans==false)ans=false;
+		}
+		return ans;
+	}
+
+	this.checkFullDateSelect=function(dateElement){
+		var setError = function(element){
+			element.style.borderColor="black";
+			element.style.borderWidth="1px";
+		}
+		var selectDia = dateElement.element.firstChild;
+		var selectMes = selectDia.nextSibling;
+		var selectAnio = dateElement.element.lastChild;
+
+	}
 	
 
 	this.fullCheck=function(){
@@ -331,6 +380,7 @@ function Validacion(formulario){
 		var sbans = [];
 		if(this.txts.length!=0) sbans.push(this.fullTxtsCheck());
 		if(this.selects.length!=0) sbans.push(this.fullSelectsCheck());
+		if(this.specialElements!=0) sbans.push(this.fullSpecialElementsCheck());
 		for(i in sbans){if(!sbans[i]){ans=false;break;}}
 		return ans;
 	}

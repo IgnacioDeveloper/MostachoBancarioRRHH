@@ -13,8 +13,7 @@
 		private $localidad;
 		private $telefono;
 		private $mail;
-		private $urlCV;
-		private $idUsuario;
+		private $cv;
 
 		function __construct(){
 			$params = func_get_args();
@@ -34,8 +33,22 @@
 			$this->idPersona=$idPersona;
 		}
 
-		function __construct13($idPersona,$legajo,$cuil,$nombre,$apellido,$fechaNacimiento,
-			$domicilio,$localidad,$telefono,$mail,$urlCV,$sueldoBrutoAcordado,$idUsuario){
+		function __construct11($legajo,$cuil,$nombre,$apellido,$fechaNacimiento,$mail,$telefono,
+			$domicilio,$localidad,$provincia,$cv){
+			$this->legajo = $legajo;
+			$this->cuil = $cuil;
+			$this->nombre = $nombre;
+			$this->apellido = $apellido;
+			$this->fechaNacimiento = $fechaNacimiento;
+			$this->telefono = $telefono;
+			$this->domicilio = $domicilio;
+			$this->localidad = $localidad;
+			$this->mail = $mail;
+			$this->$cv = $cv;
+		}
+
+		function __construct12($idPersona,$legajo,$cuil,$nombre,$apellido,$fechaNacimiento,$mail,$telefono,
+			$domicilio,$localidad,$provincia,$cv){
 			$this->idPersona = $idPersona;
 			$this->legajo = $legajo;
 			$this->cuil = $cuil;
@@ -46,8 +59,7 @@
 			$this->domicilio = $domicilio;
 			$this->localidad = $localidad;
 			$this->mail = $mail;
-			$this->$urlCV = $urlCV;
-			$this->$idUsuario = $idUsuario;
+			$this->$cv = $cv;
 		}
 
 		function getIdPersona(){
@@ -87,7 +99,7 @@
 		}
 
 		function getUrlCV(){
-			return $this->urlCV;
+			return $this->cv;
 		}
 
 		function getIdUsuario(){
@@ -134,7 +146,7 @@
 		}
 
 		function setUrlCV($valor){
-			$this->urlCV = $valor;
+			$this->cv = $valor;
 		}
 
 		function setIdUsuario($valor){
@@ -158,8 +170,7 @@
 			$this->domicilio = $registro[0]->domicilio;
 			$this->localidad = $registro[0]->localidad;
 			$this->mail = $registro[0]->mail;
-			$this->urlCV = $registro[0]->urlCV;
-			$this->idUsuario = $registro[0]->idUsuario;
+			$this->cv = $registro[0]->cv;
 			unset($registro);
 		}
 
@@ -167,7 +178,7 @@
 			$valores = "'$this->idPersona',$this->legajo
 			','$this->cuil','$this->nombre','$this->apellido'
 			,'$this->fechaNacimiento','$this->domicilio','$this->localidad'
-			,'$this->telefono','$this->mail','$this->urlCV','$this->idUsuario'";
+			,'$this->telefono','$this->mail','$this->cv','$this->idUsuario'";
 			$this->persistencia->aniadir('PERSONA',$valores);
 		}
 
@@ -175,7 +186,7 @@
 			$set="IDPERSONA = '$this->idPersona',LEGAJO = '$this->legajo', CUIL = '$this->cuil',
 			NOMBRE =  '$this->nombre', APELLIDO = '$this->apellido', FECHANACIMIENTO = '$this->fechaNacimiento\,
 			DOMICILIO = '$this->domicilio', LOCALIDAD = '$this->localidad', TELEFONO = '$this->telefono',
-			MAIL = '$this->mail', URLCV = '$this->urlCV', USUARIO_IDUSUARIO = '$this->idUsuario'";
+			MAIL = '$this->mail', URLCV = '$this->cv', USUARIO_IDUSUARIO = '$this->idUsuario'";
 			$this->persistencia->modificar('PERSONA',$set);
 		}
 

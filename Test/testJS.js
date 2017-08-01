@@ -12,6 +12,8 @@ window.onload=function(){
 	var filtro = document.getElementById("filtroApellidos");
 	var btnMensaje = document.getElementById("btnMensaje");
 	var inputMensaje = document.getElementById('inputRespuestaMensaje');
+	var btnSubirArchivo = document.getElementById('btnSubirArchivo');
+	var inputFile = document.getElementById('inputFile');
 
 	lblValidacion.innerHTML="Validacion: "+reExpression;
 
@@ -42,6 +44,26 @@ window.onload=function(){
 		new Mensaje(this,'Entonces cual es tu respuesta?','condicion');
 		
 	}
+
+	btnSubirArchivo.onclick=function(){
+		if(inputFile.files[0].type !== 'image/png') return 0;
+		var formData = new FormData();
+		var fileName = inputFile.files[0].name.split('.')[0].toUpperCase();
+		console.log(fileName);
+		formData.append('nombreArchivo',fileName);
+		formData.append('file',inputFile.files[0]);
+		var ajax_request = new XMLHttpRequest();
+		ajax_request.open('POST','http://localhost/MostachoRRHH/Test/TestFiles.php',true);
+		//ajax_request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		console.log(formData.get('file'));
+		ajax_request.send(formData);
+		ajax_request.onreadystatechange=function(){
+			if(ajax_request.readyState == 4 && ajax_request.status == 200){
+				console.log(ajax_request.responseText);
+			}
+		}
+	}
+
 }
 
 

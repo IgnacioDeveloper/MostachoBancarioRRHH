@@ -73,27 +73,33 @@ function ModalWindowModel(modal){
 					node[0].id = elementId;
 					node[0].className="dates" ;
 					node[1] = document.createElement("select");
-					node[1].id = 'selectDia';
+					node[1].id = 'select-dia';
 					node[2] = document.createElement("select");
-					node[2].id = 'selectMes';
+					node[2].id = 'select-mes';
 					node[3] = document.createElement("select");
-					node[3].id = 'selectAnio';
-					for(i=0;i<3;i++) node[0].appendChild(node[i+1]);
+					node[3].id = 'select-anio';
+					node[0].appendChild(node[1]);
+					node[0].appendChild(node[2]);
+					node[0].appendChild(node[3]);
 					node=node[0];
 					modalSector.appendChild(node);break;
 				case "file_path": 
 					node[0]=document.createElement("div");
 					node[0].id=elementId;
-					node[0].className = "url";
+					node[0].className = "file-path";
 					node[1]=document.createElement("p");
-					node[1].id="file_path";
-					node[2]=document.createElement("button")
-					node[2].id="path_button";
-					node[2].innerHTML="Subir Archivo";
-					node[0].appendChild(node[1]);
+					node[1].id = 'texto-archivo';
+					node[2]=document.createElement("p");
+					node[2].id = "textoBoton";
+					node[2].innerHTML = "Agregar Archivo";
+					node[3]=document.createElement("input");
+					node[3].id="buttonSendFile";
+					node[3].type="file";
+					node[3].innerHTML="Archivo Subido";
 					node[0].appendChild(node[2]);
-					node = node[0];
-					modalSector.appendChild(node);break;
+					node[0].appendChild(node[3]);
+					modalSector.appendChild(node[1]);
+					modalSector.appendChild(node[0]);break;
 			}
 			resultado.push(document.getElementById(elementId));
 			if(i == elements.length-1 && modalSector==this.modalBody){
@@ -101,6 +107,7 @@ function ModalWindowModel(modal){
 					modalSector.appendChild(document.createElement("br"));
 			}
 		}
+		//console.log(modalSector);
 		return resultado;
 	}
 
@@ -405,7 +412,7 @@ function FormPersona(dataHandler,conf,registro){
 	//Elementos del Formulario
 	Formulario.call(this,conf.modal);
 	this.dataHandler = dataHandler;
-	this.txtLegajo;this.txtCuil;this.txtNombre,this.txtApellido;this.txtTelefono;this.txtDomicilio; this.txtLocalidad;this.txtProvincia;this.txtUrlCurriculumVitae;
+	this.txtLegajo;this.txtCuil;this.txtNombre,this.txtApellido;this.dateFechaNac;this.txtMail;this.txtTelefono;this.txtDomicilio; this.txtLocalidad;this.txtProvincia;this.urlCurriculumVitae;
 	this.bodyNodes=[new Node("lblLegajo","p","Legajo"),
 			new Node("txtLegajo","input_text",""),
 			new Node("errorLegajo","error_text",""),
@@ -421,6 +428,14 @@ function FormPersona(dataHandler,conf,registro){
 			new Node("lblApellido","p","Apellido"),
 			new Node("txtApellido","input_text",""),
 			new Node("errorApellido","error_text",""),
+			//
+			new Node("lblFechaNac","p","Fecha de Nacimiento"),
+			new Node("selectsFechaNac","date_select",""),
+			new Node("errorFechaNac","error_text",""),
+			//
+			new Node("lblMail","p","Mail"),
+			new Node("txtMail","input_text",""),
+			new Node("errorMail","error_text",""),
 			//
 			new Node("lblTelefono","p","Telefono"),
 			new Node("txtTelefono","input_text",""),
@@ -438,14 +453,13 @@ function FormPersona(dataHandler,conf,registro){
 			new Node("txtProvincia","input_text",""),
 			new Node("errorProvincia","error_text",""),
 			//
-			new Node("lblUrlCurriculumVitae","p","Curriculum Vitae"),
-			new Node("urlCurriculumVitae","p",""),
-			new Node("errorLegajo","error_text",""),
-			new Node("buttonCurriculum","button","Agregar CV")];
+			new Node("lblUrlCV","p","Curriculum Vitae"),
+			new Node("urlCV","file_path",""),
+			new Node("errorCV","error_text","")];
 
 	this.conf=conf;
 	this.registro=registro;
-	this.lblurlCV = null;
+	this.uploadFileOption;
 	
 
 	//End Elementos del Formulario
@@ -453,19 +467,24 @@ function FormPersona(dataHandler,conf,registro){
 	this.startUserForm=function(){
 		//Maquetacion y referenciacion de Elementos del Formulario
 		this.bodyElements = this.appendElements(this.bodyNodes,this.modalBody);
+		//console.log(this.bodyElements[13]);
 		this.txtLegajo = new FormBodyElement(this.bodyElements[1],this.bodyElements[2],"integer",true);
 		this.txtCuil = new FormBodyElement(this.bodyElements[4],this.bodyElements[5],"cuil",true);
 		this.txtNombre = new FormBodyElement(this.bodyElements[7],this.bodyElements[8],"textOnly",true);
 		this.txtApellido = new FormBodyElement(this.bodyElements[10],this.bodyElements[11],"textOnly",true);
-		this.txtTelefono = new FormBodyElement(this.bodyElements[13],this.bodyElements[14],"phone",true);
-		this.txtDomicilio = new FormBodyElement(this.bodyElements[16],this.bodyElements[17],"alphanumeric",true);
-		this.txtLocalidad = new FormBodyElement(this.bodyElements[19],this.bodyElements[20],"alphanumeric",true);
-		this.txtProvincia = new FormBodyElement(this.bodyElements[22],this.bodyElements[23],"integer",true);
-		this.txtUrlCurriculumVitae = new FormBodyElement(this.bodyElements[25],this.bodyElements[26],"url",true);
+		this.dateFechaNac =	new FormBodyElement(this.bodyElements[13],this.bodyElements[14],"date-selects",true);  
+		this.txtMail = new FormBodyElement(this.bodyElements[16],this.bodyElements[17],"mail",true);
+		this.txtTelefono = new FormBodyElement(this.bodyElements[19],this.bodyElements[20],"phone",true); 
+		this.txtDomicilio = new FormBodyElement(this.bodyElements[22],this.bodyElements[23],"alphanumeric",true); 
+		this.txtLocalidad = new FormBodyElement(this.bodyElements[25],this.bodyElements[26],"alphanumeric",true); 
+		this.txtProvincia = new FormBodyElement(this.bodyElements[28],this.bodyElements[29],"integer",true); 
+		this.urlCurriculumVitae = new FormBodyElement(this.bodyElements[31],this.bodyElements[32],undefined,false);
 		this.button1 = this.footerElements[0];
 		this.button2 = this.footerElements[1];
-		this.formBodyElements = [this.txtLegajo,this.txtCuil,this.txtNombre,this.txtApellido,this.txtTelefono,this.txtDomicilio, this.txtLocalidad,this.txtProvincia,this.txtUrlCurriculumVitae];
+		this.formBodyElements = [this.txtLegajo,this.txtCuil,this.txtNombre,this.txtApellido,this.dateFechaNac,this.txtTelefono,this.txtDomicilio, this.txtLocalidad,this.txtProvincia,this.urlCurriculumVitae];
+		this.uploadFileOption = this.urlCurriculumVitae.element.lastChild;
 		//End Maquetacion y referenciacion de ELementos del Formulario
+		this.prepareSelects();
 		this.startValidacion();
 		this.setConf();
 		this.show();
@@ -482,19 +501,12 @@ function FormPersona(dataHandler,conf,registro){
 	}
 
 	this.prepareSelects=function(){
-		var optionsUsertype = ["Seleccione una Opcion:","Jefe de Recursos Humanos","Empleado de Recursos Humanos"];
-		var optionsEstado = ["Seleccione una Opcion:","Habilitado","Deshabilitado"];
-		for(i=0;i<optionsUsertype.length;i++){
-			this.selectUsertype.element.options[i] = new Option(optionsUsertype[i],optionsUsertype[i].charAt(0));
-		}
-		for(i=0;i<optionsEstado.length;i++){
-			this.selectEstado.element.options[i] = new Option(optionsEstado[i],optionsEstado[i].charAt(0));
-		}
+		//console.log(this.dateFechaNac.element);
+		this.conf.dateActions.prepareSelects(this.dateFechaNac.element);
 	}
 
 	this.setConfAlta=function(){
 		var self = this;
-
 		this.title.innerHTML = "Nueva Persona";
 		this.button1.innerHTML = "Guardar Informacion de Persona";
 		this.button2.innerHTML = "Cancelar";
@@ -535,8 +547,15 @@ function FormPersona(dataHandler,conf,registro){
 		if(val){
 			var persona = this.getJSonData();
 			var params="metodo=savePersona&params="+persona;
-			this.dataHandler.ejecutarOperacionAJAX(this,"savePersona",params);
+			//this.dataHandler.ejecutarOperacionAJAX(this,"savePersona",params);
+			console.log(params);
+			this.subirCV();
 		}
+	}
+
+	this.subirCV=function(){
+		var file = this.urlCurriculumVitae.element.lastChild.files[0];
+		console.log(file);
 	}
 
 	this.modificarDatos=function(){
@@ -579,15 +598,13 @@ function FormPersona(dataHandler,conf,registro){
 		this.closeForm();
 	}
 
-	//this.txtLegajo;this.txtCuil;this.txtNombre,this.txtApellido;this.txtTelefono;this.txtDomicilio; this.txtLocalidad;this.txtProvincia;this.txtUrlCurriculumVitae;
-
 	this.getJSonData=function(){
-		var idUsuario = '';
+		var idPersona = '';
 		var password = '';
 		if(this.conf.tipo!==1){
 			idPersona = '"idPersona":'+this.conf.idBuscado+',';
 		}
-		return '{'+idPersona+'"legajo":"'+this.txtLegajo.element.value+'","cuil":"'+this.txtCuil.element.value+'","nombre":"'+this.txtNombre.element.value+'","apellido":"'+this.txtApellido.element.value+'","telefono":"'+this.txtTelefono.element.value+'","domicilio":"'+this.txtDomicilio.element.value+'","Localidad":"'+this.txtLocalidad.element.value+'","provincia":"'+this.txtProvincia.element.value+'","urlCV":"'+this.txtUrlCurriculumVitae.element.value+'"}';
+		return '{'+idPersona+'"legajo":"'+this.txtLegajo.element.value+'","cuil":"'+this.txtCuil.element.value+'","nombre":"'+this.txtNombre.element.value+'","apellido":"'+this.txtApellido.element.value+'fechaNacimiento:'+this.conf.dateActions.getDateString(this.dateFechaNac.element)+'","telefono":"'+this.txtTelefono.element.value+'","domicilio":"'+this.txtDomicilio.element.value+'","localidad":"'+this.txtLocalidad.element.value+'","provincia":"'+this.txtProvincia.element.value+'"}';
 	}
 
 	this.getData=function(idBuscado){
@@ -606,6 +623,14 @@ function FormPersona(dataHandler,conf,registro){
 		this.txtLocalidad.element.value = persona.localidad;
 		this.txtProvincia.element.value = persona.provincia;
 		this.txtUrlCurriculumVitae.element.value = persona.urlCV;
+	}
+
+	this.eventosFormulario=function(){
+		this.uploadFileOption.onchange=function(){
+			var fileName = this.value.slice(12);
+			//Mostrar nombre de archivo subido
+			document.getElementById('texto-archivo').innerHTML=fileName;
+		}
 	}
 
 	this.closeForm = function(){
