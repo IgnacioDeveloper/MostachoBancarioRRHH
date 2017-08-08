@@ -14,6 +14,7 @@ window.onload=function(){
 	var inputMensaje = document.getElementById('inputRespuestaMensaje');
 	var btnSubirArchivo = document.getElementById('btnSubirArchivo');
 	var inputFile = document.getElementById('inputFile');
+	this.events(inputFile);
 
 	lblValidacion.innerHTML="Validacion: "+reExpression;
 
@@ -45,8 +46,26 @@ window.onload=function(){
 		
 	}
 
-	btnSubirArchivo.onclick=function(){
-		if(inputFile.files[0].type !== 'image/png') return 0;
+
+	
+}
+
+function events(inputFile){
+		inputFile.onchange=function(){
+		console.log(inputFile.files[0]);
+		if(inputFile.files[0].type !== 'image/png'){
+			var x=inputFile.parentNode;
+			var elemento = x.firstChild.nextSibling.nextSibling.nextSibling;
+			var elementoReferencia = elemento.nextSibling;
+			x.removeChild(elemento);
+			elemento = document.createElement('input');
+			elemento.type = 'file';
+			elemento.id = 'inputFile';
+			inputFile = elemento;
+			events(inputFile);
+			x.insertBefore(elemento,elementoReferencia);
+			return 0;
+		}
 		var formData = new FormData();
 		var fileName = inputFile.files[0].name.split('.')[0].toUpperCase();
 		console.log(fileName);
@@ -63,9 +82,7 @@ window.onload=function(){
 			}
 		}
 	}
-
 }
-
 
 function ElementoHTML(input,errorMessage){
 	this.input = input;

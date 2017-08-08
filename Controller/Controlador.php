@@ -90,7 +90,7 @@ class Controlador{
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
 		$params = json_decode($params);
 		$usuario = new Usuario();
-		$usuario->autocompletar('IDUSUARIO = '.$params);
+		$usuario->getUsuario('IDUSUARIO = '.$params);
 		$registro=$usuario->getJSON();
 		return $registro;
 	}
@@ -130,15 +130,16 @@ class Controlador{
 	//
 
 	private function savePersona($params){
-		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Persona.php';
 		$params = json_decode($params);
-		$usuario = new Persona($params->legajo,$params->cuil,$params->nombre,$params->apellido,$params->fechaNacimiento,$params->mail,$params->telefono,$params->domicilio,$params->localidad,$params->provincia,$params->cv);
-		//$usuario->guardar();
-		return true;
+		$persona = new Persona($params->legajo,$params->cuil,$params->nombre,$params->apellido,$params->fechaNacimiento,$params->mail,$params->telefono,$params->domicilio,$params->localidad,$params->provincia);
+		$persona->guardar();
+		$persona->getPersona("LEGAJO = '$params->legajo' AND CUIL = '$params->cuil'");
+		return $persona->getIdPersona();
 	}
 
 	private function getPersonas($params){
-		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Persona.php';
 		$params = json_decode($params);
 		$usuario = new Usuario();
 		$registros = $usuario->getUsuarios($params->condicion);
@@ -146,7 +147,7 @@ class Controlador{
 	}
 
 	private function getPersona($params){
-		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Persona.php';
 		$params = json_decode($params);
 		$usuario = new Usuario();
 		$usuario->autocompletar('IDUSUARIO = '.$params);
@@ -155,7 +156,7 @@ class Controlador{
 	}
 
 	private function modifyPersona($params){
-		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Persona.php';
 		$params = json_decode($params);
 		$usuario= new Usuario($params->idUsuario);
 		$usuario->setNombre($params->nombre);
@@ -168,7 +169,7 @@ class Controlador{
 	}
 
 	private function deletePersona($params){
-		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Usuario.php';
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Persona.php';
 		$params = json_decode($params);
 		$usuario = new Usuario($params->idUsuario); 
 		$usuario->eliminar();
@@ -222,6 +223,32 @@ class Controlador{
 		$area = new Area($params->idArea); 
 		$area->eliminar();
 		return true;
+	}
+
+	private function saveFile($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/FileHandler/FileHandler.php';
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Persona.php';
+		if(isset($_FILES['cvFile'])){
+			$fileHandler = FileHandler::getInstance();
+			$params=json_decode($params);
+			$name = $fileHandler->saveFile($_FILES['cvFile'],$params->idPersona);
+			$persona = new Persona($params->idPersona);
+			$persona->asignarArchivo($name);
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	private function getFile($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/FileHandler/FileHandler.php';
+		//obtener archivo;
+	}
+
+	private function deleteFile($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/FileHandler/FileHandler.php';
+		//borrar archivo;
 	}
 }
 

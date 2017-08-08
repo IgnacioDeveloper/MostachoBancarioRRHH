@@ -83,9 +83,9 @@ function MenuPrincipal(){
 		this.iNuevoPuesto.onclick=function(){self.openAddForm('puestos');};
 		this.iNuevaPersona.onclick=function(){self.openAddForm('personas');};
 		this.iNuevoUsuario.onclick=function(){self.openAddForm('usuarios');};
-		this.iAreas.onclick=function(){self.renderTabla('areas');};
-		this.iPuestos.onclick=function(){self.renderTabla(this.main,'puestos');};
-		this.iPersonas.onclick=function(){self.renderTabla(this.main,'personas');};
+		this.iAreas.onclick=function(){self.renderMainMenu('areas');};
+		this.iPuestos.onclick=function(){self.renderMainMenu('puestos');};
+		this.iPersonas.onclick=function(){self.renderMainMenu('personas');};
 		this.iUsuarios.onclick=function(){self.renderMainMenu('usuarios');};
 	}
 

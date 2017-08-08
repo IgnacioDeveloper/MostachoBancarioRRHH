@@ -5,6 +5,7 @@ function DataHandler(){
 
    	this.ejecutarOperacionAJAX=function(callContext,operacion,params){
    		var ajax_request = this.getAjaxRequest("http://localhost/MostachoRRHH/Controller/Controlador.php","POST");
+   		ajax_request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		ajax_request.send(params);
 		ajax_request.onreadystatechange=function(){
 			if(ajax_request.readyState == 4 && ajax_request.status == 200){
@@ -26,7 +27,7 @@ function DataHandler(){
 					case "deletePuesto":break; 
 					case "getPuesto":break;
 					case "getPuestos":break;
-					case "savePersona":callContext.confirmacion(ajax_request.responseText,1);break; 
+					case "savePersona":callContext.subirCV(ajax_request.responseText);break; 
 					case "modifyPersona":callContext.confirmacion(ajax_request.responseText,2);break;
 					case "deletePersona":callContext.updateInfo();break; 
 					case "getPersona":callContext.setFormData(ajax_request.responseText);break;
@@ -37,17 +38,30 @@ function DataHandler(){
    	}
 
 
-   	this.subirArchivoAJAX=function(archivo){
+   	this.ejecutarOperacionArchivoAJAX=function(callContext,id,archivo,operacion){
    		var ajax_request = this.getAjaxRequest("http://localhost/MostachoRRHH/Controller/Controlador.php","POST");
-   		formData = new FormData(); //establecida la codificacion "multi-part/form-data por default"
+   		var formData = new FormData(); //establecida la codificacion "multi-part/form-data por default"
+   		formData.append('params','{"idPersona":'+id+'}');
    		formData.append('cvFile',archivo);
+   		formData.append('metodo',operacion);
+   		/*for (var pair of formData.entries()){
+			 console.log(pair[0]+ ', '+ pair[1]); 
+		}*/
    		ajax_request.send(formData);
+   		ajax_request.onreadystatechange=function(){
+   			if(ajax_request.readyState == 4 && ajax_request.status == 200){
+				switch(operacion){
+					case 'saveFile':console.log(ajax_request.responseText);callContext.confirmacion(ajax_request.responseText,1);break;
+					case 'getFile':callContext.confirmacion(ajax_request.responseText,2);break;
+					case 'deleteFile':callContext.updateInfo(ajax_request.responseText);break;
+				}
+			}
+   		}
    	}
 
    	this.getAjaxRequest=function(ajax_url,method){
    		var ajax_request = new XMLHttpRequest();
 		ajax_request.open(method,ajax_url,true);
-		ajax_request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 		return ajax_request;
    	}
 

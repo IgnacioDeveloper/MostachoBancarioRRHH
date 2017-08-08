@@ -1,6 +1,6 @@
 <?php
 	
-	require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/PersistenciaPDO/PersistenciaPDO.php';
+	require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/PersistenciaDB/PersistenciaPDO.php';
 
 	class Persona{
 		private $idPersona;
@@ -9,11 +9,13 @@
 		private $nombre;
 		private $apellido;
 		private $fechaNacimiento;
+		private $mail;
 		private $domicilio;
 		private $localidad;
-		private $telefono;
-		private $mail;
+		private $provincia;
 		private $cv;
+		private $idUsuario;
+		private $idPuesto;
 
 		function __construct(){
 			$params = func_get_args();
@@ -29,26 +31,26 @@
 		
 		}
 
-		function _construct1($idPersona){
+		function __construct1($idPersona){
 			$this->idPersona=$idPersona;
 		}
 
-		function __construct11($legajo,$cuil,$nombre,$apellido,$fechaNacimiento,$mail,$telefono,
-			$domicilio,$localidad,$provincia,$cv){
+		function __construct10($legajo,$cuil,$nombre,$apellido,$fechaNacimiento,$mail,$telefono,
+			$domicilio,$localidad,$provincia){
 			$this->legajo = $legajo;
 			$this->cuil = $cuil;
 			$this->nombre = $nombre;
 			$this->apellido = $apellido;
 			$this->fechaNacimiento = $fechaNacimiento;
+			$this->mail = $mail;
 			$this->telefono = $telefono;
 			$this->domicilio = $domicilio;
 			$this->localidad = $localidad;
-			$this->mail = $mail;
-			$this->$cv = $cv;
+			$this->provincia = $provincia;
+
 		}
 
-		function __construct12($idPersona,$legajo,$cuil,$nombre,$apellido,$fechaNacimiento,$mail,$telefono,
-			$domicilio,$localidad,$provincia,$cv){
+		function __construct11($idPersona,$legajo,$cuil,$nombre,$apellido,$fechaNacimiento,$mail,$telefono,$domicilio,$localidad,$provincia){
 			$this->idPersona = $idPersona;
 			$this->legajo = $legajo;
 			$this->cuil = $cuil;
@@ -59,7 +61,6 @@
 			$this->domicilio = $domicilio;
 			$this->localidad = $localidad;
 			$this->mail = $mail;
-			$this->$cv = $cv;
 		}
 
 		function getIdPersona(){
@@ -157,29 +158,30 @@
         	$this->mail = $valor;
     	}
 
-    	function autocompletar($condicion){
-			$registro = $this->getPersonas($condicion);
-			$registro = json_decode($registro);
+    	function autocompletar($registro){
 			$this->idPersona = $registro[0]->idPersona;
 			$this->legajo = $registro[0]->legajo;
 			$this->cuil = $registro[0]->cuil;
 			$this->nombre = $registro[0]->nombre;
 			$this->apellido = $registro[0]->apellido;
-			$this->fechaNacimiento = $registro[0]->fechaNacimiento;
+			$this->fechaNacimiento = $registro[0]->fechaNac;
 			$this->telefono = $registro[0]->telefono;
 			$this->domicilio = $registro[0]->domicilio;
 			$this->localidad = $registro[0]->localidad;
 			$this->mail = $registro[0]->mail;
 			$this->cv = $registro[0]->cv;
+			$this->idUsuario = $registro[0]->Usuario_idUsuario;
+			$this->idPuesto = $registro[0]->Puesto_idPuesto;
 			unset($registro);
 		}
 
     	function guardar(){
-			$valores = "'$this->idPersona',$this->legajo
-			','$this->cuil','$this->nombre','$this->apellido'
-			,'$this->fechaNacimiento','$this->domicilio','$this->localidad'
-			,'$this->telefono','$this->mail','$this->cv','$this->idUsuario'";
+			$valores = "'$this->legajo',
+			'$this->cuil','$this->nombre','$this->apellido',
+			'$this->fechaNacimiento','$this->mail',
+			'$this->telefono','$this->domicilio','$this->localidad','$this->provincia','waiting',0,0";
 			$this->persistencia->aniadir('PERSONA',$valores);
+			return true;
 		}
 
 		function modificar(){
@@ -187,7 +189,8 @@
 			NOMBRE =  '$this->nombre', APELLIDO = '$this->apellido', FECHANACIMIENTO = '$this->fechaNacimiento\,
 			DOMICILIO = '$this->domicilio', LOCALIDAD = '$this->localidad', TELEFONO = '$this->telefono',
 			MAIL = '$this->mail', URLCV = '$this->cv', USUARIO_IDUSUARIO = '$this->idUsuario'";
-			$this->persistencia->modificar('PERSONA',$set);
+			$condicion = "IDPERSONA = '$this->idPersona";
+			$this->persistencia->modificar('PERSONA',$set,$condicion);
 		}
 
 		function eliminar(){
@@ -195,10 +198,23 @@
 			$this->persistencia->eliminar('PERSONA',$condicion);
 		}
 
+		function getPersona($condicion){
+			$registro = $this->getPersonas($condicion);
+			$registro = json_decode($registro);
+			$this->autocompletar($registro);
+		}
+
 		function getPersonas($condicion){
 			$registros = $this->persistencia->leer('PERSONA','*','',$condicion);
 			$registros = json_encode($registros);
 			return $registros;
 		}
+
+		function asignarArchivo($name){
+			$set="CV = '$name'";
+			$condicion = "IDPERSONA = '$this->idPersona'";
+			$this->persistencia->modificar('PERSONA',$set,$condicion);
+		}
+
 	}
 ?>

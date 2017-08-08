@@ -165,6 +165,7 @@ function Registro(sector,dataHandler,modeloTabla){
 	}
 
 	this.updateTableInfo=function(registros){
+		console.log(registros);
 		registros = JSON.parse(registros);
 		this.modeloTabla.updateTable(registros);
 		this.searchBar.modeloSearchBar.updateResultInfo(this.modeloTabla.getRowCount());
@@ -336,7 +337,7 @@ function DataBarModel(registro,dataBarElement){
 		this.buttons[3].onclick=function(){
 			self.registro.modeloTabla.confirmDeleteOperation(self.registro);
 		}
-	}
+	
 
 }
 
@@ -427,25 +428,6 @@ function TableModelPersona(tableElement){
 
 	this.updateTable=function(personas){
 		this.updateRows(this.setRows(personas),true);
-	}
-
-	this.confirmDeleteOperation=function(registro){
-		console.log(this.selectedRow.cells[4].innerHTML);
-		if(this.selectedRow.cells[4].innerHTML==='Hab.')
-			this.deshabilitarUsuario(this.selectedRow.getAttribute('data-value'),registro);
-		else 
-			this.habilitarUsuario(this.selectedRow.getAttribute('data-value'),registro);
-	}
-
-	this.habilitarUsuario=function(id,registro){
-		var params='metodo=setUsuarioPermit&params={"idUsuario":'+id+',"permit":1}';
-		registro.dataHandler.ejecutarOperacionAJAX(registro,'setUsuarioPermit',params);
-	}
-
-	this.deshabilitarUsuario=function(id,registro){
-		console.log(registro);
-		var params='metodo=setUsuarioPermit&params={"idUsuario":'+id+',"permit":0}';
-		registro.dataHandler.ejecutarOperacionAJAX(registro,'setUsuarioPermit',params);
 	}
 
 }

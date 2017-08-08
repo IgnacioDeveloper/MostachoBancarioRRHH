@@ -10,14 +10,11 @@ function DateActions(){
 		var optionsMes = this.getMesRange();
 		var optionsMesValues = this.getNumRange(12,'Mes');
 		var optionsAnio = this.getAnioRange();
-		console.log(selectDia);
-		console.log(selectMes);
-		console.log(selectAnio);
 		this.makeSelectReady(selectDia,optionsDia,optionsDia);
 		this.makeSelectReady(selectMes,optionsMes,optionsMesValues);
 		this.makeSelectReady(selectAnio,optionsAnio,optionsAnio);
-		selectMes.addEventListener('blur',function(){self.correctSelects(selects);});
-		selectAnio.addEventListener('blur',function(){self.correctSelects(selects);});
+		selectMes.addEventListener('change',function(){self.correctSelects(selects);});
+		selectAnio.addEventListener('change',function(){self.correctSelects(selects);});
 	}
 
 	this.correctSelects=function(selects){

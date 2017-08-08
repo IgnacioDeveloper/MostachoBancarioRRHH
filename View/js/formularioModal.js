@@ -83,17 +83,17 @@ function ModalWindowModel(modal){
 					node[0].appendChild(node[3]);
 					node=node[0];
 					modalSector.appendChild(node);break;
-				case "file_path": 
+				case "file": 
 					node[0]=document.createElement("div");
 					node[0].id=elementId;
-					node[0].className = "file-path";
+					node[0].className = "file";
 					node[1]=document.createElement("p");
 					node[1].id = 'texto-archivo';
 					node[2]=document.createElement("p");
-					node[2].id = "textoBoton";
+					node[2].id = "texto-boton";
 					node[2].innerHTML = "Agregar Archivo";
 					node[3]=document.createElement("input");
-					node[3].id="buttonSendFile";
+					node[3].id="inputFile";
 					node[3].type="file";
 					node[3].innerHTML="Archivo Subido";
 					node[0].appendChild(node[2]);
@@ -412,7 +412,7 @@ function FormPersona(dataHandler,conf,registro){
 	//Elementos del Formulario
 	Formulario.call(this,conf.modal);
 	this.dataHandler = dataHandler;
-	this.txtLegajo;this.txtCuil;this.txtNombre,this.txtApellido;this.dateFechaNac;this.txtMail;this.txtTelefono;this.txtDomicilio; this.txtLocalidad;this.txtProvincia;this.urlCurriculumVitae;
+	this.txtLegajo;this.txtCuil;this.txtNombre,this.txtApellido;this.dateFechaNac;this.txtMail;this.txtTelefono;this.txtDomicilio; this.txtLocalidad;this.txtProvincia;this.cv;
 	this.bodyNodes=[new Node("lblLegajo","p","Legajo"),
 			new Node("txtLegajo","input_text",""),
 			new Node("errorLegajo","error_text",""),
@@ -454,7 +454,7 @@ function FormPersona(dataHandler,conf,registro){
 			new Node("errorProvincia","error_text",""),
 			//
 			new Node("lblUrlCV","p","Curriculum Vitae"),
-			new Node("urlCV","file_path",""),
+			new Node("inputFileArea","file",""),
 			new Node("errorCV","error_text","")];
 
 	this.conf=conf;
@@ -476,13 +476,13 @@ function FormPersona(dataHandler,conf,registro){
 		this.txtMail = new FormBodyElement(this.bodyElements[16],this.bodyElements[17],"mail",true);
 		this.txtTelefono = new FormBodyElement(this.bodyElements[19],this.bodyElements[20],"phone",true); 
 		this.txtDomicilio = new FormBodyElement(this.bodyElements[22],this.bodyElements[23],"alphanumeric",true); 
-		this.txtLocalidad = new FormBodyElement(this.bodyElements[25],this.bodyElements[26],"alphanumeric",true); 
-		this.txtProvincia = new FormBodyElement(this.bodyElements[28],this.bodyElements[29],"integer",true); 
-		this.urlCurriculumVitae = new FormBodyElement(this.bodyElements[31],this.bodyElements[32],undefined,false);
+		this.txtLocalidad = new FormBodyElement(this.bodyElements[25],this.bodyElements[26],"textOnly",true); 
+		this.txtProvincia = new FormBodyElement(this.bodyElements[28],this.bodyElements[29],"textOnly",true); 
+		this.cv = new FormBodyElement(this.bodyElements[31],this.bodyElements[32],"PDF",true);
 		this.button1 = this.footerElements[0];
 		this.button2 = this.footerElements[1];
-		this.formBodyElements = [this.txtLegajo,this.txtCuil,this.txtNombre,this.txtApellido,this.dateFechaNac,this.txtTelefono,this.txtDomicilio, this.txtLocalidad,this.txtProvincia,this.urlCurriculumVitae];
-		this.uploadFileOption = this.urlCurriculumVitae.element.lastChild;
+		this.formBodyElements = [this.txtLegajo,this.txtCuil,this.txtNombre,this.txtApellido,this.dateFechaNac,this.txtMail,this.txtTelefono,this.txtDomicilio, this.txtLocalidad,this.txtProvincia,this.cv];
+		this.uploadFileOption = this.cv.element.lastChild;
 		//End Maquetacion y referenciacion de ELementos del Formulario
 		this.prepareSelects();
 		this.startValidacion();
@@ -547,15 +547,15 @@ function FormPersona(dataHandler,conf,registro){
 		if(val){
 			var persona = this.getJSonData();
 			var params="metodo=savePersona&params="+persona;
-			//this.dataHandler.ejecutarOperacionAJAX(this,"savePersona",params);
 			console.log(params);
-			this.subirCV();
+			this.dataHandler.ejecutarOperacionAJAX(this,"savePersona",params);
 		}
 	}
 
-	this.subirCV=function(){
-		var file = this.urlCurriculumVitae.element.lastChild.files[0];
+	this.subirCV=function(id){
+		var file = this.cv.element.lastChild.files[0];
 		console.log(file);
+		this.dataHandler.ejecutarOperacionArchivoAJAX(this,id,file,'saveFile');
 	}
 
 	this.modificarDatos=function(){
@@ -604,7 +604,7 @@ function FormPersona(dataHandler,conf,registro){
 		if(this.conf.tipo!==1){
 			idPersona = '"idPersona":'+this.conf.idBuscado+',';
 		}
-		return '{'+idPersona+'"legajo":"'+this.txtLegajo.element.value+'","cuil":"'+this.txtCuil.element.value+'","nombre":"'+this.txtNombre.element.value+'","apellido":"'+this.txtApellido.element.value+'fechaNacimiento:'+this.conf.dateActions.getDateString(this.dateFechaNac.element)+'","telefono":"'+this.txtTelefono.element.value+'","domicilio":"'+this.txtDomicilio.element.value+'","localidad":"'+this.txtLocalidad.element.value+'","provincia":"'+this.txtProvincia.element.value+'"}';
+		return '{'+idPersona+'"legajo":"'+this.txtLegajo.element.value+'","cuil":"'+this.txtCuil.element.value+'","nombre":"'+this.txtNombre.element.value+'","apellido":"'+this.txtApellido.element.value+'","fechaNacimiento":"'+this.conf.dateActions.getDateString(this.dateFechaNac.element)+'","mail":"'+this.txtMail.element.value+'","telefono":"'+this.txtTelefono.element.value+'","domicilio":"'+this.txtDomicilio.element.value+'","localidad":"'+this.txtLocalidad.element.value+'","provincia":"'+this.txtProvincia.element.value+'"}';
 	}
 
 	this.getData=function(idBuscado){
@@ -626,11 +626,7 @@ function FormPersona(dataHandler,conf,registro){
 	}
 
 	this.eventosFormulario=function(){
-		this.uploadFileOption.onchange=function(){
-			var fileName = this.value.slice(12);
-			//Mostrar nombre de archivo subido
-			document.getElementById('texto-archivo').innerHTML=fileName;
-		}
+
 	}
 
 	this.closeForm = function(){
@@ -764,7 +760,7 @@ function FormArea(dataHandler,conf,registro){
 	}
 
 	this.operacionExitosa = function(tipo){
-		this.registro.updateInfo();
+		if(this.registro!==undefined)this.registro.updateInfo();
 		var messageContent;
 		switch(tipo){ 
 			case 1: messageContent = "Los datos del Area han sido guardados con exito";break;

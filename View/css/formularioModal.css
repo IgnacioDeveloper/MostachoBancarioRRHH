@@ -141,7 +141,7 @@
 
 /*Elementos de tipo File*/
 
-.file-path{
+.file{
     position:relative;
     margin:auto;
     padding:10px;
@@ -150,7 +150,7 @@
     background-color:darkorange;
 }
 
-.file-path:active{
+.file:active{
     background-color:red;
 }
 
@@ -158,7 +158,7 @@
     font-style:italic;
 }
 
-.file-path #textoBoton{
+.file #texto-boton{
     position:absolute;
     color:black;
     margin:auto;
@@ -166,7 +166,7 @@
     left:0;
 }
 
-.file-path #buttonSendFile{
+.file #inputFile{
     position:absolute;
     top:0;
     left:0;

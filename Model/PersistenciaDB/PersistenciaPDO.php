@@ -28,7 +28,7 @@
 		}
 
 		function leer($tablas, $columnas = '*', $join = '', $condicion = '1'){
-			$sql_query = 'SELECT '.$columnas.' FROM '.$tablas.' '.$join.' WHERE '.$condicion;
+			$sql_query = 'SELECT '.$columnas.' FROM '.$tablas.' '.$join.' WHERE '.$condicion.' AND NOT ID'.$tablas.'=0';
 			//echo $sql_query.'<br/>';
 			try{
 				$statement = $this->connectionDB->prepare($sql_query);
@@ -69,10 +69,9 @@
 		function aniadir($tabla,$values){
 			$arrayColumnas = $this->nombreColumnas($tabla);
 			unset($arrayColumnas[0]);
-			var_dump($arrayColumnas);
 			$columnNames = implode(",",$arrayColumnas);
 			$sql_query = 'INSERT INTO '.$tabla.' ('.$columnNames.') VALUES ('.$values.')';
-			echo("<br/>".$sql_query);
+			//echo("<br/>".$sql_query);
 			//echo $sql_query.'<br/>';
 			try{
 				$this->connectionDB->exec($sql_query);

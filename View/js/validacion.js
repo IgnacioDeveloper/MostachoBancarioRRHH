@@ -4,7 +4,7 @@ function Validacion(formulario){
    	Validacion.singleInstance = this;
    	this.reExpVacio =/^[ ]*$/;
 	this.reExpTextOnly = /^[A-Za-z][A-Za-z ,.]*[A-Za-z. ]*$/;
-	this.reExpAlphanumeric = /^[[A-Za-z0-9. ]+$/;
+	this.reExpAlphanumeric = /^[[A-Za-z0-9.º" ]+$/;
 	this.reExpAlphanumericSc = /^[A-Za-z0-9,.()/ ]+$/;
 	this.reExpAlphanumericSs = /^[\w]+$/;
 	this.reExpMail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/;
@@ -26,32 +26,44 @@ function Validacion(formulario){
 	this.setVal=function(){	
 		this.clearValValues();
 		this.setValValues();
-		if(this.txts.length != 0) this.aplicarLostFocusTxtVal();
+		if(this.txts.length != 0) this.setLostFocusTxtVal();
 		if(this.selects.length != 0) this.setAutoRecSelects();
 		if(this.specialElements.length!=0)this.setSpecialVal();
 	}
 
 	this.setSpecialVal=function(){
-		for(i=0;i<this.specialElements.length;i++){
+		for(i in this.specialElements){
 			var type = this.specialElements[i].valType;
 			switch(type){
-				case 'date-selects':  this.setDateElementDefaultValues(this.specialElements[i]);
+				case 'date-selects':  this.setDateElementDefaultValues(this.specialElements[i]);break;
+				case 'PDF': this.setClickFileElementVal(this.specialElements[i]);break;
 			}
 		}
 	}
 
+	this.setClickFileElementVal=function(fileElement){
+		var inputFile =  fileElement.element.lastChild;
+		var self=this;
+		inputFile.addEventListener('change',function(){
+			self.valFile(fileElement,false);
+		});
+	}
+
 	this.setDateElementDefaultValues=function(dateElement){
-		var setNormal = function(element){
-			element.style.borderColor="black";
-			element.style.borderWidth="1px";
-		}
 		var self = this;
 		var selectDia = dateElement.element.firstChild;
 		var selectMes = selectDia.nextSibling;
 		var selectAnio = dateElement.element.lastChild;
-		selectDia.addEventListener('blur',function(){setNormal(this);});
-		selectMes.addEventListener('blur',function(){setNormal(this);});
-		selectAnio.addEventListener('blur',function(){setNormal(this);});
+		var setNormal = function(element){
+			element.style.borderColor="black";
+			element.style.borderWidth="1px";
+			if(selectDia.selectedIndex == 0 || selectMes.selectedIndex == 0 || selectAnio.selectedIndex == 0){
+				dateElement.errorMessage.innerHTML="";
+			}
+		}
+		selectDia.onblur=function(){setNormal(this);};
+		selectMes.onblur=function(){setNormal(this);};
+		selectAnio.onblur=function(){setNormal(this);};
 	}
 
 	this.setValValues=function(){
@@ -69,10 +81,11 @@ function Validacion(formulario){
 	this.clearValValues=function(){
 		this.txts = [];
 		this.selects = [];
+		this.specialElements=[];
 		this.submitButton = undefined;
 	}
 
-	this.aplicarLostFocusTxtVal = function(){
+	this.setLostFocusTxtVal = function(){
 		var validacion = this;
 		for(i in this.txts){
 			var txt = this.txts[i];
@@ -100,15 +113,15 @@ function Validacion(formulario){
 		}
 	}
 	
-	this.setNormal = function(txt){
-		txt.style.borderColor="black";
-		txt.style.borderWidth="1px";
-		txt.nextSibling.innerHTML="";
+	this.setNormal = function(element){
+		element.style.borderColor="black";
+		element.style.borderWidth="1px";
+		element.nextSibling.innerHTML="";
 	}
 
-	this.setError = function(txt){
-		txt.style.borderColor="red";
-		txt.style.borderWidth="medium";
+	this.setError = function(element){
+		element.style.borderColor="red";
+		element.style.borderWidth="medium";
 	}
 
 	this.valTextOnly=function(txt){
@@ -307,6 +320,47 @@ function Validacion(formulario){
 		if(this.reExpVacio.test(valor))return true;
 		return false;
 	}
+
+	this.valFile=function(fileElement,fullVal){
+		var self=this;
+		var inputFile = fileElement.element.lastChild;
+		var textoArchivo = fileElement.element.previousSibling;
+		var fileName = inputFile.value.slice(12);
+		console.log(fileName);
+		textoArchivo.innerHTML = fileName;
+		console.log(inputFile.files[0]);
+		if(fileElement.must){
+			if(inputFile.files.length!=0){
+				if(inputFile.files[0].type=='application/pdf'){
+					textoArchivo.style.color='green';
+					fileElement.errorMessage.innerHTML='';
+					return true;
+				}
+				else{
+					textoArchivo.style.color='red';
+				    var x = inputFile.parentNode;
+				    var elementoReferencia = inputFile.nextSibling;
+				    x.removeChild(inputFile);
+				    inputFile = document.createElement('input');
+					inputFile.type = 'file';
+					inputFile.id = 'inputFile';
+					x.insertBefore(inputFile,elementoReferencia);
+					inputFile.addEventListener('change',function(){
+						self.valFile(fileElement,false);
+					});
+					fileElement.errorMessage.innerHTML='El archivo debe ser un PDF';
+					return false;
+				}
+			}
+			else{
+				if(fullVal){
+					textoArchivo.style.color='red';
+					fileElement.errorMessage.innerHTML='Se debe subir el archivo PDF';
+					return false;
+				}
+			}
+		}
+	}
 	
 	this.fullTxtsCheck=function(){
 		var ans= true;
@@ -338,7 +392,7 @@ function Validacion(formulario){
 		var ans = true;
 		for(i in this.selects){
 			var select = this.selects[i].element;
-			if(select.selectedIndex == 0){
+			if(select.selectedIndex == 0 && this.selects[i].must){
 				ans = false;
 				this.setError(select);
 				select.nextSibling.innerHTML="Debe seleccionar una opcion";
@@ -353,10 +407,11 @@ function Validacion(formulario){
 
 	this.fullSpecialElementsCheck=function(){
 		var ans = true;
-		for(se in this.specialElements){
+		for(i in this.specialElements){
 			var sbans;
-			switch(se.valType){
-				case 'date-selects':sbans=this.checkFullDateSelect(se);
+			switch(this.specialElements[i].valType){
+				case 'date-selects':sbans=this.checkFullDateSelect(this.specialElements[i]);break;
+				case 'PDF':sbans=this.valFile(this.specialElements[i],true);break;
 			}
 			if(sbans==false)ans=false;
 		}
@@ -364,14 +419,38 @@ function Validacion(formulario){
 	}
 
 	this.checkFullDateSelect=function(dateElement){
-		var setError = function(element){
-			element.style.borderColor="black";
-			element.style.borderWidth="1px";
-		}
+		var ans=true;
 		var selectDia = dateElement.element.firstChild;
 		var selectMes = selectDia.nextSibling;
 		var selectAnio = dateElement.element.lastChild;
-
+		var valuesZero=[];
+		if(dateElement.must){
+			if(selectDia.selectedIndex == 0){
+				this.setError(selectDia);
+				valuesZero.push('Día');
+			}
+			if(selectMes.selectedIndex == 0){
+				this.setError(selectMes);
+				valuesZero.push('Mes');
+			}
+			if(selectAnio.selectedIndex == 0){
+				this.setError(selectAnio);
+				valuesZero.push('Año');
+			}
+			if(valuesZero.length!=0){
+				ans=false;
+				var mensajeError = 'Debe especificar el ';
+				if(valuesZero.length==1){
+					mensajeError+=valuesZero[0];
+				}else if(valuesZero.length == 2){
+					mensajeError+= valuesZero[0] +' y el '+valuesZero[1];
+				}else{
+					mensajeError+= 'el Día, el Mes y el Año';
+				}
+				dateElement.errorMessage.innerHTML=mensajeError;
+			}
+		}
+		return ans;
 	}
 	
 

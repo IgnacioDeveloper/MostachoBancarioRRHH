@@ -105,14 +105,11 @@ class Usuario{
 	function autenticar(){
 		$funcion = "FX_USEROK('$this->username','$this->password')";
 		$resultado = $this->persistencia->ejecutarFuncion($funcion);
-		if($resultado == 1) $this->autocompletar("USERNAME = '$this->username'");
+		if($resultado == 1) $this->getUsuario("USERNAME = '$this->username'");
 		return $resultado;
 	}
 
-	function autocompletar($condicion){
-		$registro = $this->getUsuarios($condicion);
-		//[{"idUsuario":"1","nombre":"Ignacio Matias Aramburu","username":"ignaciodeveloper","password":"753f34fd0d965f463506cb6ba85a30cd","usertype":"J","estado":"H","token":"0"}]
-		$registro = json_decode($registro);
+	function autocompletar($registro){
 		$this->idUsuario = $registro[0]->idUsuario;
 		$this->nombre = $registro[0]->nombre;
 		$this->username = $registro[0]->username;
@@ -123,7 +120,6 @@ class Usuario{
 
 	function guardar(){
 		$valores = "'$this->nombre','$this->username','$this->password','$this->usertype','$this->estado','0'";
-		echo($valores."<br/>");
 		$this->persistencia->aniadir('USUARIO',$valores);
 	}
 
@@ -137,6 +133,12 @@ class Usuario{
 	function eliminar(){
 		$condicion='IDUSUARIO = '.$this->idUsuario;
 		$this->persistencia->eliminar('USUARIO',$condicion);
+	}
+
+	function getUsuario($condicion){
+		$registro = $this->getUsuarios($condicion);
+		$registro = json_decode($registro);
+		$this->autocompletar($registro);
 	}
 
 	function getUsuarios($condicion){
