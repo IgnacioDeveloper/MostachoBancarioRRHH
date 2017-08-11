@@ -107,7 +107,7 @@ function ModalWindowModel(modal){
 					modalSector.appendChild(document.createElement("br"));
 			}
 		}
-		//console.log(modalSector);
+		////console.log(modalSector);
 		return resultado;
 	}
 
@@ -337,7 +337,7 @@ function FormUsuario(dataHandler,conf,registro){
 		if(val){
 			var usuario = this.getJSonData();
 			var params="metodo=modifyUsuario&params="+usuario;
-			console.log(params);
+			//console.log(params);
 			this.dataHandler.ejecutarOperacionAJAX(this,"modifyUsuario",params);
 		}
 	}
@@ -347,7 +347,7 @@ function FormUsuario(dataHandler,conf,registro){
 	}
 
 	this.confirmacion=function(resultado,tipo){
-		console.log(resultado);
+		//console.log(resultado);
 		if(resultado==1){
 			this.operacionExitosa(tipo);
 		}
@@ -386,12 +386,12 @@ function FormUsuario(dataHandler,conf,registro){
 
 	this.getData=function(idBuscado){
 		var params="metodo=getUsuario&params="+idBuscado;
-		//console.log(params);
+		////console.log(params);
 		this.dataHandler.ejecutarOperacionAJAX(this,"getUsuario",params);
 	}
 
 	this.setFormData=function(usuario){
-		console.log(usuario);
+		//console.log(usuario);
 		usuario = JSON.parse(usuario);
 		this.txtNombre.element.value=usuario.nombre; 
 		this.txtUsername.element.value=usuario.username; 
@@ -458,6 +458,7 @@ function FormPersona(dataHandler,conf,registro){
 			new Node("errorCV","error_text","")];
 
 	this.conf=conf;
+	this.fileName;
 	this.registro=registro;
 	this.uploadFileOption;
 	
@@ -467,7 +468,7 @@ function FormPersona(dataHandler,conf,registro){
 	this.startUserForm=function(){
 		//Maquetacion y referenciacion de Elementos del Formulario
 		this.bodyElements = this.appendElements(this.bodyNodes,this.modalBody);
-		//console.log(this.bodyElements[13]);
+		////console.log(this.bodyElements[13]);
 		this.txtLegajo = new FormBodyElement(this.bodyElements[1],this.bodyElements[2],"integer",true);
 		this.txtCuil = new FormBodyElement(this.bodyElements[4],this.bodyElements[5],"cuil",true);
 		this.txtNombre = new FormBodyElement(this.bodyElements[7],this.bodyElements[8],"textOnly",true);
@@ -483,6 +484,7 @@ function FormPersona(dataHandler,conf,registro){
 		this.button2 = this.footerElements[1];
 		this.formBodyElements = [this.txtLegajo,this.txtCuil,this.txtNombre,this.txtApellido,this.dateFechaNac,this.txtMail,this.txtTelefono,this.txtDomicilio, this.txtLocalidad,this.txtProvincia,this.cv];
 		this.uploadFileOption = this.cv.element.lastChild;
+		this.fileLink = this.cv.element.previousSibling;
 		//End Maquetacion y referenciacion de ELementos del Formulario
 		this.prepareSelects();
 		this.startValidacion();
@@ -501,7 +503,7 @@ function FormPersona(dataHandler,conf,registro){
 	}
 
 	this.prepareSelects=function(){
-		//console.log(this.dateFechaNac.element);
+		////console.log(this.dateFechaNac.element);
 		this.conf.dateActions.prepareSelects(this.dateFechaNac.element);
 	}
 
@@ -520,6 +522,8 @@ function FormPersona(dataHandler,conf,registro){
 		var self = this;
 		if(!flag)this.getData(this.conf.idBuscado);
 		this.unlockInfo();
+		this.conf.dateActions.unlockDateSelects(this.dateFechaNac.element);
+		this.cv.element.firstChild.innerHTML='Cambiar Archivo';
 		this.title.innerHTML = "Modificar Informacion de Persona";
 		this.button1.innerHTML = "Guardar cambios";
 		this.button2.innerHTML = "Cancelar";
@@ -532,6 +536,8 @@ function FormPersona(dataHandler,conf,registro){
 	this.setConfConsulta=function(){
 		var self = this;
 		this.lockInfo();
+		this.conf.dateActions.lockDateSelects(this.dateFechaNac.element);
+		this.cv.element.style.display='none';
 		this.getData(this.conf.idBuscado);
 		this.title.innerHTML = "Consulta de Informacion de Persona";
 		this.button1.innerHTML = "Habilitar Modificaciones";
@@ -547,15 +553,19 @@ function FormPersona(dataHandler,conf,registro){
 		if(val){
 			var persona = this.getJSonData();
 			var params="metodo=savePersona&params="+persona;
-			console.log(params);
+			//console.log(params);
 			this.dataHandler.ejecutarOperacionAJAX(this,"savePersona",params);
 		}
 	}
 
 	this.subirCV=function(id){
-		var file = this.cv.element.lastChild.files[0];
-		console.log(file);
-		this.dataHandler.ejecutarOperacionArchivoAJAX(this,id,file,'saveFile');
+		if(this.cv.element.lastChild.files.length!==0){
+			var file = this.cv.element.lastChild.files[0];
+			this.dataHandler.ejecutarOperacionArchivoAJAX(this,'saveFile',id,file);
+		}
+		else{
+			this.confirmacion(1,this.conf.tipo);
+		}
 	}
 
 	this.modificarDatos=function(){
@@ -563,7 +573,6 @@ function FormPersona(dataHandler,conf,registro){
 		if(val){
 			var persona = this.getJSonData();
 			var params="metodo=modifyPersona&params="+persona;
-			console.log(params);
 			this.dataHandler.ejecutarOperacionAJAX(this,"modifyPersona",params);
 		}
 	}
@@ -573,7 +582,6 @@ function FormPersona(dataHandler,conf,registro){
 	}
 
 	this.confirmacion=function(resultado,tipo){
-		console.log(resultado);
 		if(resultado==1){
 			this.operacionExitosa(tipo);
 		}
@@ -583,7 +591,7 @@ function FormPersona(dataHandler,conf,registro){
 	}
 
 	this.operacionExitosa = function(tipo){
-		this.registro.updateInfo();
+		if(this.registro!==undefined)this.registro.updateInfo();
 		var messageContent;
 		switch(tipo){ 
 			case 1: messageContent = "Los datos de la Persona han sido guardados con exito";break;
@@ -613,16 +621,35 @@ function FormPersona(dataHandler,conf,registro){
 	}
 
 	this.setFormData=function(persona){
+		//console.log(persona);
+		var self = this;
 		persona = JSON.parse(persona);
 		this.txtLegajo.element.value = persona.legajo;
 		this.txtCuil.element.value = persona.cuil;
 		this.txtNombre.element.value = persona.nombre;
 		this.txtApellido.element.value = persona.apellido;
+		this.conf.dateActions.setDateSelects(this.dateFechaNac.element,persona.fechaNacimiento);
+		this.txtMail.element.value = persona.mail;
 		this.txtTelefono.element.value = persona.telefono;
 		this.txtDomicilio.element.value = persona.domicilio;
 		this.txtLocalidad.element.value = persona.localidad;
 		this.txtProvincia.element.value = persona.provincia;
-		this.txtUrlCurriculumVitae.element.value = persona.urlCV;
+		this.fileName=persona.cv;
+		var a = document.createElement('a');
+		a.innerHTML='Consultar CV Cargado en el Sistema.';
+		a.href="#";
+		this.fileLink.appendChild(a);
+		/*
+		this.fileLink.onmouseover=function(){
+			this.style.color="orange";
+		}
+		this.fileLink.onmouseout=function(){
+			this.style.color="blue";
+		}*/
+		//console.log(this.fileLink);
+		this.fileLink.onclick=function(){
+			var tab = window.open('../../CurriculumsVitaes/'+self.fileName);
+		}
 	}
 
 	this.eventosFormulario=function(){
@@ -740,7 +767,7 @@ function FormArea(dataHandler,conf,registro){
 		if(val){
 			var persona = this.getJSonData();
 			var params="metodo=modifyArea&params="+area;
-			console.log(params);
+			//console.log(params);
 			this.dataHandler.ejecutarOperacionAJAX(this,"modifyArea",params);
 		}
 	}
@@ -750,7 +777,7 @@ function FormArea(dataHandler,conf,registro){
 	}
 
 	this.confirmacion=function(resultado,tipo){
-		console.log(resultado);
+		//console.log(resultado);
 		if(resultado==1){
 			this.operacionExitosa(tipo);
 		}

@@ -21,7 +21,7 @@
 
 }
 
-.table .headers{
+.table tbody .headers{
 	position:relative;
 	background-color:#ed7804;
 	width:100%;

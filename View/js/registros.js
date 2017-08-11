@@ -119,9 +119,22 @@ function TableModel(tableElement,headers,widths){
 			this.columns[i].style.width=widths[i];
 	}
 
+	this.checkSelected=function(){
+		if(this.selectedRow!==null && this.selectedRow.nodeName === 'TR' && !this.selectedRow.classList.contains('headers')){
+			return true;
+		}
+		return false;
+	}
+
+	this.notSelected=function(){
+		var messageContent = 'Debe seleccionar un registro para poder realizar esta operacion';
+		new Mensaje(this,messageContent,"confirmacion");
+	}
+
 	this.eventos=function(){
 		console.log(this.tableElement.firstChild);
 		this.tableElement.onclick=function(e){
+			console.log(e.target.parentNode);
 			this.setSelectedRow(e.target.parentNode);
 		}.bind(this);
 	}
@@ -153,6 +166,7 @@ function Registro(sector,dataHandler,modeloTabla){
 			condicion = "UPPER("+campo+") LIKE '"+criterio+"%'";
 		}
 		var params = 'metodo='+metodo+'&params={"condicion":"'+condicion+'"}';
+		console.log(params);
 		this.dataHandler.ejecutarOperacionAJAX(this,metodo,params);
 	} 
 
@@ -277,7 +291,7 @@ function DataBarModel(registro,dataBarElement){
 	this.dataBarElement = dataBarElement;
 	this.registro = registro;
 	this.modeloTabla = registro.modeloTabla;
-	this.buttons=[]
+	this.buttons=[];
 
 	this.startDataBarModel=function(){
 		this.clearDataBarModel();
@@ -316,28 +330,9 @@ function DataBarModel(registro,dataBarElement){
 	}
 
 	this.eventos=function(){
-		var self = this;
 		var modal = document.getElementById('formularioModal');
-		this.buttons[0].onclick=function(){
-			new FormUsuario(self.registro.dataHandler,
-				{modal:modal,tipo:1});
-		}
-		this.buttons[1].onclick=function(){
-			new FormUsuario(self.registro.dataHandler,
-				{modal:modal,tipo:2,
-					idBuscado:self.registro.modeloTabla.selectedRow.getAttribute('data-value')},
-					self.registro);
-		}
-		this.buttons[2].onclick=function(){
-			new FormUsuario(self.registro.dataHandler,
-				{modal:modal,tipo:3,
-					idBuscado:self.registro.modeloTabla.selectedRow.getAttribute('data-value')},
-					self.registro);
-		}
-		this.buttons[3].onclick=function(){
-			self.registro.modeloTabla.confirmDeleteOperation(self.registro);
-		}
-	
+		this.registro.modeloTabla.eventosBotones(this,modal);
+	}
 
 }
 
@@ -376,7 +371,6 @@ function TableModelUsuario(tableElement){
 	}
 
 	this.confirmDeleteOperation=function(registro){
-		console.log(this.selectedRow.cells[4].innerHTML);
 		if(this.selectedRow.cells[4].innerHTML==='Hab.')
 			this.deshabilitarUsuario(this.selectedRow.getAttribute('data-value'),registro);
 		else 
@@ -394,12 +388,53 @@ function TableModelUsuario(tableElement){
 		registro.dataHandler.ejecutarOperacionAJAX(registro,'setUsuarioPermit',params);
 	}
 
+	this.eventosBotones=function(dataBarModel,modal){
+		var self = this;
+		dataBarModel.buttons[0].onclick=function(){
+			new FormUsuario(dataBarModel.registro.dataHandler,
+				{modal:modal,tipo:1});
+		}
+		dataBarModel.buttons[1].onclick=function(){
+			if(self.checkSelected()){
+				new FormUsuario(dataBarModel.registro.dataHandler,
+				{modal:modal,tipo:2,
+					idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value')},
+					dataBarModel.registro);
+			}
+			else{
+				self.notSelected();
+			}
+			
+		}
+		dataBarModel.buttons[2].onclick=function(){
+			if(self.checkSelected()){
+				new FormUsuario(dataBarModel.registro.dataHandler,
+				{modal:modal,tipo:3,
+					idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value')},
+					dataBarModel.registro);
+			}
+			else{
+				self.notSelected();
+			}
+			
+		}
+		dataBarModel.buttons[3].onclick=function(){
+			if(self.checkSelected()){
+				self.confirmDeleteOperation(dataBarModel.registro);
+			}
+			else{
+				self.notSelected();
+			}
+			
+		}
+	}
+
 }
 
 function TableModelPersona(tableElement){
 	TableModel.call(this,tableElement,
-		['Nro','Legajo','Cuil','Apellido','Nombre'],
-		['7%','13%','20%','30%','38%']);
+		['Nro','Legajo','Cuil','Apellido','Nombre','Puesto','Area'],
+		['2%','2%','2%','5%','5%','8%','8%']);
 	this.modulo = 'Persona';
 	this.titulo = 'Registros de Personas del Sistema'
 	this.metodoEntities = 'getPersonas';
@@ -408,20 +443,22 @@ function TableModelPersona(tableElement){
 	this.dataModify = 'Modificar Persona Seleccionada';
 	this.dataDelete = 'Eliminar Persona Seleccionada';
 	this.dataConsult = 'Consultar Persona Seleccionada';
-	this.options = ['Legajo','Cuil','Apellido','Nombre'];
-	this.optionsValue = ['LEGAJO','CUIL','APELLIDO','NOMBRE'];
+	this.options = ['Legajo','Cuil','Apellido','Nombre','Puesto','Area'];
+	this.optionsValue = ['LEGAJO','CUIL','APELLIDO','NOMBRE','PUESTO','AREA'];
 
 	this.setRows=function(personas){
 		var i=0,j=0;
 		var rows=[];
 		for(i=0;i<personas.length;i++){
-			rows[i]=new Array(6);
+			rows[i]=new Array(8);
 			rows[i][0]=personas[i].idPersona;
 			rows[i][1]=++j;
 			rows[i][2]=personas[i].legajo;
 			rows[i][3]=personas[i].cuil;
 			rows[i][4]=personas[i].apellido;
 			rows[i][5]=personas[i].nombre;
+			rows[i][6]='No Asignado';
+			rows[i][7]='No Asignada';
 		}
 		return rows;
 	}
@@ -430,6 +467,55 @@ function TableModelPersona(tableElement){
 		this.updateRows(this.setRows(personas),true);
 	}
 
+	this.confirmDelete=function(extra){
+		new Mensaje(this,'¿Esta seguro que desea borrar este registro?','condicion','delete',extra);
+	}
+
+	this.delete=function(registro){
+		var id = this.selectedRow.getAttribute('data-value')
+		var params = 'metodo=deletePersona&params={"idPersona":'+id+'}';
+		registro.dataHandler.ejecutarOperacionAJAX(registro,'deletePersona',params);
+		registro.dataHandler.ejecutarOperacionArchivoAJAX(registro,'deleteFile',id);
+	}
+
+	this.eventosBotones=function(dataBarModel,modal){
+		var self = this;
+		dataBarModel.buttons[0].onclick=function(){
+			new FormPersona(dataBarModel.registro.dataHandler,
+				{modal:modal,tipo:1,dateActions:new DateActions()});
+		}
+		dataBarModel.buttons[1].onclick=function(){
+			if(self.checkSelected()){
+				new FormPersona(dataBarModel.registro.dataHandler,
+				{modal:modal,tipo:2,
+					idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions()},
+					dataBarModel.registro);
+			}
+			else{
+				self.notSelected();
+			}
+		}
+		dataBarModel.buttons[2].onclick=function(){
+			if(self.checkSelected()){
+				new FormPersona(dataBarModel.registro.dataHandler,
+					{modal:modal,tipo:3,
+						idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions()},
+						dataBarModel.registro);
+			}
+			else{
+				self.notSelected();
+			}
+		}
+		dataBarModel.buttons[3].onclick=function(){
+			if(self.checkSelected()){
+					self.confirmDelete(dataBarModel.registro);
+			}
+			else{
+				self.notSelected();
+			}
+		}
+	}
+	
 }
 
 

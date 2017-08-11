@@ -28,7 +28,7 @@ function DataHandler(){
 					case "getPuesto":break;
 					case "getPuestos":break;
 					case "savePersona":callContext.subirCV(ajax_request.responseText);break; 
-					case "modifyPersona":callContext.confirmacion(ajax_request.responseText,2);break;
+					case "modifyPersona":callContext.subirCV(ajax_request.responseText);break;
 					case "deletePersona":callContext.updateInfo();break; 
 					case "getPersona":callContext.setFormData(ajax_request.responseText);break;
 					case "getPersonas":callContext.updateTableInfo(ajax_request.responseText);break;
@@ -38,12 +38,13 @@ function DataHandler(){
    	}
 
 
-   	this.ejecutarOperacionArchivoAJAX=function(callContext,id,archivo,operacion){
+   	this.ejecutarOperacionArchivoAJAX=function(callContext,operacion,id,archivo){
    		var ajax_request = this.getAjaxRequest("http://localhost/MostachoRRHH/Controller/Controlador.php","POST");
    		var formData = new FormData(); //establecida la codificacion "multi-part/form-data por default"
-   		formData.append('params','{"idPersona":'+id+'}');
-   		formData.append('cvFile',archivo);
    		formData.append('metodo',operacion);
+   		formData.append('params','{"idPersona":'+id+'}');
+   		console.log(archivo);
+   		if(archivo!==undefined){console.log('El archivo esta definido');formData.append('cvFile',archivo);};
    		/*for (var pair of formData.entries()){
 			 console.log(pair[0]+ ', '+ pair[1]); 
 		}*/
@@ -51,8 +52,7 @@ function DataHandler(){
    		ajax_request.onreadystatechange=function(){
    			if(ajax_request.readyState == 4 && ajax_request.status == 200){
 				switch(operacion){
-					case 'saveFile':console.log(ajax_request.responseText);callContext.confirmacion(ajax_request.responseText,1);break;
-					case 'getFile':callContext.confirmacion(ajax_request.responseText,2);break;
+					case 'saveFile':callContext.confirmacion(ajax_request.responseText,1);break;
 					case 'deleteFile':callContext.updateInfo(ajax_request.responseText);break;
 				}
 			}

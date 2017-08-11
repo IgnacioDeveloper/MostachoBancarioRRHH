@@ -22,12 +22,8 @@
 			return $name;
 		}
 
-		public function getFile($file){
-			
-		}
-
-		public function deleteFile($file){
-			
+		public function deleteFile($name){
+			return unlink('../../CurriculumsVitaes/'.$name);
 		}
 
 		public function renameFile($file,$id){

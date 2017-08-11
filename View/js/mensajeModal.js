@@ -1,7 +1,9 @@
-function Mensaje(parent,contenidoMensaje,tipo){
+function Mensaje(parent,contenidoMensaje,tipo,operacion,extra){
 	this.parent = parent;
 	this.contenidoMensaje = contenidoMensaje;
 	this.tipo = tipo;
+	this.operacion = operacion;
+	this.extra = extra;
 	this.modal = document.getElementById("mensajeModal");
 	this.modalBody = this.modal.getElementsByClassName("modal-content")[0];
 	this.botones = [];
@@ -74,7 +76,11 @@ function Mensaje(parent,contenidoMensaje,tipo){
 	}
 
 	this.returnResponse=function(ans){
-		this.parent.catchResponse(ans,operacion);
+		if(ans){
+			switch(this.operacion){
+				case 'delete':this.parent.delete(this.extra);break;
+			}
+		}
 	}
 
 	this.openMessage();

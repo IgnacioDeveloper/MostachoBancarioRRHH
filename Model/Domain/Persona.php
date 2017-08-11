@@ -110,12 +110,17 @@
 		function getMail(){
         	return $this->mail;
     	}
+
+    	function getCv(){
+    		return $this->cv;
+    	}
+
 		function setIdPersona($valor){
 			$this->idPersona = $valor;
 		}
 
 		function setLegajo($valor){
-			$this->Legajo = $valor;
+			$this->legajo = $valor;
 		}
 
 		function setCuil($valor){
@@ -130,6 +135,14 @@
 			$this->apellido = $valor;
 		}
 
+		function setFechaNacimiento($valor){
+			$this->fechaNacimiento = $valor;
+		}
+
+		function setMail($valor){
+			$this->mail = $valor;
+		}
+
 		function setTelefono($valor){
 			$this->telefono = $valor;
 		}
@@ -142,21 +155,17 @@
 			$this->localidad = $valor;
 		}
 
-		function setFechaNacimiento($valor){
-			$this->fechaNacimiento = $valor;
+		function setProvincia($valor){
+			$this->provincia = $valor;
 		}
 
-		function setUrlCV($valor){
+		function setCv($valor){
 			$this->cv = $valor;
 		}
 
 		function setIdUsuario($valor){
 			$this->idUsuario = $valor;
 		}
-
-		function _setMail($valor){
-        	$this->mail = $valor;
-    	}
 
     	function autocompletar($registro){
 			$this->idPersona = $registro[0]->idPersona;
@@ -168,6 +177,7 @@
 			$this->telefono = $registro[0]->telefono;
 			$this->domicilio = $registro[0]->domicilio;
 			$this->localidad = $registro[0]->localidad;
+			$this->provincia = $registro[0]->provincia;
 			$this->mail = $registro[0]->mail;
 			$this->cv = $registro[0]->cv;
 			$this->idUsuario = $registro[0]->Usuario_idUsuario;
@@ -185,16 +195,16 @@
 		}
 
 		function modificar(){
-			$set="IDPERSONA = '$this->idPersona',LEGAJO = '$this->legajo', CUIL = '$this->cuil',
-			NOMBRE =  '$this->nombre', APELLIDO = '$this->apellido', FECHANACIMIENTO = '$this->fechaNacimiento\,
-			DOMICILIO = '$this->domicilio', LOCALIDAD = '$this->localidad', TELEFONO = '$this->telefono',
-			MAIL = '$this->mail', URLCV = '$this->cv', USUARIO_IDUSUARIO = '$this->idUsuario'";
-			$condicion = "IDPERSONA = '$this->idPersona";
+			$set="LEGAJO = '$this->legajo', CUIL = '$this->cuil', 
+			NOMBRE =  '$this->nombre', APELLIDO = '$this->apellido', FECHANAC = '$this->fechaNacimiento', 
+			MAIL = '$this->mail', TELEFONO = '$this->telefono', DOMICILIO = '$this->domicilio', 
+			LOCALIDAD = '$this->localidad', PROVINCIA = '$this->provincia',CV = '$this->cv'";
+			$condicion = "IDPERSONA = '$this->idPersona'";
 			$this->persistencia->modificar('PERSONA',$set,$condicion);
 		}
 
 		function eliminar(){
-			$condicion='IDPERSONA = '.$idPersona;
+			$condicion="IDPERSONA = '$this->idPersona'";
 			$this->persistencia->eliminar('PERSONA',$condicion);
 		}
 
@@ -216,5 +226,18 @@
 			$this->persistencia->modificar('PERSONA',$set,$condicion);
 		}
 
+		function getJSON(){
+			return '{"idPersona":"'.$this->idPersona.'","legajo":"'.$this->legajo.'","cuil":"'.$this->cuil.
+			'","nombre":"'.$this->nombre.'","apellido":"'.$this->apellido.'","fechaNacimiento":"'.$this->fechaNacimiento.'","mail":"'.$this->mail.'","telefono":"'.$this->telefono.'","domicilio":"'.$this->domicilio.'","localidad":"'.$this->localidad.'","provincia":"'.$this->provincia.'","cv":"'.$this->cv.'"}';
+		}
+
 	}
+
+	/*$persona = new Persona();
+	$persona->getPersona('IDPERSONA = 50');
+	$registro=$persona->getJSON();
+	$persona->setNombre('Gustavo Baltazar Bariloche');
+	$registro = $persona->getJSON();
+	$persona->modificar();
+	echo($registro);*/
 ?>

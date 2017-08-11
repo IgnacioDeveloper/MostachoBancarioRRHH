@@ -92,6 +92,36 @@ function DateActions(){
 		return selectAnio.value+'-'+selectMes.value+'-'+selectDia.value;
 	}
 
+	this.setDateSelects=function(dateSelects,date){
+		var selectDia = dateSelects.firstChild;
+		var selectMes = selectDia.nextSibling;
+		var selectAnio = dateSelects.lastChild;
+		var dia = date.slice(8);
+		var mes = date.slice(5,7);
+		var anio = date.slice(0,4);
+		selectDia.value = (dia[0]=="0")?dia[1]:dia;
+		selectMes.value = (mes[0]=="0")?mes[1]:mes;
+		selectAnio.value = anio;
+	}
+
+	this.lockDateSelects=function(dateSelects){
+		var selectDia = dateSelects.firstChild;
+		var selectMes = selectDia.nextSibling;
+		var selectAnio = dateSelects.lastChild;
+		selectDia.disabled=true;
+		selectMes.disabled=true;
+		selectAnio.disabled=true;
+	}
+
+	this.unlockDateSelects=function(dateSelects){
+		var selectDia = dateSelects.firstChild;
+		var selectMes = selectDia.nextSibling;
+		var selectAnio = dateSelects.lastChild;
+		selectDia.disabled=false;
+		selectMes.disabled=false;
+		selectAnio.disabled=false;
+	}
+
 	this.dateToSQL=function(dateSelects){
 
 	}

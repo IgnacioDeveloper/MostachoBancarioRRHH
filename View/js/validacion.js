@@ -323,21 +323,23 @@ function Validacion(formulario){
 
 	this.valFile=function(fileElement,fullVal){
 		var self=this;
-		var inputFile = fileElement.element.lastChild;
 		var textoArchivo = fileElement.element.previousSibling;
-		var fileName = inputFile.value.slice(12);
-		console.log(fileName);
-		textoArchivo.innerHTML = fileName;
-		console.log(inputFile.files[0]);
+		var inputFile = fileElement.element.lastChild;
+		if(inputFile.files.length!=0){
+			var fileName = inputFile.value.slice(12);
+			textoArchivo.innerHTML = fileName;
+		}
 		if(fileElement.must){
 			if(inputFile.files.length!=0){
 				if(inputFile.files[0].type=='application/pdf'){
 					textoArchivo.style.color='green';
+					textoArchivo.onclick=function(){};
 					fileElement.errorMessage.innerHTML='';
 					return true;
 				}
 				else{
 					textoArchivo.style.color='red';
+					textoArchivo.onclick=function(){};
 				    var x = inputFile.parentNode;
 				    var elementoReferencia = inputFile.nextSibling;
 				    x.removeChild(inputFile);
@@ -354,9 +356,12 @@ function Validacion(formulario){
 			}
 			else{
 				if(fullVal){
-					textoArchivo.style.color='red';
-					fileElement.errorMessage.innerHTML='Se debe subir el archivo PDF';
-					return false;
+					if(textoArchivo.firstChild===null){
+						textoArchivo.style.color='red';
+						textoArchivo.onclick=function(){};
+						fileElement.errorMessage.innerHTML='Se debe subir el archivo PDF';
+						return false;
+					}
 				}
 			}
 		}

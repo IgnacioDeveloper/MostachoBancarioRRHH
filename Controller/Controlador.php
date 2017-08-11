@@ -141,38 +141,44 @@ class Controlador{
 	private function getPersonas($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Persona.php';
 		$params = json_decode($params);
-		$usuario = new Usuario();
-		$registros = $usuario->getUsuarios($params->condicion);
+		$persona = new Persona();
+		$registros = $persona->getPersonas($params->condicion);
 		return $registros;
 	}
 
 	private function getPersona($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Persona.php';
 		$params = json_decode($params);
-		$usuario = new Usuario();
-		$usuario->autocompletar('IDUSUARIO = '.$params);
-		$registro=$usuario->getJSON();
+		$persona = new Persona();
+		$persona->getPersona('IDPERSONA = '.$params);
+		$registro=$persona->getJSON();
 		return $registro;
 	}
 
 	private function modifyPersona($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Persona.php';
 		$params = json_decode($params);
-		$usuario= new Usuario($params->idUsuario);
-		$usuario->setNombre($params->nombre);
-		$usuario->setUsername($params->username);
-		if(isset($params->password))$usuario->setPassword($params->password);
-		$usuario->setUsertype($params->usertype);
-		$usuario->setEstado($params->estado);
-		$usuario->modificar();
-		return true;
+		$persona= new Persona($params->idPersona);
+		$persona->setLegajo($params->legajo);
+		$persona->setCuil($params->cuil);
+		$persona->setNombre($params->nombre);
+		$persona->setApellido($params->apellido);
+		$persona->setFechaNacimiento($params->fechaNacimiento);
+		$persona->setMail($params->mail);
+		$persona->setTelefono($params->telefono);
+		$persona->setDomicilio($params->domicilio);
+		$persona->setLocalidad($params->localidad);
+		$persona->setProvincia($params->provincia);
+		$persona->modificar();
+		return $persona->getIdPersona();
 	}
 
 	private function deletePersona($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Persona.php';
 		$params = json_decode($params);
-		$usuario = new Usuario($params->idUsuario); 
-		$usuario->eliminar();
+		echo $params->idPersona;
+		$persona = new Persona($params->idPersona); 
+		$persona->eliminar();
 		return true;
 	}
 
@@ -240,15 +246,12 @@ class Controlador{
 			return false;
 		}
 	}
-
-	private function getFile($params){
-		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/FileHandler/FileHandler.php';
-		//obtener archivo;
-	}
-
+	
 	private function deleteFile($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/FileHandler/FileHandler.php';
-		//borrar archivo;
+		$fileHandler = FileHandler::getInstance();
+		$params=json_decode($params);
+		return $fileHandler->deleteFile('CV_'.$params->idPersona.'.pdf');
 	}
 }
 
