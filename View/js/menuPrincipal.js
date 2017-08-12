@@ -39,6 +39,7 @@ function MenuPrincipal(){
 		this.loadScript('http://localhost/MostachoRRHH/View/js/reloj.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/dataHandler.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/registros.js');
+		this.loadScript('http://localhost/MostachoRRHH/View/js/menuAreas.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/dateActions.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/mensajeModal.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/validacion.js');
@@ -116,9 +117,6 @@ function MenuPrincipal(){
 		tabla.className = 'table';
 		var dataBar = document.getElementById('dataBar');
 		switch(modulo){
-			case 'areas': this.registers.push(new Registro(this.main,
-							this.dataHandler,
-							new TableModelArea(tabla))); break;
 			case 'puestos':this.registers.push(new Registro(this.main,
 							this.dataHandler,
 							new TableModelPuesto(tabla))); break;
@@ -139,7 +137,7 @@ function MenuPrincipal(){
 			case 'puestos':
 			case 'personas':
 			case 'usuarios':this.renderTabla(this.main,modulo);break;
-			case 'areas':this.renderAreaRegisters();break;
+			case 'areas':new MenuAreas(this.main,this.dataHandler);break;
 		}
 	}
 
