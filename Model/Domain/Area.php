@@ -1,13 +1,13 @@
 <?php
 
-	require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/PersistenciaPDO/PersistenciaPDO.php';
+	require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/PersistenciaDB/PersistenciaPDO.php';
 
 	class Area{
 		private $idArea;
 		private $codigo;
 		private $descripcion;
+		private $idAreaSuperior;
 		private $cantidadPersonas;
-		private $idTipo;
 		private $persistencia;
 
 		function __construct(){
@@ -21,17 +21,23 @@
 		}
 
 		function __construct0(){
-		
 		}
 
-		function _construct1($idArea){
+		function __construct1($idArea){
 			$this->idArea=$idArea;
 		}
 
-		function __construct5($idArea,$codigo,$descripcion,$cantidadPersonas){
-			$this->idArea = $idArea,
+		function __construct3($codigo,$descripcion,$idAreaSuperior){
 			$this->codigo = $codigo;
 			$this->descripcion = $descripcion;
+			$this->cantidadPersonas = 0;
+			$this->idAreaSuperior = $idAreaSuperior;
+		}
+
+		function __construct4($codigo,$descripcion,$idAreaSuperior,$cantidadPersonas){
+			$this->codigo = $codigo;
+			$this->descripcion = $descripcion;
+			$this->idAreaSuperior = $idAreaSuperior;
 			$this->cantidadPersonas = $cantidadPersonas;
 		}
 
@@ -51,8 +57,8 @@
 			return $this->cantidadPersonas;
 		}
 
-		function getIdTipo(){
-			return $this->itTipo;
+		function getIdAreaSuperior(){
+			return $this->idAreaSuperior;
 		}
 
 		function setIdArea($valor){
@@ -71,41 +77,51 @@
 			$this->cantidadPersonas = $valor;
 		}
 
-		function setIdTipo($valor){
-			$this->idTipo = $valor;
+		function setIdAreaSuperior($valor){
+			$this->idAreaSuperior = $valor;
 		}
 
-		function autocompletar($condicion){
-			$registro = $this->getAreas($condicion);
-			$registro = json_decode($registro);
+		function autocompletar($registro){
 			$this->idArea = $registro[0]->idArea;
 			$this->codigo = $registro[0]->codigo;
 			$this->descripcion = $registro[0]->descripcion;
+			$this->idAreaSuperior=$registro[0]->Area_idAreaSuperior;
 			$this->cantidadPersonas = $registro[0]->cantidadPersonas;
 			unset($registro);
 		}
 
 		function guardar(){
-			$valores = "'$this->idArea' , '$this->codigo',
-			'$this->descripcion','$this->cantidadPersonas','$this->idTipo'";
+			$valores = "'$this->codigo',
+			'$this->descripcion','$this->idAreaSuperior','$this->cantidadPersonas'";
 			$this->persistencia->aniadir('AREA',$valores);
 		}
 
 		function modificar(){
-			$set="IDAREA = '$this->idArea', CODIGO = '$this->codigo', DESCRIPCION = '$this->descripcion,
-			CANTIDADPERSONAS = '$this->cantidadPersonas', TIPOAREA_IDTIPO = '$this->idTipo'";
-			$this->persistencia->modificar('AREA',$set);
+			$set="CODIGO = '$this->codigo',
+			 DESCRIPCION = '$this->descripcion', AREA_IDAREASUPERIOR='$this->idAreaSuperior'";
+			$condicion = "IDAREA = '$this->idArea'";
+			$this->persistencia->modificar('AREA',$set,$condicion);
 		}
 
 		function eliminar(){
-			$condicion='IDAREA ='. $this->idArea;
+			$condicion = "IDAREA = '$this->idArea'";
 			$this->persistencia->eliminar('AREA',$condicion);
 		}
 
+		function getArea($condicion){
+			$registro = $this->getAreas($condicion);
+			$registro = json_decode($registro);
+			$this->autocompletar($registro);
+		}
+
 		function getAreas($condicion){
-			$registros = $this->persistencia->leer('USUARIO','*','',$condicion);
+			$registros = $this->persistencia->leer('AREA','*','',$condicion);
 			$registros = json_encode($registros);
 			return $registros;
+		}
+
+		function getJSON(){
+			return '{"idArea":"'.$this->idArea.'","codigo":"'.$this->codigo.'","descripcion":"'.$this->descripcion.'","idAreaSuperior":"'.$this->idAreaSuperior.'","cantidadPersonas":"'.$this->cantidadPersonas.'"}';
 		}
 
 	}

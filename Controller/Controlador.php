@@ -32,6 +32,8 @@ class Controlador{
 		}
 	}
 
+	//USUARIOS
+
 	private function startUserSession($params){
 		$resultado = $this->getAuthenticationResult($params);
 		return $resultado;
@@ -129,6 +131,8 @@ class Controlador{
 
 	//
 
+	//PERSONAS
+
 	private function savePersona($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Persona.php';
 		$params = json_decode($params);
@@ -176,58 +180,8 @@ class Controlador{
 	private function deletePersona($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Persona.php';
 		$params = json_decode($params);
-		echo $params->idPersona;
 		$persona = new Persona($params->idPersona); 
 		$persona->eliminar();
-		return true;
-	}
-
-
-	private function saveArea($params){
-		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Area.php';
-		$params = json_decode($params);
-		$usuario = new Area($params->idArea,$params->codigo,$params->descripcion,$params->cantidadPersonas);
-		$usuario->guardar();
-		return true;
-	}
-
-	private function modifyArea($params){
-		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Area.php';
-		$params = json_decode($params);
-		$area = $_SESSION['areaInteres'];
-		$area->setCodigo($params->codigo);
-		$area->setDescripcion($params->descripcion);
-		$area->setCantidadPersonas($params->username);
-		$registros = $area->getAreas($params);
-		return $registros;
-	}
-
-	private function getAreas($params){
-		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Area.php';
-		$params = json_decode($params);
-		$areas = new Area();
-		$registros = $area->getAreas($params);
-		return $registros;
-	}
-
-	private function getArea($params){
-		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Area.php';
-		$params = json_decode($params);
-		if(isset($_SESSION['areaInteres'])){
-			$_SESSION['areaInteres']=new Area();
-		}
-		//$area = new Area();
-		$area->autocompletar('IDAREA = '.$params);
-		$registro=$area->getJSON();
-		$_SESSION['usuarioInteres'] = $area;
-		return $registro;
-	}
-
-	private function deleteArea($params){
-		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Area.php';
-		$params = json_decode($params);
-		$area = new Area($params->idArea); 
-		$area->eliminar();
 		return true;
 	}
 
@@ -253,6 +207,106 @@ class Controlador{
 		$params=json_decode($params);
 		return $fileHandler->deleteFile('CV_'.$params->idPersona.'.pdf');
 	}
+
+	//AREAS
+
+	private function saveArea($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Area.php';
+		$params = json_decode($params);
+		$area = new Area($params->codigo,$params->descripcion,$params->idAreaSuperior);
+		$area->guardar();
+		return true;
+	}
+
+	private function getAreas($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Area.php';
+		$params = json_decode($params);
+		$area = new Area();
+		$registros = $area->getAreas($params->condicion);
+		return $registros;
+	}
+
+	private function getArea($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Area.php';
+		$params = json_decode($params);
+		$area = new Area();
+		$area->getArea('IDAREA = '.$params);
+		$registro = $area->getJSON();
+		return $registro;
+	}
+
+	private function modifyArea($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Area.php';
+		$params = json_decode($params);
+		$area = new Area($params->idArea);
+		$area->setCodigo($params->codigo);
+		$area->setDescripcion($params->descripcion);
+		$area->setIdAreaSuperior($params->idAreaSuperior);
+		$area->modificar();
+		return true;
+	}
+
+	private function deleteArea($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Area.php';
+		$params = json_decode($params);
+		$area = new Area($params->idArea); 
+		$area->eliminar();
+		return true;
+	}
+
+//PUESTOS
+
+	private function savePuesto($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Puesto.php';
+		$params = json_decode($params);
+		$puesto = new Puesto($params->codigo,$params->nombre,$params->descripcion,$params->objetivoGeneral,$params->funcionesEspecificas,
+			$params->competenciasRequeridas,$params->conocimientosRequeridos,$params->idArea);
+		$puesto->guardar();
+		return true;
+	}
+
+	private function getPuestos($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Puesto.php';
+		$params = json_decode($params);
+		$puesto = new Puesto();
+		$registros = $puesto->getPuestos($params->condicion);
+		return $registros;
+	}
+
+	private function getPuesto($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Puesto.php';
+		$params = json_decode($params);
+		$puesto = new Puesto();
+		$puesto->getPuesto($params->condicion);
+		$registro = $puesto->getJSON();
+		return $registro;
+	}
+
+	private function modifyPuesto($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Puesto.php';
+		$params = json_decode($params);
+		$puesto = new Puesto($params->idPuesto);
+		$puesto->setCodigo($params->codigo);
+		$puesto->setNombre($params->nombre);
+		$puesto->setDescripcion($params->descripcion);
+		$puesto->setObjetivoGeneral($params->objetivoGeneral);
+		$puesto->setFuncionesEspecificas($params->funcionesEspecificas);
+		$puesto->setCompetenciasRequeridas($params->competenciasRequeridas);
+		$puesto->setConocimientosRequeridos($params->conocimientosRequeridos);
+		$puesto->setIdArea($params->idArea);
+		$puesto->modificar();
+		return true;
+	}
+
+	private function deletePuesto($params){
+		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Puesto.php';
+		$params = json_decode($params);
+		$puesto = new Puesto($params->idPuesto); 
+		$puesto->eliminar();
+		return true;
+	}
+
+
 }
 
 ?>

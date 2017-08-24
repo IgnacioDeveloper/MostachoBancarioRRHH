@@ -46,7 +46,7 @@ function ModalWindowModel(modal){
 					node.type="text"; 
 					node.innerHTML = elementInsideText; 
 					modalSector.appendChild(node); break;
-				case "textarea": node = document.createElement("textArea"); 
+				case "text_area": node = document.createElement("textArea"); 
 					node.rows = "4"; 
 					node.cols = "50"; 
 					node.resize = "none" ;
@@ -81,6 +81,18 @@ function ModalWindowModel(modal){
 					node[0].appendChild(node[1]);
 					node[0].appendChild(node[2]);
 					node[0].appendChild(node[3]);
+					node=node[0];
+					modalSector.appendChild(node);break;
+				case "chooser":
+					node[0]=document.createElement("div");
+					node[0].id=elementId;
+					node[0].className = "chooser";
+					node[1]=document.createElement("p");
+					node[1].innerHTML = "Ninguna Area Seleccionada";
+					node[2]=document.createElement("button");
+					node[2].innerHTML = "Seleccione un Area";
+					node[0].appendChild(node[1]);
+					node[0].appendChild(node[2]);
 					node=node[0];
 					modalSector.appendChild(node);break;
 				case "file": 
@@ -639,14 +651,7 @@ function FormPersona(dataHandler,conf,registro){
 		a.innerHTML='Consultar CV Cargado en el Sistema.';
 		a.href="#";
 		this.fileLink.appendChild(a);
-		/*
-		this.fileLink.onmouseover=function(){
-			this.style.color="orange";
-		}
-		this.fileLink.onmouseout=function(){
-			this.style.color="blue";
-		}*/
-		//console.log(this.fileLink);
+
 		this.fileLink.onclick=function(){
 			var tab = window.open('../../CurriculumsVitaes/'+self.fileName);
 		}
@@ -667,7 +672,7 @@ function FormArea(dataHandler,conf,registro){
 	//Elementos del Formulario
 	Formulario.call(this,conf.modal);
 	this.dataHandler = dataHandler;
-	this.txtCodigo;this.txtDescripcion;this.txtCantidadPersonas;this.txtAreaSuperior;
+	this.txtCodigo;this.txtDescripcion;this.chooserAreaSuperior;
 	this.bodyNodes=[new Node("lblCodigo","p","Codigo"),
 			new Node("txtCodigo","input_text",""),
 			new Node("errorCodigo","error_text",""),
@@ -676,16 +681,15 @@ function FormArea(dataHandler,conf,registro){
 			new Node("txtDescripcion","input_text",""),
 			new Node("errorDescripcion","error_text",""),
 			//
-			new Node("lblCantidadPersonas","p","Cantidad de Personas"),
-			new Node("txtCantidadPersonas","input_text",""),
-			new Node("errorCantidadPersonas","error_text",""),
-			//
 			new Node("lblAreaSuperior","p","Area Superior Inmediata"),
-			new Node("txtAreaSuperior","input_text",""),
+			//new Node("lblWhich","input-text","No se ha seleccionado un area"),
+			//new Node("buttonAreaSuperior","button","Seleccione el Area"),
+			new Node("chooserAreaSuperior","chooser",""),
 			new Node("errorAreaSuperior","error_text","")];
 
 	this.conf=conf;
 	this.registro=registro;
+	this.areaSuperior;
 	
 
 	//End Elementos del Formulario
@@ -696,15 +700,28 @@ function FormArea(dataHandler,conf,registro){
 		//this.txtCodigo;this.txtDescripcion;this.txtCantidadPersonas;this.txtAreaSuperior;
 		this.txtCodigo = new FormBodyElement(this.bodyElements[1],this.bodyElements[2],"integer",true);
 		this.txtDescripcion = new FormBodyElement(this.bodyElements[4],this.bodyElements[5],"alphanumeric",true);
-		this.txtCantidadPersonas = new FormBodyElement(this.bodyElements[7],this.bodyElements[8],"integer",true);
-		this.txtAreaSuperior = new FormBodyElement(this.bodyElements[10],this.bodyElements[11],"alphanumeric",true);
+		this.chooserAreaSuperior = new FormBodyElement(this.bodyElements[7],this.bodyElements[8],"chooser",true);
 		this.button1 = this.footerElements[0];
 		this.button2 = this.footerElements[1];
-		this.formBodyElements = [this.txtCodigo,this.txtDescripcion,this.txtCantidadPersonas,this.txtAreaSuperior];
+		this.formBodyElements = [this.txtCodigo,this.txtDescripcion,this.chooserAreaSuperior];
 		//End Maquetacion y referenciacion de ELementos del Formulario
+		this.prepareChooser();
 		this.startValidacion();
 		this.setConf();
 		this.show();
+	}
+
+	this.prepareChooser=function(){
+		this.chooserAreaSuperior.element.firstChild.style.fontStyle='italic';
+		this.chooserAreaSuperior.element.lastChild.onclick=function(){
+			new OrganigramaModal(this);
+		}.bind(this);
+	}
+
+	this.getAreaValues=function(area){
+		this.areaSuperior=area;
+		this.chooserAreaSuperior.element.firstChild.innerHTML=area.descripcion;
+		this.chooserAreaSuperior.element.firstChild.style.color='blue';
 	}
 
 	this.setConf=function(){
@@ -729,9 +746,10 @@ function FormArea(dataHandler,conf,registro){
 
 	this.setConfModificacion=function(flag){
 		var self = this;
+		this.chooserAreaSuperior.element.lastChild.disabled=false;
 		if(!flag)this.getData(this.conf.idBuscado);
 		this.unlockInfo();
-		this.title.innerHTML = "Modificar Informacion de Persona";
+		this.title.innerHTML = "Modificar Informacion de Area";
 		this.button1.innerHTML = "Guardar cambios";
 		this.button2.innerHTML = "Cancelar";
 		this.button1.onclick=function(){
@@ -743,8 +761,9 @@ function FormArea(dataHandler,conf,registro){
 	this.setConfConsulta=function(){
 		var self = this;
 		this.lockInfo();
+		this.chooserAreaSuperior.element.lastChild.disabled=true;
 		this.getData(this.conf.idBuscado);
-		this.title.innerHTML = "Consulta de Informacion de Persona";
+		this.title.innerHTML = "Consulta de Informacion de Area";
 		this.button1.innerHTML = "Habilitar Modificaciones";
 		this.button2.innerHTML = "Ok";
 		this.button1.onclick=function(){
@@ -756,8 +775,9 @@ function FormArea(dataHandler,conf,registro){
 	this.guardarDatos=function(){
 		var val = this.validacion.fullCheck();
 		if(val){
-			var persona = this.getJSonData();
+			var area = this.getJSonData();
 			var params="metodo=saveArea&params="+area;
+			console.log(params);
 			this.dataHandler.ejecutarOperacionAJAX(this,"saveArea",params);
 		}
 	}
@@ -765,9 +785,9 @@ function FormArea(dataHandler,conf,registro){
 	this.modificarDatos=function(){
 		var val = this.validacion.fullCheck();
 		if(val){
-			var persona = this.getJSonData();
+			var area= this.getJSonData();
 			var params="metodo=modifyArea&params="+area;
-			//console.log(params);
+			console.log(params);
 			this.dataHandler.ejecutarOperacionAJAX(this,"modifyArea",params);
 		}
 	}
@@ -777,7 +797,7 @@ function FormArea(dataHandler,conf,registro){
 	}
 
 	this.confirmacion=function(resultado,tipo){
-		//console.log(resultado);
+		console.log(resultado);
 		if(resultado==1){
 			this.operacionExitosa(tipo);
 		}
@@ -805,25 +825,236 @@ function FormArea(dataHandler,conf,registro){
 
 	this.getJSonData=function(){
 		//this.txtCodigo;this.txtDescripcion;this.txtCantidadPersonas;this.txtAreaSuperior;
-		var idUsuario = '';
-		var password = '';
+		var idArea = '';	
 		if(this.conf.tipo!==1){
 			idArea = '"idArea":'+this.conf.idBuscado+',';
 		}
-		return '{'+idArea+'"codigo":"'+this.txtLegajo.element.value+'","descripcion":"'+this.txtDescripcion.element.value+'","cantidadPersonas":"'+this.txtCantidadPersonas.element.value+'","areaSuperior":"'+this.txtAreaSupreior.element.value+'"}';
+		return '{'+idArea+'"codigo":"'+this.txtCodigo.element.value+'","descripcion":"'+this.txtDescripcion.element.value+'","idAreaSuperior":"'+this.areaSuperior.id+'"}';
 	}
 
 	this.getData=function(idBuscado){
-		var params="metodo=getPersona&params="+idBuscado;
-		this.dataHandler.ejecutarOperacionAJAX(this,"getPersona",params);
+		var params="metodo=getArea&params="+idBuscado;
+		this.dataHandler.ejecutarOperacionAJAX(this,"getArea",params);
 	}
 
 	this.setFormData=function(area){
+		console.log(area);
 		area = JSON.parse(area);
-		this.txtLegajo.element.value = area.legajo;
-		this.txtDescripcion.element.value = area.cuil;
-		this.txtCantidadPersonas.element.value = area.nombre;
-		this.txtAreaSuperior.element.value = area.apellido;
+		this.txtCodigo.element.value = area.codigo;
+		this.txtDescripcion.element.value = area.descripcion;
+		this.getAreaValues({id:area.idAreaSuperior,descripcion:this.conf.descripcionAreaSuperior});
+	}
+
+	this.closeForm = function(){
+		this.setWindow(this,false);
+	}
+
+
+	this.startUserForm();
+}
+
+function FormPuesto(dataHandler,conf,registro){
+	//Elementos del Formulario
+	Formulario.call(this,conf.modal);
+	this.dataHandler = dataHandler;
+	this.txtCodigo;this.txtNombre; this.txtDescripcion; this.txtObjetivo; this.txtFunciones; this.txtCompetencias; this.txtConocimientos; this.chooserAreaSuperior;
+	this.bodyNodes=[new Node("lblCodigo","p","Codigo"),
+			new Node("txtCodigo","input_text",""),
+			new Node("errorCodigo","error_text",""),
+			//
+			new Node("lblNombre","p","Nombre del Puesto"),
+			new Node("txtNombre","input_text",""),
+			new Node("errorNombre","error_text",""),
+			//
+			new Node("lblAreaSuperior","p","Area del Puesto"),
+			new Node("chooserAreaSuperior","chooser",""),
+			new Node("errorAreaSuperior","error_text",""),
+			//
+			new Node("lblDescripcion","p","Descripcion"),
+			new Node("txtDescripcion","text_area",""),
+			new Node("errorDescripcion","error_text",""),
+			//
+			new Node("lblObjetivo","p","Objetivo General"),
+			new Node("txtObjetivoGeneral","text_area",""),
+			new Node("errorObjetivo","error_text",""),
+			//
+			new Node("lblFunciones","p","Funciones Especificas"),
+			new Node("txtFunciones","text_area",""),
+			new Node("errorFunciones","error_text",""),
+			//
+			new Node("lblCompetencias","p","Conpetencias Requeridas"),
+			new Node("txtCompetencias","text_area",""),
+			new Node("errorCompetencias","error_text",""),
+			//
+			new Node("lblConocimientos","p","Conocimientos Requeridos"),
+			new Node("txtConocimientos","text_area",""),
+			new Node("errorConocimientos","error_text","")]
+			//
+			
+
+	this.conf=conf;
+	this.registro=registro;
+	this.areaSeleccionada;
+	
+
+	//End Elementos del Formulario
+
+	this.startUserForm=function(){
+		//Maquetacion y referenciacion de Elementos del Formulario
+		this.bodyElements = this.appendElements(this.bodyNodes,this.modalBody);
+		this.txtCodigo = new FormBodyElement(this.bodyElements[1],this.bodyElements[2],"integer",true);
+		this.txtNombre = new FormBodyElement(this.bodyElements[4],this.bodyElements[5],"textOnly",true);
+		this.chooserAreaSuperior = new FormBodyElement(this.bodyElements[7],this.bodyElements[8],"chooser",true);
+		this.txtDescripcion = new FormBodyElement(this.bodyElements[10],this.bodyElements[11],undefined,true);
+		this.txtObjetivo = new FormBodyElement(this.bodyElements[13],this.bodyElements[14],undefined,true);
+		this.txtFunciones = new FormBodyElement(this.bodyElements[16],this.bodyElements[17],undefined,true);
+		this.txtCompetencias = new FormBodyElement(this.bodyElements[19],this.bodyElements[20],undefined,true);
+		this.txtConocimientos = new FormBodyElement(this.bodyElements[21],this.bodyElements[22],undefined,true);
+		
+		this.button1 = this.footerElements[0];
+		this.button2 = this.footerElements[1];
+		this.formBodyElements = [this.txtCodigo,this.txtNombre, this.txtDescripcion, this.txtObjetivo, this.txtFunciones, this.txtCompetencias, this.txtConocimientos, this.chooserAreaSuperior];
+		//End Maquetacion y referenciacion de ELementos del Formulario
+		this.prepareChooser();
+		this.startValidacion();
+		this.setConf();
+		this.show();
+	}
+
+	this.prepareChooser=function(){
+		this.chooserAreaSuperior.element.firstChild.style.fontStyle='italic';
+		this.chooserAreaSuperior.element.lastChild.onclick=function(){
+			new OrganigramaModal(this);
+		}.bind(this);
+	}
+
+	this.getAreaValues=function(area){
+		this.areaSeleccionada=area;
+		this.chooserAreaSuperior.element.firstChild.innerHTML=area.descripcion;
+		this.chooserAreaSuperior.element.firstChild.style.color='blue';
+	}
+
+	this.setConf=function(){
+		var tipo = this.conf.tipo;
+		switch(tipo){
+			case 1: this.setConfAlta(); break;
+			case 2: this.setConfModificacion(); break;
+			case 3: this.setConfConsulta(); break;
+		}
+	}
+
+	this.setConfAlta=function(){
+		var self = this;
+		this.title.innerHTML = "Nuevo Puesto";
+		this.button1.innerHTML = "Guardar Informacion de Puesto";
+		this.button2.innerHTML = "Cancelar";
+		this.button1.onclick=function(){
+			self.guardarDatos();
+		}
+		this.setCloseButton(this,this.button2);
+	}
+
+	this.setConfModificacion=function(flag){
+		var self = this;
+		if(!flag)this.getData(this.conf.idBuscado);
+		this.unlockInfo();
+		this.title.innerHTML = "Modificar Informacion de Puesto";
+		this.button1.innerHTML = "Guardar cambios";
+		this.button2.innerHTML = "Cancelar";
+		this.button1.onclick=function(){
+			self.modificarDatos(self.conf.idBuscado);
+		}
+		this.setCloseButton(this,this.button2);
+	}
+
+	this.setConfConsulta=function(){
+		var self = this;
+		this.lockInfo();
+		this.getData(this.conf.idBuscado);
+		this.title.innerHTML = "Consulta de Informacion de Puesto";
+		this.button1.innerHTML = "Habilitar Modificaciones";
+		this.button2.innerHTML = "Ok";
+		this.button1.onclick=function(){
+			self.mutarConf();
+		}
+		this.setCloseButton(this,this.button2);
+	}
+
+	this.guardarDatos=function(){
+		var val = this.validacion.fullCheck();
+		if(val){
+			var puesto = this.getJSonData();
+			var params="metodo=savePuesto&params="+puesto;
+			console.log(params);
+			this.dataHandler.ejecutarOperacionAJAX(this,"savePuesto",params);
+		}
+	}
+
+	this.modificarDatos=function(){
+		var val = this.validacion.fullCheck();
+		if(val){
+			var persona = this.getJSonData();
+			var params="metodo=modifyPuesto&params="+area;
+			//console.log(params);
+			this.dataHandler.ejecutarOperacionAJAX(this,"modifyPuesto",params);
+		}
+	}
+
+	this.mutarConf=function(){
+		this.setConfModificacion(true);
+	}
+
+	this.confirmacion=function(resultado,tipo){
+		//console.log(resultado);
+		if(resultado==1){
+			this.operacionExitosa(tipo);
+		}
+		else{
+			this.operacionFallida();
+		}
+	}
+
+	this.operacionExitosa = function(tipo){
+		if(this.registro!==undefined)this.registro.updateInfo();
+		var messageContent;
+		switch(tipo){ 
+			case 1: messageContent = "Los datos del Puesto han sido guardados con exito";break;
+			case 2: messageContent = "Los datos del Puesto han sido modificados con exito";break;
+		}
+		new Mensaje(this,messageContent,"confirmacion");
+		this.closeForm();
+	}
+
+	this.operacionFallida=function(){
+		new Mensaje(this,"Ha ocurrido un error y la operacion no pudo realizarse.\nIntente realizarla nuevamente en un rato.\nSi el problema persiste contactese con el Area de Informatica e informe de la situacion.","confirmacion");
+		this.closeForm();
+	}
+
+
+	this.getJSonData=function(){
+		//this.txtCodigo;this.txtDescripcion;this.txtCantidadPersonas;this.txtAreaSuperior;
+		var idPuesto = '';	
+		if(this.conf.tipo!==1){
+			idPuesto = '"idPuesto":'+this.conf.idBuscado+',';
+		}
+		return '{'+idPuesto+'"codigo":"'+this.txtCodigo.element.value+'","nombre":"'+this.txtNombre.element.value+'","idArea":"'+this.areaSeleccionada.id+'","descripcion":"'+this.txtDescripcion.element.value+'","objetivoGeneral":"'+this.txtObjetivo.element.value+'","funcionesEspecificas":"'+this.txtFunciones.element.value+'","competenciasRequeridas":"'+this.txtCompetencias.element.value+'","conocimientosRequeridos":"'+this.txtConocimientos.element.value+'"}';
+	}
+
+	this.getData=function(idBuscado){
+		var params="metodo=getPuesto&params="+idBuscado;
+		this.dataHandler.ejecutarOperacionAJAX(this,"getPuesto",params);
+	}
+
+	this.setFormData=function(puesto){
+		puesto = JSON.parse(puesto);
+		this.txtCodigo.element.value = puesto.codigo,
+		this.txtNombre.element.value = puesto.nombre, 
+		this.txtDescripcion.element.value = puesto.descripcion, 
+		this.txtObjetivo.element.value = puesto.objetivoGeneral, 
+		this.txtFunciones.element.value = puesto.funcionesEspecificas, 
+		this.txtCompetencias.element.value = puesto.competenciasRequeridas, 
+		this.txtConocimientos.element.value = puesto.conocimientosRequeridos, 
+		this.areaSeleccionada = puesto.idArea;
 	}
 
 	this.closeForm = function(){

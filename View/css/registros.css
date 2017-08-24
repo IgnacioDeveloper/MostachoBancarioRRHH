@@ -22,12 +22,16 @@
 }
 
 .table tbody .headers{
-	position:relative;
 	background-color:#ed7804;
 	width:100%;
 	font-family: arial;
 	font-weight:bold;
 	font-size:16px;
+}
+
+.table{
+	height:80%;
+	overflow:auto;
 }
 
 .table tr{
@@ -49,7 +53,7 @@
 }
 
 /*SEARCH BAR*/
-#searchBar{
+.searchBar{
 	height:10%;
 	width:80%;
 	margin:auto;
@@ -77,7 +81,7 @@
 	width:50%;
 }
 
-#searchBar p{
+.searchBar p{
 	/*margin-top:0;*/
 	
 	font-weight: bold;
@@ -86,17 +90,17 @@
 	margin-right:0.5em;
 }
 
-#searchBar input{
+.searchBar input{
 	margin-top:0.8em;
 	font-size:1em;
 }
 
-#searchBar select{
+.searchBar select{
 	margin-top:0.8em;
 	font-size:1.1em;
 	width:50%;
 }
-#searchBar button{
+.searchBar button{
 	margin-top:0.8em;
 	font-size:1em;
 	margin-right:1em;
@@ -124,7 +128,7 @@
 
 /*DATA BAR*/
 
-#dataBar{
+.dataBar{
 	position:fixed;
 	bottom:23%;
 	position:relative;
@@ -132,7 +136,7 @@
 	margin:auto;
 }
 
-#dataBar button{
+.dataBar button{
 	width:50%;
 	font-size:1em;
 	line-height:1.3em;

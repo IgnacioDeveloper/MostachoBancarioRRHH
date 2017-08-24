@@ -141,12 +141,14 @@ function TableModel(tableElement,headers,widths){
 
 }
 
+
 function Registro(sector,dataHandler,modeloTabla){
 	this.sector = sector;
 	this.dataHandler = dataHandler;
 	this.modeloTabla=modeloTabla;
 	this.searchBar=new SearchBar(this,this.modeloTabla.tableElement.previousSibling);
 	this.dataBar=new DataBar(this,this.modeloTabla.tableElement.nextSibling);
+	this.all = false;
 
 	this.startRegistro=function(){
 		this.searchBar.modeloSearchBar.startSearchBarModel();
@@ -160,10 +162,12 @@ function Registro(sector,dataHandler,modeloTabla){
 		var condicion;
 		if(campo === 1){
 			condicion = '1';
+			this.all = true;
 		} 
 		else {
 			criterio = criterio.toUpperCase();
 			condicion = "UPPER("+campo+") LIKE '"+criterio+"%'";
+			this.all=false;
 		}
 		var params = 'metodo='+metodo+'&params={"condicion":"'+condicion+'"}';
 		console.log(params);
@@ -176,6 +180,19 @@ function Registro(sector,dataHandler,modeloTabla){
 
 	this.updateInfo=function(){
 		this.getData(self.selectCampo.options[selectCampo.selectedIndex].value,self.inputCriterio.value);
+	}
+
+	this.updateAreas=function(registros){
+		registros = JSON.parse(registros);
+		this.modeloTabla.updateTable(registros,this.all);
+		this.searchBar.modeloSearchBar.updateResultInfo(this.modeloTabla.getRowCount());
+	}
+
+	this.updatePuestos=function(registros){
+		console.log(registros);
+		registros = JSON.parse(registros);
+		this.modeloTabla.updateTable(registros,this.all);
+		this.searchBar.modeloSearchBar.updateResultInfo(this.modeloTabla.getRowCount());
 	}
 
 	this.updateTableInfo=function(registros){
@@ -239,13 +256,13 @@ function SearchBarModel(registro,searchBarElement){
 		var lblCriterio = document.createElement('p');
 		var lblCampo = document.createElement('p');
 		this.lblTotal = document.createElement('p');
-		lblCriterio.id = 'lblCriterio';
-		this.inputCriterio.id = 'inputCriterio';
-		this.btnBuscar.id = 'btnBuscar';
+		lblCriterio.id = 'lblCriterio-'+this.registro.modeloTabla.modulo;;
+		this.inputCriterio.id = 'inputCriterio-'+this.registro.modeloTabla.modulo;
+		this.btnBuscar.id = 'btnBuscar-'+this.registro.modeloTabla.modulo;
 		this.btnBuscar.innerHTML = 'Buscar';
 		this.btnUpdate.id = 'btnUpdate';
 		this.btnUpdate.innerHTML = 'Actualizar';
-		this.selectCampo.id = 'selectCampo';
+		this.selectCampo.id = 'selectCampo-'+this.registro.modeloTabla.modulo;
 		var options=this.registro.modeloTabla.options;
 		var optionsValue=this.registro.modeloTabla.optionsValue;
 		console.log(optionsValue);
@@ -275,10 +292,10 @@ function SearchBarModel(registro,searchBarElement){
 	this.eventos=function(){
 		self = this;
 		this.btnUpdate.onclick=function(){
-			self.registro.getData(self.selectCampo.options[selectCampo.selectedIndex].value,self.inputCriterio.value);
+			self.registro.getData(self.selectCampo.options[self.selectCampo.selectedIndex].value,self.inputCriterio.value);
 		}
 		this.btnBuscar.onclick=function(){
-			self.registro.getData(self.selectCampo.options[selectCampo.selectedIndex].value,self.inputCriterio.value);
+			self.registro.getData(self.selectCampo.options[self.selectCampo.selectedIndex].value,self.inputCriterio.value);
 		}
 	}
 }
@@ -499,7 +516,7 @@ function TableModelPersona(tableElement){
 			if(self.checkSelected()){
 				new FormPersona(dataBarModel.registro.dataHandler,
 					{modal:modal,tipo:3,
-						idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions()},
+						idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions(),descripcionAreaSuperior:dataBarModel.registro.modeloTabla.selectedRow.lastChild.value},
 						dataBarModel.registro);
 			}
 			else{
@@ -515,6 +532,260 @@ function TableModelPersona(tableElement){
 			}
 		}
 	}
+}
+
+function TableModelArea(tableElement,sectorInfo){
+	TableModel.call(this,tableElement,
+		['Nro','Codigo','Descripcion','Area Superior'],
+		['2%','2%','8%','8%']);
+	this.modulo = 'Area';
+	this.titulo = 'Registros de Areas del Sistema'
+	this.metodoEntities = 'getAreas';
+	this.metodoEntity = 'getArea';
+	this.dataAdd = 'Agregar Nueva Area';
+	this.dataModify = 'Modificar Area';
+	this.dataDelete = 'Eliminar Area';
+	this.dataConsult = 'Consultar Area';
+	this.options = ['Codigo','Descripcion','Area Superior'];
+	this.optionsValue = ['CODIGO','DESCRIPCION','AREA_IDAREASUPERIOR'];
+	this.areas = null;
+	this.sectorInfo=sectorInfo;
+
+	this.setDimensions=function(){
+		var searchBar = this.tableElement.previousSibling;
+		var dataBar = this.tableElement.nextSibling;
+		searchBar.style.width="95%";
+		dataBar.style.width="95%"
+		this.tableElement.style.height="70%";
+		this.tableElement.style.width="95%"
+		this.tableElement.style.marginBottom="1%";
+	}
+
+	this.setRows=function(areas){
+		var i=0,j=0;
+		var rows=[];
+		for(i=0;i<areas.length;i++){
+			rows[i]=new Array(5);
+			rows[i][0]=areas[i].idArea;
+			rows[i][1]=++j;
+			rows[i][2]=areas[i].codigo;
+			rows[i][3]=areas[i].descripcion;
+			rows[i][4]=this.traducirIdArea(areas[i].Area_idAreaSuperior);		
+		}
+		return rows;
+	}
+
+	this.traducirIdArea=function(id){
+		if(id===0) return '-';
+		for(i in this.areas){
+			if(this.areas[i].idArea === id){
+				return this.areas[i].descripcion;
+			}
+		}
+	}
+
+	this.updateTable=function(areas,all){
+		if(all)this.areas=areas;
+		this.updateRows(this.setRows(areas),true);
+		this.setFullAreaInfo();
+	}
+
+	this.setFullAreaInfo=function(id){
+		if(this.sectorInfo.hasChildNodes()){
+			var titulo = this.sectorInfo.firstChild;
+			while(this.sectorInfo.hasChildNodes()){
+				this.sectorInfo.removeChild(this.sectorInfo.lastChild);
+			}
+			this.sectorInfo.appendChild(titulo);
+		}
+		if(id===undefined)id=null;
+		var cantAreas = document.createElement('p');
+		if(id===null){
+			cantAreas.innerHTML = 'Cantidad de Areas de Mostacho Bancario: '+this.areas.length;
+			this.sectorInfo.appendChild(cantAreas);
+		}
+	}
+
+	this.confirmDelete=function(extra){
+		new Mensaje(this,'¿Esta seguro que desea borrar este registro?','condicion','delete',extra);
+	}
+
+	this.delete=function(registro){
+		var id = this.selectedRow.getAttribute('data-value')
+		var params = 'metodo=deleteArea&params={"idArea":'+id+'}';
+		registro.dataHandler.ejecutarOperacionAJAX(registro,'deleteArea',params);
+		registro.dataHandler.ejecutarOperacionArchivoAJAX(registro,'deleteFile',id);
+	}
+
+	this.eventosBotones=function(dataBarModel,modal){
+		var self = this;
+		dataBarModel.buttons[0].onclick=function(){
+			new FormArea(dataBarModel.registro.dataHandler,
+				{modal:modal,tipo:1,dateActions:new DateActions()});
+		}
+		dataBarModel.buttons[1].onclick=function(){
+			console.log('Hi');
+			console.log(dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML);
+			if(self.checkSelected()){
+				new FormArea(dataBarModel.registro.dataHandler,
+				{modal:modal,tipo:2,
+					idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions(),descripcionAreaSuperior:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
+					dataBarModel.registro);
+			}
+			else{
+				self.notSelected();
+			}
+		}
+		dataBarModel.buttons[2].onclick=function(){
+			if(self.checkSelected()){
+				new FormArea(dataBarModel.registro.dataHandler,
+					{modal:modal,tipo:3,
+						idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions(),descripcionAreaSuperior:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
+						dataBarModel.registro);
+			}
+			else{
+				self.notSelected();
+			}
+		}
+		dataBarModel.buttons[3].onclick=function(){
+			if(self.checkSelected()){
+					self.confirmDelete(dataBarModel.registro);
+			}
+			else{
+				self.notSelected();
+			}
+		}
+	}
+
+	this.setDimensions();
+	
+}
+
+function TableModelPuesto(tableElement){
+	TableModel.call(this,tableElement,
+		['Nro','Codigo','Nombre','Area'],
+		['2%','2%','8%','8%']);
+	this.modulo = 'Puesto';
+	this.titulo = 'Registros de Puestos del Sistema'
+	this.metodoEntities = 'getPuestos';
+	this.metodoEntity = 'getPuesto';
+	this.dataAdd = 'Agregar Nuevo Puesto';
+	this.dataModify = 'Modificar Puesto';
+	this.dataDelete = 'Eliminar Puesto';
+	this.dataConsult = 'Consultar Puesto';
+	this.options = ['Codigo','Nombre','Area'];
+	this.optionsValue = ['CODIGO','NOMBRE','AREA'];
+	this.puestos = null;
+	//this.sectorInfo=sectorInfo;
+
+	this.setDimensions=function(){
+		if(tableElement.parentNode.classList.contains('lateral-derecho-inferior')){
+			var searchBar = this.tableElement.previousSibling;
+			var dataBar = this.tableElement.nextSibling;
+			searchBar.style.width="95%";
+			dataBar.style.width="95%"
+			this.tableElement.style.height="60%";
+			this.tableElement.style.width="95%"
+			this.tableElement.style.marginBottom="1%";
+		}
+	}
+
+	this.setRows=function(puestos){
+		var i=0,j=0;
+		var rows=[];
+		for(i=0;i<puestos.length;i++){
+			rows[i]=new Array(5);
+			rows[i][0]=puestos[i].idPuesto;
+			rows[i][1]=++j;
+			rows[i][2]=puestos[i].codigo;
+			rows[i][3]=puestos[i].nombrePuesto;
+			rows[i][4]=this.traducirIdArea(puestos[i].idArea);		
+		}
+		return rows;
+	}
+
+	this.traducirIdArea=function(id){
+		if(id===0) return '-';
+		for(i in this.puestos){
+			if(this.puestos[i].idArea === id){
+				return this.puestos[i].descripcion;
+			}
+		}
+	}
+
+	this.updateTable=function(puestos,all){
+		if(all)this.puestos=puestos;
+		this.updateRows(this.setRows(puestos),true);
+	}
+
+	this.setFullAreaInfo=function(id){
+		if(this.sectorInfo.hasChildNodes()){
+			var titulo = this.sectorInfo.firstChild;
+			while(this.sectorInfo.hasChildNodes()){
+				this.sectorInfo.removeChild(this.sectorInfo.lastChild);
+			}
+			this.sectorInfo.appendChild(titulo);
+		}
+		if(id===undefined)id=null;
+		var cantAreas = document.createElement('p');
+		if(id===null){
+			cantAreas.innerHTML = 'Cantidad de Areas de Mostacho Bancario: '+this.areas.length;
+			this.sectorInfo.appendChild(cantAreas);
+		}
+	}
+
+	this.confirmDelete=function(extra){
+		new Mensaje(this,'¿Esta seguro que desea borrar este registro?','condicion','delete',extra);
+	}
+
+	this.delete=function(registro){
+		var id = this.selectedRow.getAttribute('data-value')
+		var params = 'metodo=deletePuesto&params={"idPuesto":'+id+'}';
+		registro.dataHandler.ejecutarOperacionAJAX(registro,'deletePuesto',params);
+		registro.dataHandler.ejecutarOperacionArchivoAJAX(registro,'deletePuesto',id);
+	}
+
+	this.eventosBotones=function(dataBarModel,modal){
+		var self = this;
+		dataBarModel.buttons[0].onclick=function(){
+			new FormPuesto(dataBarModel.registro.dataHandler,
+				{modal:modal,tipo:1,dateActions:new DateActions()});
+		}
+		dataBarModel.buttons[1].onclick=function(){
+			console.log('Hi');
+			console.log(dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML);
+			if(self.checkSelected()){
+				new FormPuesto(dataBarModel.registro.dataHandler,
+				{modal:modal,tipo:2,
+					idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions(),descripcionArea:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
+					dataBarModel.registro);
+			}
+			else{
+				self.notSelected();
+			}
+		}
+		dataBarModel.buttons[2].onclick=function(){
+			if(self.checkSelected()){
+				new FormPuesto(dataBarModel.registro.dataHandler,
+					{modal:modal,tipo:3,
+						idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions(),descripcionArea:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
+						dataBarModel.registro);
+			}
+			else{
+				self.notSelected();
+			}
+		}
+		dataBarModel.buttons[3].onclick=function(){
+			if(self.checkSelected()){
+					self.confirmDelete(dataBarModel.registro);
+			}
+			else{
+				self.notSelected();
+			}
+		}
+	}
+
+	this.setDimensions();
 	
 }
 

@@ -196,7 +196,7 @@
 
 		function modificar(){
 			$set="LEGAJO = '$this->legajo', CUIL = '$this->cuil', 
-			NOMBRE =  '$this->nombre', APELLIDO = '$this->apellido', FECHANAC = '$this->fechaNacimiento', 
+			NOMBRE =  '$this->nombre', APELLIDO = '$this->apellido', FECHANAC = '$this->fechaNacimiento',
 			MAIL = '$this->mail', TELEFONO = '$this->telefono', DOMICILIO = '$this->domicilio', 
 			LOCALIDAD = '$this->localidad', PROVINCIA = '$this->provincia',CV = '$this->cv'";
 			$condicion = "IDPERSONA = '$this->idPersona'";

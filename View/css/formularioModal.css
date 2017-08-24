@@ -100,9 +100,9 @@
     border-color: black;
 }
 
-.modalFormulario .modal-body textArea{
+.modalFormulario .modal-body textarea{
     font-size: 16px;
-    width:98.5%;
+    width:80%;
     height: 180px;
     resize: none;
 }
@@ -111,7 +111,7 @@
     font-size: 16px;
 }
 
-.modalFormulario .modal-footer button{
+.modalFormulario button{
     font-size:18px;
     margin: 4px 8px;
 }

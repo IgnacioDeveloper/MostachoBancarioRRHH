@@ -27,8 +27,8 @@
 			return $recordSet;
 		}
 
-		function leer($tablas, $columnas = '*', $join = '', $condicion = '1'){
-			$sql_query = 'SELECT '.$columnas.' FROM '.$tablas.' '.$join.' WHERE '.$condicion.' AND NOT ID'.$tablas.'=0';
+		function leer($tablas, $columnas = '*', $join = '', $condicion = '1',$order=''){
+			$sql_query = 'SELECT '.$columnas.' FROM '.$tablas.' '.$join.' WHERE '.$condicion.' AND NOT ID'.$tablas.'=0 '.$order;
 			//echo $sql_query.'<br/>';
 			try{
 				$statement = $this->connectionDB->prepare($sql_query);
@@ -71,7 +71,6 @@
 			unset($arrayColumnas[0]);
 			$columnNames = implode(",",$arrayColumnas);
 			$sql_query = 'INSERT INTO '.$tabla.' ('.$columnNames.') VALUES ('.$values.')';
-			//echo("<br/>".$sql_query);
 			//echo $sql_query.'<br/>';
 			try{
 				$this->connectionDB->exec($sql_query);

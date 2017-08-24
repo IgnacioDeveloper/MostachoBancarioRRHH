@@ -5,7 +5,7 @@ function Validacion(formulario){
    	this.reExpVacio =/^[ ]*$/;
 	this.reExpTextOnly = /^[A-Za-z][A-Za-z ,.]*[A-Za-z. ]*$/;
 	this.reExpAlphanumeric = /^[[A-Za-z0-9.º" ]+$/;
-	this.reExpAlphanumericSc = /^[A-Za-z0-9,.()/ ]+$/;
+	this.reExpAlphanumericSc = /^[A-Za-z0-9,;"'º.()/ ]+$/;
 	this.reExpAlphanumericSs = /^[\w]+$/;
 	this.reExpMail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/;
 	this.reExpPhone = /^([0-9]{2}[-]?)?[0-9]{8}$|^([0-9]{3}[-]?)?[0-9]{7}$|^([0-9]{4}[-]?)?[0-9]{6}$/;
@@ -37,6 +37,7 @@ function Validacion(formulario){
 			switch(type){
 				case 'date-selects':  this.setDateElementDefaultValues(this.specialElements[i]);break;
 				case 'PDF': this.setClickFileElementVal(this.specialElements[i]);break;
+				case 'chooser':this.setClickChooserElementVal(this.specialElements[i]);break;
 			}
 		}
 	}
@@ -46,6 +47,13 @@ function Validacion(formulario){
 		var self=this;
 		inputFile.addEventListener('change',function(){
 			self.valFile(fileElement,false);
+		});
+	}
+
+	this.setClickChooserElementVal=function(chooserElement){
+		chooserElement.element.lastChild.addEventListener('click',function(){
+			chooserElement.element.firstChild.style.color='black';
+			chooserElement.errorMessage.innerHTML ='';	
 		});
 	}
 
@@ -70,6 +78,7 @@ function Validacion(formulario){
 		for(i in this.formBodyElements){
 			var node = this.formBodyElements[i].element.nodeName;
 			switch(node){
+				case"TEXTAREA":
 				case "INPUT":this.txts.push(this.formBodyElements[i]);break;
 				case "SELECT": this.selects.push(this.formBodyElements[i]);break;
 				case "DIV":this.specialElements.push(this.formBodyElements[i]);break;
@@ -260,10 +269,8 @@ function Validacion(formulario){
 			txt.nextSibling.innerHTML="Este campo es obligatorio";
 			return true;
 		}
-		else{
-			this.setNormal(txt);
-			return false;
-		}
+		this.setNormal(txt);
+		return false;
 	}
 
 	this.checkTextOnly=function(valor){
@@ -321,6 +328,18 @@ function Validacion(formulario){
 		return false;
 	}
 
+	this.valChooser=function(chooserElement){
+		if(chooserElement.element.firstChild.innerHTML === 'Ninguna Area Seleccionada'){
+			chooserElement.element.firstChild.style.color='red';
+			chooserElement.errorMessage.innerHTML ='Debe seleccionar un Area';
+			return false;
+		}else{
+			chooserElement.element.firstChild.style.color='black';
+			chooserElement.errorMessage.innerHTML ='';
+			return true;
+		}
+	}
+
 	this.valFile=function(fileElement,fullVal){
 		var self=this;
 		var textoArchivo = fileElement.element.previousSibling;
@@ -376,16 +395,17 @@ function Validacion(formulario){
 			var sbans;
 			var txt = this.txts[i];
 			switch(txt.valType){
-				case "textOnly" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valTextOnly(txt.element); else sbans=invBool(this.must);break;
-				case "alphanumeric" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valAlphanumeric(txt.element); else sbans=invBool(this.must);break;
-				case "alphanumericSc" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valAlphanumericSc(txt.element); else sbans=invBool(this.must);break;
-				case "alphanumericSs" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valAlphanumericSs(txt.element); else sbans=invBool(this.must);break;
-				case "password" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valPassword(txt.element); else sbans=invBool(this.must);break;
-				case "mail" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valMail(txt.element); else sbans=invBool(this.must);break;
-				case "phone" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valPhone(txt.element); else sbans=invBool(this.must);break;
-				case "cuil" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valCuil(txt.element); else sbans=invBool(this.must);break;
-				case "integer": if(!this.valEmpty(txt.element,txt.must))sbans = this.valInteger(txt.element); else sbans=invBool(this.must);break;
-				case "double": if(!this.valEmpty(txt.element,txt.must))sbans = this.valDouble(txt.element); else sbans=invBool(this.must);break;
+				case "textOnly" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valTextOnly(txt.element); else sbans=invBool(txt.must);break;
+				case "alphanumeric" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valAlphanumeric(txt.element); else sbans=invBool(txt.must);break;
+				case "alphanumericSc" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valAlphanumericSc(txt.element); else sbans=invBool(txt.must);break;
+				case "alphanumericSs" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valAlphanumericSs(txt.element); else sbans=invBool(txt.must);break;
+				case "password" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valPassword(txt.element); else sbans=invBool(txt.must);break;
+				case "mail" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valMail(txt.element); else sbans=invBool(txt.must);break;
+				case "phone" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valPhone(txt.element); else sbans=invBool(txt.must);break;
+				case "cuil" : if(!this.valEmpty(txt.element,txt.must))sbans = this.valCuil(txt.element); else sbans=invBool(txt.must);break;
+				case "integer": if(!this.valEmpty(txt.element,txt.must))sbans = this.valInteger(txt.element); else sbans=invBool(txt.must);break;
+				case "double": if(!this.valEmpty(txt.element,txt.must))sbans = this.valDouble(txt.element); else sbans=invBool(txt.must);break;
+				//case undefined: if(this.checkEmpty(txt.element.value) && txt.must) sbans = false; else sbans = true; break;
 			}
 			if(sbans == false)ans=false;
 		}
@@ -417,6 +437,7 @@ function Validacion(formulario){
 			switch(this.specialElements[i].valType){
 				case 'date-selects':sbans=this.checkFullDateSelect(this.specialElements[i]);break;
 				case 'PDF':sbans=this.valFile(this.specialElements[i],true);break;
+				case 'chooser':sbans=this.valChooser(this.specialElements[i]);break;
 			}
 			if(sbans==false)ans=false;
 		}
@@ -465,7 +486,7 @@ function Validacion(formulario){
 		if(this.txts.length!=0) sbans.push(this.fullTxtsCheck());
 		if(this.selects.length!=0) sbans.push(this.fullSelectsCheck());
 		if(this.specialElements!=0) sbans.push(this.fullSpecialElementsCheck());
-		for(i in sbans){if(!sbans[i]){ans=false;break;}}
+		for(i in sbans){console.log(sbans[i]);if(!sbans[i]){ans=false;break;}}
 		return ans;
 	}
 

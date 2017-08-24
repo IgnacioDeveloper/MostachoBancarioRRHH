@@ -2,7 +2,7 @@ window.onload=function(){
 	var boton = document.getElementById("boton");
 	var input = document.getElementsByTagName("INPUT")[0];
 	var errorMessage = document.getElementsByTagName("P")[0];
-	var reExpression = /^[\w]+$/;
+	var reExpression = /^[A-Za-z][A-Za-z ,.]*[A-Za-z. ]*$/;
 	var reVacio =/^[ ]*$/;
 	var mensaje =" Hey there ";
 	var elemento = new ElementoHTML(input,errorMessage);
@@ -23,12 +23,12 @@ window.onload=function(){
 	}
 
 	boton.onclick=function(){
-		alert(elemento.errorMessage);
+		console.log(elemento.errorMessage);
 		if(reVacio.test(input.value))alert("Cuadro de texto vacio");
 		else{
 		var resultadoValidacionTest = reExpression.test(elemento.input.value);
 		//var resultadoValidacionMatch = input.value.match(reExpression);
-		alert("Usando test :'"+input.value+"'"+": resultado de Validacion = "+resultadoValidacionTest);
+		console.log("Usando test :'"+input.value+"'"+": resultado de Validacion = "+resultadoValidacionTest);
 		//alert("Usando .match :'"+input.value+"'"+": resultado de Validacion = "+resultadoValidacionMatch);
 		if(!resultadoValidacionTest)setErrorMessage(elemento.errorMessage);else elemento.errorMessage = "";
 		}

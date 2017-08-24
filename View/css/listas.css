@@ -1,0 +1,75 @@
+.barraBusqueda{
+	background-color:#ed7804;
+	width:95%;
+	margin:auto;
+	overflow:auto;
+}
+
+.barraOperaciones{
+	background-color:#ed7804;
+	width:95%;
+	margin:auto;
+	overflow:auto;
+}
+
+.barraBusqueda *{
+	margin:1%;
+	float:left;
+}
+
+.barraOperaciones *{
+	margin:1%;
+	float:left;
+}
+
+.barraBusqueda > p{
+	margin-top:1%;
+	font-weight: bold;
+}
+
+.barraBusqueda > input{
+	width:44%;
+}
+
+.barraOperaciones > p{
+	margin-top:1%;
+	font-weight: bold;
+}
+
+.tablaLista{
+	height:50%;
+	width:95%;
+	margin-bottom:0;
+	margin:auto;
+}
+
+.tablaLista tbody{
+
+	display:block;
+	overflow:auto;
+}
+
+.tablaLista .headers{
+	background-color:#ed7804;
+	font-family: arial;
+	font-weight:bold;
+	font-size:16px;
+}
+
+.tablaLista tr{
+	background-color:#fff;
+}
+
+.tablaLista tr:hover:not(.headers){
+	background-color:lightblue;
+	color:black;
+}
+
+.tablaLista tr.selected:not(.headers){
+	background-color:blue;
+	color:white;
+}
+
+.tablaLista td{
+	position:relative;
+}

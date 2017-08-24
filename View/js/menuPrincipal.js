@@ -32,15 +32,21 @@ function MenuPrincipal(){
 		this.loadAllScripts();
 		this.startDataHandlerMainOperations(); //Enlaza con el archivo servidor.js y setea los eventos
 		this.lblUser.innerHTML = 'Nombre de Usuario: '+this.usuario.nombre+' // Tipo de Usuario: '+this.translateProfile(this.usuario.usertype);
-
+		//
+		
+		//
+		this.renderMainMenu('organigrama');
 	}
 
 	this.loadAllScripts=function(){
 		this.loadScript('http://localhost/MostachoRRHH/View/js/reloj.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/dataHandler.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/registros.js');
+		this.loadScript('http://localhost/MostachoRRHH/View/js/listas.js');
+		this.loadScript('http://localhost/MostachoRRHH/View/js/organigrama.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/menuAreas.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/dateActions.js');
+		this.loadScript('http://localhost/MostachoRRHH/View/js/organigramaModal.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/mensajeModal.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/validacion.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/formularioModal.js');
@@ -80,6 +86,7 @@ function MenuPrincipal(){
 	this.setEvents=function(){
 		var self = this;
 		this.iCerrarSesion.onclick=function(){self.solicitudServidorAJAX('metodo=destroySession',2);};
+		this.iOrganigrama.onclick=function(){self.renderMainMenu('organigrama');};
 		this.iNuevaArea.onclick=function(){self.openAddForm('areas');};
 		this.iNuevoPuesto.onclick=function(){self.openAddForm('puestos');};
 		this.iNuevaPersona.onclick=function(){self.openAddForm('personas');};
@@ -90,13 +97,12 @@ function MenuPrincipal(){
 		this.iUsuarios.onclick=function(){self.renderMainMenu('usuarios');};
 	}
 
-
 	this.openAddForm=function(modulo){
 		var Configuracion = {modal:this.modal,tipo:1};
 		if(modulo === 'personas') Configuracion.dateActions = new DateActions();
 		switch(modulo){
 			case 'areas': new FormArea(this.dataHandler,Configuracion);break;
-			case 'puestos':new FormPuestos(this.dataHandler,Configuracion);break;
+			case 'puestos':new FormPuesto(this.dataHandler,Configuracion);break;
 			case 'personas':new FormPersona(this.dataHandler,Configuracion);break;
 			case 'usuarios':new FormUsuario(this.dataHandler,Configuracion);break;
 		}
@@ -109,13 +115,12 @@ function MenuPrincipal(){
 	}
 
 	this.renderTabla=function(sector,modulo){
-		this.addElement(sector,'div','searchBar','searchBar-'+modulo)
-		this.addElement(sector,'table','tabla','tabla-'+modulo);
-		this.addElement(sector,'div','dataBar','dataBar-'+modulo);
-		var searchBar = document.getElementById('searchBar');
-		var tabla = document.getElementById('tabla');
-		tabla.className = 'table';
-		var dataBar = document.getElementById('dataBar');
+		this.addElement(sector,'div','searchBar-'+modulo,'searchBar');
+		this.addElement(sector,'table','tabla-'+modulo,'table');
+		this.addElement(sector,'div','dataBar-'+modulo,'dataBar');
+		var searchBar = document.getElementById('searchBar-'+modulo);
+		var tabla = document.getElementById('tabla-'+modulo);
+		var dataBar = document.getElementById('dataBar-'+modulo);
 		switch(modulo){
 			case 'puestos':this.registers.push(new Registro(this.main,
 							this.dataHandler,
@@ -128,21 +133,32 @@ function MenuPrincipal(){
 							new TableModelUsuario(tabla))); break;
 		}
 		this.addElement(sector,'p','titulo',
-			undefined,this.registers[this.registers.length-1].modeloTabla.titulo,{where:'before',from:'searchBar'});
+			undefined,this.registers[this.registers.length-1].modeloTabla.titulo,{where:'before',from:'searchBar-'+modulo});
 	}
 
 	this.renderMainMenu=function(modulo){
 		this.clearMain();
 		switch(modulo){
+			case 'organigrama':
+			this.addElement(this.main,'p','titulo',
+				undefined,'Organigrama de Mostacho Bancario');
+			try{
+				new Organigrama(this,this.main,this.dataHandler);
+			}catch(e){
+				if(e instanceof ReferenceError){
+					console.log(e);
+					setTimeout(function(){this.renderMainMenu('organigrama');}.bind(this),100);
+				}
+				else{
+					console.log(e);
+				}
+			};
+			break;
 			case 'puestos':
 			case 'personas':
 			case 'usuarios':this.renderTabla(this.main,modulo);break;
-			case 'areas':new MenuAreas(this.main,this.dataHandler);break;
+			case 'areas':new MenuAreas(this,this.main,this.dataHandler);break;
 		}
-	}
-
-	this.renderAreaRegisters=function(){
-		
 	}
 
 	this.addElement = function(contexto,elementType,id,className,elementContent,position){
