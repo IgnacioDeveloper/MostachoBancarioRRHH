@@ -6,13 +6,33 @@ function ListaPuestos(sector,dataHandler){
 	this.barraOperaciones = null;
 	this.columns = [];
 	this.rows = [];
+	this.selectedRow = null;
 	this.puestos = [];
+	this.areas = areas;
+	this.showPuestos;
 	this.indicesInteres = [];
 	this.condicion = '1';
 
 	this.startLista=function(){
+		this.getAllAreas();
+	}
+
+	this.prepareLista=function(){
 		this.renderLista();
 		this.getDataPuestos(this.condicion);
+		this.eventos();
+	}
+
+	this.getAllAreas=function(){
+		var params = 'metodo=getAreas&params={"condicion":"1"}';
+		var metodo = 'getAreas';
+		new DataHandler().ejecutarOperacionAJAX(this,metodo,params);
+	}
+
+	this.updateAreas=function(areas){
+		areas = JSON.parse(areas);
+		this.areas = areas;
+		this.prepareLista();
 	}
 
 	this.getDataPuestos=function(){
@@ -29,7 +49,17 @@ function ListaPuestos(sector,dataHandler){
 	}
 
 	this.updateList=function(){
-		this.appendRows(this.setRows());
+		this.updateRows(this.setRows(),true);
+	}
+
+	this.filter=function(criterio){
+		for(i=0;i<this.rows.length;i++){
+			if(this.rows[i].lastChild.innerHTML.startsWith(criterio)){
+				this.rows[i].style.display = 'table-row';
+			} else {
+				this.rows[i].style.display = 'none';
+			}
+		}
 	}
 
 	this.appendRow=function(row){
@@ -39,17 +69,33 @@ function ListaPuestos(sector,dataHandler){
 			cellNode = rowNode.insertCell(j);
 			cellNode.innerHTML=row[j];
 		}
-		this.rows.push(rowNode);
+		this.rows.push(this.tablaLista.firstChild.lastChild);
+		console.log(this.rows[this.rows.length-1]);
 	}
 
-	this.appendRows=function(rows){
+	this.updateRows = function(rows,isId){
 		this.removeAllDataRows();
-		for(i=0;i<rows.length;i++){
-			this.appendRow(rows[i].splice(1));
-			console.log(rows);
-			//rows[i].setAttribute('data-value',rows[i][0]);
+		if(isId){	
+			for(i=0;i<rows.length;i++){
+				this.appendRow(rows[i].splice(1));
+				this.rows[i].setAttribute('data-value',rows[i][0]);
+				this.rows[i].setAttribute('descripcionArea',rows[i][0]);
+			}	
 		}
-		this.rows = rows;
+		else{
+			for(i=0;i<rows.length;i++){
+				this.appendRow(rows[i]);
+			}	
+		}
+	}
+
+	this.traducirIdArea=function(id){
+		if(id===0) return '-';
+		for(i in this.areas){
+			if(this.areas[i].idArea === id){
+				return this.areas[i].descripcion;
+			}
+		}
 	}
 
 	this.setRows=function(){
@@ -63,7 +109,6 @@ function ListaPuestos(sector,dataHandler){
 				rows[i][2]=this.puestos[i].nombrePuesto;
 			}
 		}
-			
 		return rows;
 	}
 
@@ -138,6 +183,78 @@ function ListaPuestos(sector,dataHandler){
 			selectOperacion.options[i] = new Option(options[i],i);
 		}
 		return selectOperacion;
+	}
+
+	this.setSelectedRow=function(row){
+		if(this.selectedRow!=null)this.clearSelectedRow();
+		this.selectedRow = row;
+		row.classList.add('selected');
+	}
+
+	this.clearSelectedRow=function(){
+		this.selectedRow.classList.remove('selected');
+		this.selectedRow = null
+	}
+
+	this.notSelected=function(){
+		var messageContent = 'Debe seleccionar un registro para poder realizar esta operacion';
+		new Mensaje(this,messageContent,"confirmacion");
+	}
+
+	this.checkSelected=function(){
+		if(this.selectedRow!==null && this.selectedRow.nodeName === 'TR' && !this.selectedRow.classList.contains('headers')){
+			return true;
+		}
+		return false;
+	}
+
+	this.eventos=function(){
+		var self = this;
+		//Tabla Seleccionar
+		this.tablaLista.onclick=function(e){
+			self.setSelectedRow(e.target.parentNode);
+		};
+		//Boton Buscar
+		this.barraBusqueda.lastChild.onclick=function(){
+			self.filter(this.previousSibling.value);
+		}
+		//Boton Ejecutar
+		this.barraOperaciones.lastChild.onclick=function(){
+			var modal = document.getElementById('formularioModal');
+			var option = this.previousSibling.value;
+			switch(option){
+				case '0': new FormPuesto(self.dataHandler,
+				{modal:modal,tipo:1}); break;
+				case '1': 
+					if(self.checkSelected()){
+						new FormPuesto(self.dataHandler,
+						{modal:modal,tipo:2,
+							idBuscado:self.selectedRow.getAttribute('data-value'),descripcionArea:self.selectedRow.lastChild.innerHTML},
+							this);
+					}
+					else{
+						self.notSelected();
+					}
+					break;
+				case '2':
+					if(self.checkSelected()){
+						new FormPuesto(self.dataHandler,
+							{modal:modal,tipo:3,
+								idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),descripcionArea:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
+								dataBarModel.registro);
+					}
+					else{
+						self.notSelected();
+					}break;
+				case '3':
+					if(self.checkSelected()){
+							self.confirmDelete(dataBarModel.registro);
+					}
+					else{
+						self.notSelected();
+					}break;
+			}
+		}
 	}
 
 	this.startLista();

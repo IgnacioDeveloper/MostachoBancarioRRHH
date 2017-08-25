@@ -192,7 +192,7 @@ function Registro(sector,dataHandler,modeloTabla){
 		console.log(registros);
 		registros = JSON.parse(registros);
 		this.modeloTabla.updateTable(registros,this.all);
-		this.searchBar.modeloSearchBar.updateResultInfo(this.modeloTabla.getRowCount());
+		this.searchBar.modeloSearchBar.updateResultInfo(registros.length);
 	}
 
 	this.updateTableInfo=function(registros){
@@ -621,7 +621,7 @@ function TableModelArea(tableElement,sectorInfo){
 		var self = this;
 		dataBarModel.buttons[0].onclick=function(){
 			new FormArea(dataBarModel.registro.dataHandler,
-				{modal:modal,tipo:1,dateActions:new DateActions()});
+				{modal:modal,tipo:1});
 		}
 		dataBarModel.buttons[1].onclick=function(){
 			console.log('Hi');
@@ -629,7 +629,7 @@ function TableModelArea(tableElement,sectorInfo){
 			if(self.checkSelected()){
 				new FormArea(dataBarModel.registro.dataHandler,
 				{modal:modal,tipo:2,
-					idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions(),descripcionAreaSuperior:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
+					idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),descripcionAreaSuperior:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
 					dataBarModel.registro);
 			}
 			else{
@@ -640,7 +640,7 @@ function TableModelArea(tableElement,sectorInfo){
 			if(self.checkSelected()){
 				new FormArea(dataBarModel.registro.dataHandler,
 					{modal:modal,tipo:3,
-						idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions(),descripcionAreaSuperior:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
+						idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),descripcionAreaSuperior:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
 						dataBarModel.registro);
 			}
 			else{
@@ -676,7 +676,24 @@ function TableModelPuesto(tableElement){
 	this.options = ['Codigo','Nombre','Area'];
 	this.optionsValue = ['CODIGO','NOMBRE','AREA'];
 	this.puestos = null;
+	this.areas = null;
 	//this.sectorInfo=sectorInfo;
+
+	this.startModeloTabla = function(){
+		this.setDimensions();
+	}
+
+	this.getAllAreas=function(){
+		var params = 'metodo=getAreas&params={"condicion":"1"}';
+		var metodo = 'getAreas';
+		new DataHandler().ejecutarOperacionAJAX(this,metodo,params);
+	}
+
+	this.updateAreas=function(areas){
+		areas = JSON.parse(areas);
+		this.areas = areas;
+		this.updateRows(this.setRows(this.puestos),true);
+	}
 
 	this.setDimensions=function(){
 		if(tableElement.parentNode.classList.contains('lateral-derecho-inferior')){
@@ -699,23 +716,24 @@ function TableModelPuesto(tableElement){
 			rows[i][1]=++j;
 			rows[i][2]=puestos[i].codigo;
 			rows[i][3]=puestos[i].nombrePuesto;
-			rows[i][4]=this.traducirIdArea(puestos[i].idArea);		
+			rows[i][4]=this.traducirIdArea(puestos[i].Area_idArea);		
 		}
 		return rows;
 	}
 
 	this.traducirIdArea=function(id){
 		if(id===0) return '-';
-		for(i in this.puestos){
-			if(this.puestos[i].idArea === id){
-				return this.puestos[i].descripcion;
+		for(i in this.areas){
+			if(this.areas[i].idArea === id){
+				return this.areas[i].descripcion;
 			}
 		}
 	}
 
 	this.updateTable=function(puestos,all){
 		if(all)this.puestos=puestos;
-		this.updateRows(this.setRows(puestos),true);
+		if(this.areas=== null)this.getAllAreas();
+		else this.updateRows(this.setRows(puestos),true);
 	}
 
 	this.setFullAreaInfo=function(id){
@@ -749,15 +767,13 @@ function TableModelPuesto(tableElement){
 		var self = this;
 		dataBarModel.buttons[0].onclick=function(){
 			new FormPuesto(dataBarModel.registro.dataHandler,
-				{modal:modal,tipo:1,dateActions:new DateActions()});
+				{modal:modal,tipo:1});
 		}
 		dataBarModel.buttons[1].onclick=function(){
-			console.log('Hi');
-			console.log(dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML);
 			if(self.checkSelected()){
 				new FormPuesto(dataBarModel.registro.dataHandler,
 				{modal:modal,tipo:2,
-					idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions(),descripcionArea:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
+					idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),descripcionArea:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
 					dataBarModel.registro);
 			}
 			else{
@@ -768,7 +784,7 @@ function TableModelPuesto(tableElement){
 			if(self.checkSelected()){
 				new FormPuesto(dataBarModel.registro.dataHandler,
 					{modal:modal,tipo:3,
-						idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions(),descripcionArea:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
+						idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),descripcionArea:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
 						dataBarModel.registro);
 			}
 			else{
@@ -785,7 +801,7 @@ function TableModelPuesto(tableElement){
 		}
 	}
 
-	this.setDimensions();
+	this.startModeloTabla();
 	
 }
 

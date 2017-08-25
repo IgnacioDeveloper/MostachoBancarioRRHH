@@ -131,13 +131,13 @@
 		function autocompletar($registro){
 			$this->idPuesto =$registro[0]->idPuesto;
 			$this->codigo =$registro[0]->codigo;
-			$this->nombre =$registro[0]->nombre;
+			$this->nombre =$registro[0]->nombrePuesto;
 			$this->descripcion =$registro[0]->descripcion;
 			$this->objetivoGeneral =$registro[0]->objetivoGeneral;
 			$this->funcionesEspecificas =$registro[0]->funcionesEspecificas;
 			$this->competenciasRequeridas =$registro[0]->competenciasRequeridas;
 			$this->conocimientosRequeridos =$registro[0]->conocimientosRequeridos;
-			$this->idArea =$registro[0]-> $registro[0]->idArea;
+			$this->idArea =$registro[0]->Area_idArea;
 			unset($registro);
 		}
 
@@ -177,7 +177,7 @@
 		}
 
 		function getJSON(){
-			return '{"idPuesto":"'.$this->idPuesto.'","codigo":"'.$this->codigo.'","nombrePuesto":"'.$this->nombrePuesto.'","descripcion":"'.$this->descripcion.'","objetivoGeneral":"'.$this->objetivoGeneral.'","funcionesEspecificas":"'.$this->funcionesEspecificas.'","competenciasRequeridas":"'.$this->competenciasRequeridas.'","conocimientosRequeridos":"'.$this->conocimientosRequeridos.'","idArea":"'.$this->idArea.'"}';
+			return '{"idPuesto":"'.$this->idPuesto.'","codigo":"'.$this->codigo.'","nombrePuesto":"'.$this->nombre.'","descripcion":"'.$this->descripcion.'","objetivoGeneral":"'.$this->objetivoGeneral.'","funcionesEspecificas":"'.$this->funcionesEspecificas.'","competenciasRequeridas":"'.$this->competenciasRequeridas.'","conocimientosRequeridos":"'.$this->conocimientosRequeridos.'","idArea":"'.$this->idArea.'"}';
 		}
 
 	}

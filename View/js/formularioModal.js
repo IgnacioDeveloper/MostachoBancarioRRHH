@@ -857,7 +857,7 @@ function FormPuesto(dataHandler,conf,registro){
 	//Elementos del Formulario
 	Formulario.call(this,conf.modal);
 	this.dataHandler = dataHandler;
-	this.txtCodigo;this.txtNombre; this.txtDescripcion; this.txtObjetivo; this.txtFunciones; this.txtCompetencias; this.txtConocimientos; this.chooserAreaSuperior;
+	this.txtCodigo;this.txtNombre; this.txtDescripcion; this.txtObjetivo; this.txtFunciones; this.txtCompetencias; this.txtConocimientos; this.chooserArea;
 	this.bodyNodes=[new Node("lblCodigo","p","Codigo"),
 			new Node("txtCodigo","input_text",""),
 			new Node("errorCodigo","error_text",""),
@@ -867,7 +867,7 @@ function FormPuesto(dataHandler,conf,registro){
 			new Node("errorNombre","error_text",""),
 			//
 			new Node("lblAreaSuperior","p","Area del Puesto"),
-			new Node("chooserAreaSuperior","chooser",""),
+			new Node("chooserArea","chooser",""),
 			new Node("errorAreaSuperior","error_text",""),
 			//
 			new Node("lblDescripcion","p","Descripcion"),
@@ -890,11 +890,9 @@ function FormPuesto(dataHandler,conf,registro){
 			new Node("txtConocimientos","text_area",""),
 			new Node("errorConocimientos","error_text","")]
 			//
-			
-
 	this.conf=conf;
 	this.registro=registro;
-	this.areaSeleccionada;
+	this.area;
 	
 
 	//End Elementos del Formulario
@@ -904,16 +902,16 @@ function FormPuesto(dataHandler,conf,registro){
 		this.bodyElements = this.appendElements(this.bodyNodes,this.modalBody);
 		this.txtCodigo = new FormBodyElement(this.bodyElements[1],this.bodyElements[2],"integer",true);
 		this.txtNombre = new FormBodyElement(this.bodyElements[4],this.bodyElements[5],"textOnly",true);
-		this.chooserAreaSuperior = new FormBodyElement(this.bodyElements[7],this.bodyElements[8],"chooser",true);
+		this.chooserArea = new FormBodyElement(this.bodyElements[7],this.bodyElements[8],"chooser",true);
 		this.txtDescripcion = new FormBodyElement(this.bodyElements[10],this.bodyElements[11],undefined,true);
 		this.txtObjetivo = new FormBodyElement(this.bodyElements[13],this.bodyElements[14],undefined,true);
 		this.txtFunciones = new FormBodyElement(this.bodyElements[16],this.bodyElements[17],undefined,true);
 		this.txtCompetencias = new FormBodyElement(this.bodyElements[19],this.bodyElements[20],undefined,true);
-		this.txtConocimientos = new FormBodyElement(this.bodyElements[21],this.bodyElements[22],undefined,true);
+		this.txtConocimientos = new FormBodyElement(this.bodyElements[22],this.bodyElements[23],undefined,true);
 		
 		this.button1 = this.footerElements[0];
 		this.button2 = this.footerElements[1];
-		this.formBodyElements = [this.txtCodigo,this.txtNombre, this.txtDescripcion, this.txtObjetivo, this.txtFunciones, this.txtCompetencias, this.txtConocimientos, this.chooserAreaSuperior];
+		this.formBodyElements = [this.txtCodigo,this.txtNombre, this.txtDescripcion, this.txtObjetivo, this.txtFunciones, this.txtCompetencias, this.txtConocimientos, this.chooserArea];
 		//End Maquetacion y referenciacion de ELementos del Formulario
 		this.prepareChooser();
 		this.startValidacion();
@@ -922,16 +920,17 @@ function FormPuesto(dataHandler,conf,registro){
 	}
 
 	this.prepareChooser=function(){
-		this.chooserAreaSuperior.element.firstChild.style.fontStyle='italic';
-		this.chooserAreaSuperior.element.lastChild.onclick=function(){
+		this.chooserArea.element.firstChild.style.fontStyle='italic';
+		this.chooserArea.element.lastChild.onclick=function(){
 			new OrganigramaModal(this);
 		}.bind(this);
 	}
 
 	this.getAreaValues=function(area){
-		this.areaSeleccionada=area;
-		this.chooserAreaSuperior.element.firstChild.innerHTML=area.descripcion;
-		this.chooserAreaSuperior.element.firstChild.style.color='blue';
+		this.area=area;
+		console.log(area);
+		this.chooserArea.element.firstChild.innerHTML=area.descripcion;
+		this.chooserArea.element.firstChild.style.color='blue';
 	}
 
 	this.setConf=function(){
@@ -1042,19 +1041,21 @@ function FormPuesto(dataHandler,conf,registro){
 
 	this.getData=function(idBuscado){
 		var params="metodo=getPuesto&params="+idBuscado;
+		console.log(params);
 		this.dataHandler.ejecutarOperacionAJAX(this,"getPuesto",params);
 	}
 
 	this.setFormData=function(puesto){
+		console.log(puesto);
 		puesto = JSON.parse(puesto);
-		this.txtCodigo.element.value = puesto.codigo,
-		this.txtNombre.element.value = puesto.nombre, 
-		this.txtDescripcion.element.value = puesto.descripcion, 
-		this.txtObjetivo.element.value = puesto.objetivoGeneral, 
-		this.txtFunciones.element.value = puesto.funcionesEspecificas, 
-		this.txtCompetencias.element.value = puesto.competenciasRequeridas, 
-		this.txtConocimientos.element.value = puesto.conocimientosRequeridos, 
-		this.areaSeleccionada = puesto.idArea;
+		this.txtCodigo.element.value = puesto.codigo;
+		this.txtNombre.element.value = puesto.nombrePuesto; 
+		this.txtDescripcion.element.value = puesto.descripcion; 
+		this.txtObjetivo.element.value = puesto.objetivoGeneral; 
+		this.txtFunciones.element.value = puesto.funcionesEspecificas; 
+		this.txtCompetencias.element.value = puesto.competenciasRequeridas; 
+		this.txtConocimientos.element.value = puesto.conocimientosRequeridos; 
+		this.getAreaValues({id:puesto.idArea,descripcion:this.conf.descripcionArea});
 	}
 
 	this.closeForm = function(){

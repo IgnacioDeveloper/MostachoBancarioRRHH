@@ -277,7 +277,7 @@ class Controlador{
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Puesto.php';
 		$params = json_decode($params);
 		$puesto = new Puesto();
-		$puesto->getPuesto($params->condicion);
+		$puesto->getPuesto('IDPUESTO = '.$params);
 		$registro = $puesto->getJSON();
 		return $registro;
 	}
