@@ -1,3 +1,10 @@
+/*BARRA DE BUSQUEDA*/
+
+.barraBusqueda *{
+	margin:1%;
+	float:left;
+}
+
 .barraBusqueda{
 	background-color:#ed7804;
 	width:95%;
@@ -5,36 +12,26 @@
 	overflow:auto;
 }
 
-.barraOperaciones{
-	background-color:#ed7804;
-	width:95%;
-	margin:auto;
-	overflow:auto;
-}
-
-.barraBusqueda *{
-	margin:1%;
-	float:left;
-}
-
-.barraOperaciones *{
-	margin:1%;
-	float:left;
-}
-
 .barraBusqueda > p{
-	margin-top:1%;
+	margin-top:1.5%;
 	font-weight: bold;
+	font-size:1em;
+	margin-left:1em;
+	margin-right:0.5em;
 }
 
 .barraBusqueda > input{
-	width:44%;
+	width:40%;
+	margin-right:1%;
+	font-size:1em;
 }
 
-.barraOperaciones > p{
-	margin-top:1%;
-	font-weight: bold;
+.barraBusqueda button{
+	font-size:1em;
+	margin-right:1em;
 }
+
+/*TABLALISTA*/
 
 .tablaLista{
 	height:50%;
@@ -72,3 +69,38 @@
 .tablaLista td{
 	position:relative;
 }
+
+/*BARRA DE OPERACIONES*/
+
+.barraOperaciones *{
+	margin:1%;
+	float:left;
+}
+
+.barraOperaciones{
+	background-color:#ed7804;
+	width:95%;
+	margin:auto;
+	overflow:auto;
+}
+
+
+.barraOperaciones > p{
+	margin-top:1.5%;
+	font-weight: bold;
+	font-size:1em;
+	margin-left:1em;
+	margin-right:0.5em;
+}
+
+.barraOperaciones select{
+	font-size:1em;
+	margin-right:1em;
+}
+
+
+.barraOperaciones button{
+	font-size:1em;
+	margin-right:1em;
+}
+

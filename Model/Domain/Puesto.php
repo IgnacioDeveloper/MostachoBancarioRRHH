@@ -27,7 +27,7 @@
 			
 		}
 
-		function _construct1($idPuesto){
+		function __construct1($idPuesto){
 			$this->idPuesto=$idPuesto;
 		}
 
@@ -142,7 +142,7 @@
 		}
 
 		function guardar(){
-			$valores = "'$this->idPuesto','$this->codigo
+			$valores = "'$this->codigo
 			','$this->nombre','$this->descripcion','$this->objetivoGeneral'
 			,'$this->funcionesEspecificas','$this->competenciasRequeridas'
 			,'$this->conocimientosRequeridos','$this->idArea'";
@@ -150,7 +150,7 @@
 		}
 
 		function modificar(){
-			$set="CODIGO = '$this->codigo', NOMBRE = '$this->nombre',
+			$set="CODIGO = '$this->codigo', NOMBREPUESTO = '$this->nombre',
 			DESCRIPCION =  '$this->descripcion', OBJETIVOGENERAL = '$this->objetivoGeneral',
 			FUNCIONESESPECIFICAS = '$this->funcionesEspecificas',
 			COMPETENCIASREQUERIDAS = '$this->competenciasRequeridas', 

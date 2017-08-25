@@ -133,10 +133,10 @@ function TableModel(tableElement,headers,widths){
 
 	this.eventos=function(){
 		console.log(this.tableElement.firstChild);
-		this.tableElement.onclick=function(e){
+		this.tableElement.addEventListener('click',function(e){
 			console.log(e.target.parentNode);
 			this.setSelectedRow(e.target.parentNode);
-		}.bind(this);
+		}.bind(this));
 	}
 
 }
@@ -179,7 +179,7 @@ function Registro(sector,dataHandler,modeloTabla){
 	}
 
 	this.updateInfo=function(){
-		this.getData(self.selectCampo.options[selectCampo.selectedIndex].value,self.inputCriterio.value);
+		this.getData(self.selectCampo.options[self.selectCampo.selectedIndex].value,self.inputCriterio.value);
 	}
 
 	this.updateAreas=function(registros){
@@ -549,7 +549,19 @@ function TableModelArea(tableElement,sectorInfo){
 	this.options = ['Codigo','Descripcion','Area Superior'];
 	this.optionsValue = ['CODIGO','DESCRIPCION','AREA_IDAREASUPERIOR'];
 	this.areas = null;
+	this.listaPuestos = null;
 	this.sectorInfo=sectorInfo;
+
+	this.setListaPuestos=function(listaPuestos){
+		this.listaPuestos = listaPuestos;
+	}
+
+	this.startListaPuestos=function(){
+		this.listaPuestos.areas = this.areas;
+		console.log(this.listaPuestos.areas);
+		this.listaPuestos.startLista();
+		this.eventosLista();
+	}
 
 	this.setDimensions=function(){
 		var searchBar = this.tableElement.previousSibling;
@@ -585,7 +597,7 @@ function TableModelArea(tableElement,sectorInfo){
 	}
 
 	this.updateTable=function(areas,all){
-		if(all)this.areas=areas;
+		if(all){this.areas=areas;this.startListaPuestos()};
 		this.updateRows(this.setRows(areas),true);
 		this.setFullAreaInfo();
 	}
@@ -655,6 +667,21 @@ function TableModelArea(tableElement,sectorInfo){
 				self.notSelected();
 			}
 		}
+	}
+
+	this.eventosLista=function(){
+		this.tableElement.addEventListener('click',function(e){
+			if(this.checkSelected()){
+				var areaTarget = e.target.parentNode.lastChild.previousSibling.innerHTML;
+				this.sectorInfo.firstChild.innerHTML = 'Informacion del Area: '+ areaTarget;
+				this.listaPuestos.barraBusqueda.lastChild.previousSibling.value='';
+				this.listaPuestos.areaTarget = areaTarget;
+				var cantPuestos = this.listaPuestos.filterArea();
+				this.sectorInfo.lastChild.innerHTML = 'Cantidad de Puestos comprendidos: '+ cantPuestos;
+				this.sectorInfo.nextSibling.firstChild.innerHTML = 'Puestos que componen esta Area';
+			}
+			
+		}.bind(this));
 	}
 
 	this.setDimensions();

@@ -8,9 +8,10 @@ function ListaPuestos(sector,dataHandler){
 	this.rows = [];
 	this.selectedRow = null;
 	this.puestos = [];
-	this.areas = areas;
+	this.areas = null;
 	this.showPuestos;
 	this.indicesInteres = [];
+	this.areaTarget = null;
 	this.condicion = '1';
 
 	this.startLista=function(){
@@ -48,8 +49,13 @@ function ListaPuestos(sector,dataHandler){
 		this.updateList();
 	}
 
+	this.updateInfo=function(){
+		this.updateList();
+	}
+
 	this.updateList=function(){
 		this.updateRows(this.setRows(),true);
+		if(this.areaTarget!== null)this.filterArea();
 	}
 
 	this.filter=function(criterio){
@@ -60,6 +66,23 @@ function ListaPuestos(sector,dataHandler){
 				this.rows[i].style.display = 'none';
 			}
 		}
+	}
+
+	this.filterArea=function(){
+		var cantPuestos = 0;
+		for(i=0;i<this.rows.length;i++){
+			if(this.rows[i].getAttribute('descripcion-area').startsWith(this.areaTarget)){
+				this.rows[i].style.display = 'table-row';
+				cantPuestos++;
+			} else {
+				this.rows[i].style.display = 'none';
+			}
+		} 
+		return cantPuestos;
+	}
+
+	this.updateInfo=function(){
+		this.getDataPuestos();
 	}
 
 	this.appendRow=function(row){
@@ -78,8 +101,8 @@ function ListaPuestos(sector,dataHandler){
 		if(isId){	
 			for(i=0;i<rows.length;i++){
 				this.appendRow(rows[i].splice(1));
-				this.rows[i].setAttribute('data-value',rows[i][0]);
-				this.rows[i].setAttribute('descripcionArea',rows[i][0]);
+				this.rows[i].setAttribute('data-value',rows[i][0].idPuesto);
+				this.rows[i].setAttribute('descripcion-area',this.traducirIdArea(rows[i][0].idArea));
 			}	
 		}
 		else{
@@ -104,7 +127,7 @@ function ListaPuestos(sector,dataHandler){
 		if(this.condicion === '1'){
 			for(i=0;i<this.puestos.length;i++){
 				rows[i]=new Array(3);
-				rows[i][0]=this.puestos[i].idPuesto;
+				rows[i][0]={idPuesto:this.puestos[i].idPuesto,idArea:this.puestos[i].Area_idArea};
 				rows[i][1]=this.puestos[i].codigo;
 				rows[i][2]=this.puestos[i].nombrePuesto;
 			}
@@ -114,8 +137,9 @@ function ListaPuestos(sector,dataHandler){
 
 	this.removeAllDataRows=function(){
 		for(i=this.rows.length;i>0;i--){
-			this.tableElement.deleteRow(i);
+			this.tablaLista.deleteRow(i);
 		}
+		this.rows=[];
 	}
 
 	this.renderLista=function(){
@@ -169,7 +193,7 @@ function ListaPuestos(sector,dataHandler){
 		lblOperacion.innerHTML = 'Operacion a realizar: ';
 		var selectOperacion = this.prepareSelectOperacion();
 		var btnOperacion = document.createElement('button');
-		btnOperacion.innerHTML='Realizar Operacion';
+		btnOperacion.innerHTML='Go';
 		this.barraOperaciones.appendChild(lblOperacion);
 		this.barraOperaciones.appendChild(selectOperacion);
 		this.barraOperaciones.appendChild(btnOperacion);
@@ -229,8 +253,8 @@ function ListaPuestos(sector,dataHandler){
 					if(self.checkSelected()){
 						new FormPuesto(self.dataHandler,
 						{modal:modal,tipo:2,
-							idBuscado:self.selectedRow.getAttribute('data-value'),descripcionArea:self.selectedRow.lastChild.innerHTML},
-							this);
+							idBuscado:self.selectedRow.getAttribute('data-value'),descripcionArea:self.selectedRow.getAttribute('descripcion-area')},
+							self);
 					}
 					else{
 						self.notSelected();
@@ -240,8 +264,8 @@ function ListaPuestos(sector,dataHandler){
 					if(self.checkSelected()){
 						new FormPuesto(self.dataHandler,
 							{modal:modal,tipo:3,
-								idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),descripcionArea:dataBarModel.registro.modeloTabla.selectedRow.lastChild.innerHTML},
-								dataBarModel.registro);
+								idBuscado:self.selectedRow.getAttribute('data-value'),descripcionArea:self.selectedRow.getAttribute('descripcion-area')},
+								self);
 					}
 					else{
 						self.notSelected();
@@ -256,7 +280,5 @@ function ListaPuestos(sector,dataHandler){
 			}
 		}
 	}
-
-	this.startLista();
 
 }

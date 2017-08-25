@@ -955,6 +955,7 @@ function FormPuesto(dataHandler,conf,registro){
 
 	this.setConfModificacion=function(flag){
 		var self = this;
+		this.chooserArea.element.lastChild.disabled=false;
 		if(!flag)this.getData(this.conf.idBuscado);
 		this.unlockInfo();
 		this.title.innerHTML = "Modificar Informacion de Puesto";
@@ -969,6 +970,7 @@ function FormPuesto(dataHandler,conf,registro){
 	this.setConfConsulta=function(){
 		var self = this;
 		this.lockInfo();
+		this.chooserArea.element.lastChild.disabled=true;
 		this.getData(this.conf.idBuscado);
 		this.title.innerHTML = "Consulta de Informacion de Puesto";
 		this.button1.innerHTML = "Habilitar Modificaciones";
@@ -992,8 +994,8 @@ function FormPuesto(dataHandler,conf,registro){
 	this.modificarDatos=function(){
 		var val = this.validacion.fullCheck();
 		if(val){
-			var persona = this.getJSonData();
-			var params="metodo=modifyPuesto&params="+area;
+			var puesto = this.getJSonData();
+			var params="metodo=modifyPuesto&params="+puesto;
 			//console.log(params);
 			this.dataHandler.ejecutarOperacionAJAX(this,"modifyPuesto",params);
 		}
@@ -1004,7 +1006,7 @@ function FormPuesto(dataHandler,conf,registro){
 	}
 
 	this.confirmacion=function(resultado,tipo){
-		//console.log(resultado);
+		console.log(resultado);
 		if(resultado==1){
 			this.operacionExitosa(tipo);
 		}
@@ -1014,6 +1016,7 @@ function FormPuesto(dataHandler,conf,registro){
 	}
 
 	this.operacionExitosa = function(tipo){
+		console.log(this.registro);
 		if(this.registro!==undefined)this.registro.updateInfo();
 		var messageContent;
 		switch(tipo){ 
@@ -1036,7 +1039,7 @@ function FormPuesto(dataHandler,conf,registro){
 		if(this.conf.tipo!==1){
 			idPuesto = '"idPuesto":'+this.conf.idBuscado+',';
 		}
-		return '{'+idPuesto+'"codigo":"'+this.txtCodigo.element.value+'","nombre":"'+this.txtNombre.element.value+'","idArea":"'+this.areaSeleccionada.id+'","descripcion":"'+this.txtDescripcion.element.value+'","objetivoGeneral":"'+this.txtObjetivo.element.value+'","funcionesEspecificas":"'+this.txtFunciones.element.value+'","competenciasRequeridas":"'+this.txtCompetencias.element.value+'","conocimientosRequeridos":"'+this.txtConocimientos.element.value+'"}';
+		return '{'+idPuesto+'"codigo":"'+this.txtCodigo.element.value+'","nombre":"'+this.txtNombre.element.value+'","idArea":"'+this.area.id+'","descripcion":"'+this.txtDescripcion.element.value+'","objetivoGeneral":"'+this.txtObjetivo.element.value+'","funcionesEspecificas":"'+this.txtFunciones.element.value+'","competenciasRequeridas":"'+this.txtCompetencias.element.value+'","conocimientosRequeridos":"'+this.txtConocimientos.element.value+'"}';
 	}
 
 	this.getData=function(idBuscado){

@@ -2,7 +2,9 @@ function MenuAreas(parent,sector,dataHandler){
 	this.parent = parent;
 	this.sector = sector;
 	this.dataHandler=dataHandler;
+	this.areas = null;
 	this.sectorAreas;this.sectorInfoAreas,this.sectorPuestos;this.registroPuestos,this.registroAreas;this.listaPuestos;
+
 	this.startMenu=function(){
 		this.renderMenu();
 		this.renderRegistroAreas();
@@ -29,6 +31,7 @@ function MenuAreas(parent,sector,dataHandler){
 		console.log(this.sectorPuestos);
 		this.registroPuestos = new Registro(this.sectorPuestos,this.dataHandler,new TableModelPuesto(tabla));*/
 		this.listaPuestos = new ListaPuestos(this.sectorPuestos,this.dataHandler);
+		this.registroAreas.modeloTabla.setListaPuestos(this.listaPuestos);
 	}
 
 
