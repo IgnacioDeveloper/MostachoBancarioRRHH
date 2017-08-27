@@ -15,12 +15,13 @@ function ListaPuestos(sector,dataHandler){
 	this.condicion = '1';
 
 	this.startLista=function(){
+		this.clearSector();
 		this.getAllAreas();
 	}
 
 	this.prepareLista=function(){
 		this.renderLista();
-		this.getDataPuestos(this.condicion);
+		this.getDataPuestos();
 		this.eventos();
 	}
 
@@ -30,6 +31,17 @@ function ListaPuestos(sector,dataHandler){
 		new DataHandler().ejecutarOperacionAJAX(this,metodo,params);
 	}
 
+	this.clearSector=function(){
+		while(sector.hasChildNodes){
+			if(sector.lastChild.nodeName!== 'P'){
+				sector.removeChild(sector.lastChild);
+			}
+			else{
+				break;
+			}
+		}
+	}
+
 	this.updateAreas=function(areas){
 		areas = JSON.parse(areas);
 		this.areas = areas;
@@ -37,16 +49,21 @@ function ListaPuestos(sector,dataHandler){
 	}
 
 	this.getDataPuestos=function(){
-		var params = 'metodo=getPuestos&params={"condicion":"1"}';
+		var params = 'metodo=getPuestos&params={"condicion":"'+this.condicion+'"}';
 		var metodo = 'getPuestos';
-		console.log(params);
+		console.log(params)
 		this.dataHandler.ejecutarOperacionAJAX(this,metodo,params);
 	}
 
 	this.updatePuestos=function(puestos){
-		puestos = JSON.parse(puestos);
-		this.puestos = puestos;
-		this.updateList();
+		if(puestos!=='1'){
+			puestos = JSON.parse(puestos);
+			this.puestos = puestos;
+			this.updateList();
+		}else{
+			this.getDataPuestos();
+		}
+		
 	}
 
 	this.updateInfo=function(){
@@ -88,9 +105,9 @@ function ListaPuestos(sector,dataHandler){
 	this.appendRow=function(row){
 		var rowNode = this.tablaLista.insertRow(this.tablaLista.length);
 		var cellNode,start;
-		for(j=0;j<row.length;j++){
-			cellNode = rowNode.insertCell(j);
-			cellNode.innerHTML=row[j];
+		for(k=0;k<row.length;k++){
+			cellNode = rowNode.insertCell(k);
+			cellNode.innerHTML=row[k];
 		}
 		this.rows.push(this.tablaLista.firstChild.lastChild);
 		console.log(this.rows[this.rows.length-1]);
@@ -99,10 +116,11 @@ function ListaPuestos(sector,dataHandler){
 	this.updateRows = function(rows,isId){
 		this.removeAllDataRows();
 		if(isId){	
-			for(i=0;i<rows.length;i++){
-				this.appendRow(rows[i].splice(1));
-				this.rows[i].setAttribute('data-value',rows[i][0].idPuesto);
-				this.rows[i].setAttribute('descripcion-area',this.traducirIdArea(rows[i][0].idArea));
+			console.log(rows);
+			for(j=0;j<rows.length;j++){
+				this.appendRow(rows[j].splice(1));
+				this.rows[j].setAttribute('data-value',rows[j][0].idPuesto);
+				this.rows[j].setAttribute('descripcion-area',this.traducirIdArea(rows[j][0].idArea));
 			}	
 		}
 		else{
@@ -122,8 +140,8 @@ function ListaPuestos(sector,dataHandler){
 	}
 
 	this.setRows=function(){
-		var i=0,j=0;
 		var rows=[];
+		console.log(this.puestos);
 		if(this.condicion === '1'){
 			for(i=0;i<this.puestos.length;i++){
 				rows[i]=new Array(3);
@@ -132,6 +150,7 @@ function ListaPuestos(sector,dataHandler){
 				rows[i][2]=this.puestos[i].nombrePuesto;
 			}
 		}
+		console.log(rows);
 		return rows;
 	}
 
@@ -232,6 +251,16 @@ function ListaPuestos(sector,dataHandler){
 		return false;
 	}
 
+	this.confirmDelete=function(extra){
+		new Mensaje(this,'¿Esta seguro que desea borrar este registro?','condicion','delete',extra);
+	}
+
+	this.delete=function(registro){
+		var id = this.selectedRow.getAttribute('data-value')
+		var params = 'metodo=deletePuesto&params={"idPuesto":'+id+'}';
+		this.dataHandler.ejecutarOperacionAJAX(this,'deletePuesto',params);
+	}
+
 	this.eventos=function(){
 		var self = this;
 		//Tabla Seleccionar
@@ -248,7 +277,7 @@ function ListaPuestos(sector,dataHandler){
 			var option = this.previousSibling.value;
 			switch(option){
 				case '0': new FormPuesto(self.dataHandler,
-				{modal:modal,tipo:1}); break;
+				{modal:modal,tipo:1},self); break;
 				case '1': 
 					if(self.checkSelected()){
 						new FormPuesto(self.dataHandler,
@@ -272,7 +301,7 @@ function ListaPuestos(sector,dataHandler){
 					}break;
 				case '3':
 					if(self.checkSelected()){
-							self.confirmDelete(dataBarModel.registro);
+							self.confirmDelete(self);
 					}
 					else{
 						self.notSelected();

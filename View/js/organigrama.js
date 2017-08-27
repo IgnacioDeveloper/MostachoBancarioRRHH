@@ -4,6 +4,8 @@ function Organigrama(parent,sector,dataHandler){
 	this.dataHandler=dataHandler;
 	this.organigramaContainer=null;
 	this.entregramas = [];
+	this.idManagerSeleccionado = null;
+	this.descripcionManagerSeleccionado = null;
 	this.idSeleccionado = null;
 	this.descripcionSeleccionado = null;
 
@@ -25,8 +27,17 @@ function Organigrama(parent,sector,dataHandler){
 	}
 
 	this.updateAreas=function(areas){
-		console.log(areas);
 		this.renderOrganigrama(JSON.parse(areas));
+	}
+
+	this.findManager=function(){
+		console.log(this.entregramas);
+		for(j=0;j<this.entregramas.length;j++){
+			if(this.entregramas[j][0].v === this.idManagerSeleccionado){
+				this.descripcionManagerSeleccionado = this.entregramas[j][0].f;
+				break;
+			}
+		}
 	}
 
 	this.renderOrganigrama=function(areas){
@@ -51,11 +62,13 @@ function Organigrama(parent,sector,dataHandler){
 	        }
 	        console.log(self.entregramas);
 	         data.addRows(self.entregramas);
+	         console.log(data);
 
 			// Create the chart.
 			var chart = new google.visualization.OrgChart(self.organigramaContainer);
 			// Draw the chart, setting the allowHtml option to true for the tooltips.
 			chart.draw(data, {allowHtml:true});
+
 
 			google.visualization.events.addListener(chart, 'select', function(){
 				var selection = chart.getSelection();
@@ -63,14 +76,21 @@ function Organigrama(parent,sector,dataHandler){
 			        var c = selection[0];
 			        self.idSeleccionado = data.getValue(c.row, 0);
 			        self.descripcionSeleccionado = data.getFormattedValue(c.row, 0);
+			        self.idManagerSeleccionado = data.getValue(c.row,1);
+			        self.findManager();
 			    }
 			    self.returnUpdateResponse('update');
 			});
 		}
     }
 
+    this.updateInfo=function(){
+    	this.parent.renderMainMenu('organigrama');
+    }
+
+
     this.returnUpdateResponse=function(){
-    	this.parent.updatedValues();
+    	this.parent.selectedAreaValues();
     }
       	
 

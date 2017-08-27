@@ -179,20 +179,32 @@ function Registro(sector,dataHandler,modeloTabla){
 	}
 
 	this.updateInfo=function(){
-		this.getData(self.selectCampo.options[self.selectCampo.selectedIndex].value,self.inputCriterio.value);
+		console.log('here');
+		this.getData(this.searchBar.modeloSearchBar.selectCampo.options[this.searchBar.modeloSearchBar.selectCampo.selectedIndex].value,this.searchBar.modeloSearchBar.inputCriterio.value);
 	}
 
 	this.updateAreas=function(registros){
-		registros = JSON.parse(registros);
-		this.modeloTabla.updateTable(registros,this.all);
-		this.searchBar.modeloSearchBar.updateResultInfo(this.modeloTabla.getRowCount());
+		if(registros!=='1'){
+			registros = JSON.parse(registros);
+			this.modeloTabla.updateTable(registros,this.all);
+			this.searchBar.modeloSearchBar.updateResultInfo(registros.length);
+		}
+		else{
+			this.updateInfo();
+		}
+		
 	}
 
 	this.updatePuestos=function(registros){
 		console.log(registros);
-		registros = JSON.parse(registros);
-		this.modeloTabla.updateTable(registros,this.all);
-		this.searchBar.modeloSearchBar.updateResultInfo(registros.length);
+		if(registros !== '1'){
+			registros = JSON.parse(registros);
+			this.modeloTabla.updateTable(registros,this.all);
+			this.searchBar.modeloSearchBar.updateResultInfo(registros.length);
+		}
+		else{
+			this.updateInfo();
+		}
 	}
 
 	this.updateTableInfo=function(registros){
@@ -409,7 +421,7 @@ function TableModelUsuario(tableElement){
 		var self = this;
 		dataBarModel.buttons[0].onclick=function(){
 			new FormUsuario(dataBarModel.registro.dataHandler,
-				{modal:modal,tipo:1});
+				{modal:modal,tipo:1},dataBarModel.registro);
 		}
 		dataBarModel.buttons[1].onclick=function(){
 			if(self.checkSelected()){
@@ -499,7 +511,7 @@ function TableModelPersona(tableElement){
 		var self = this;
 		dataBarModel.buttons[0].onclick=function(){
 			new FormPersona(dataBarModel.registro.dataHandler,
-				{modal:modal,tipo:1,dateActions:new DateActions()});
+				{modal:modal,tipo:1,dateActions:new DateActions()},dataBarModel.registro);
 		}
 		dataBarModel.buttons[1].onclick=function(){
 			if(self.checkSelected()){
@@ -588,7 +600,7 @@ function TableModelArea(tableElement,sectorInfo){
 	}
 
 	this.traducirIdArea=function(id){
-		if(id===0) return '-';
+		if(id==='0') return '-';
 		for(i in this.areas){
 			if(this.areas[i].idArea === id){
 				return this.areas[i].descripcion;
@@ -613,7 +625,10 @@ function TableModelArea(tableElement,sectorInfo){
 		if(id===undefined)id=null;
 		var cantAreas = document.createElement('p');
 		if(id===null){
+			this.sectorInfo.firstChild.innerHTML = 'Informacion de Areas del Sistema';
 			cantAreas.innerHTML = 'Cantidad de Areas de Mostacho Bancario: '+this.areas.length;
+			this.sectorInfo.nextSibling.firstChild.innerHTML = 'Todos los puestos';
+			this.listaPuestos.filter('');
 			this.sectorInfo.appendChild(cantAreas);
 		}
 	}
@@ -633,7 +648,7 @@ function TableModelArea(tableElement,sectorInfo){
 		var self = this;
 		dataBarModel.buttons[0].onclick=function(){
 			new FormArea(dataBarModel.registro.dataHandler,
-				{modal:modal,tipo:1});
+				{modal:modal,tipo:1},dataBarModel.registro);
 		}
 		dataBarModel.buttons[1].onclick=function(){
 			console.log('Hi');
@@ -749,7 +764,6 @@ function TableModelPuesto(tableElement){
 	}
 
 	this.traducirIdArea=function(id){
-		if(id===0) return '-';
 		for(i in this.areas){
 			if(this.areas[i].idArea === id){
 				return this.areas[i].descripcion;
@@ -787,14 +801,13 @@ function TableModelPuesto(tableElement){
 		var id = this.selectedRow.getAttribute('data-value')
 		var params = 'metodo=deletePuesto&params={"idPuesto":'+id+'}';
 		registro.dataHandler.ejecutarOperacionAJAX(registro,'deletePuesto',params);
-		registro.dataHandler.ejecutarOperacionArchivoAJAX(registro,'deletePuesto',id);
 	}
 
 	this.eventosBotones=function(dataBarModel,modal){
 		var self = this;
 		dataBarModel.buttons[0].onclick=function(){
 			new FormPuesto(dataBarModel.registro.dataHandler,
-				{modal:modal,tipo:1});
+				{modal:modal,tipo:1},dataBarModel.registro);
 		}
 		dataBarModel.buttons[1].onclick=function(){
 			if(self.checkSelected()){

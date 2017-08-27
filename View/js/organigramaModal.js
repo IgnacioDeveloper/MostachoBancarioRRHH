@@ -52,7 +52,7 @@ function OrganigramaModal(parent){
 		this.organigrama = new Organigrama(this,this.modalBody,this.parent.dataHandler);
     }
 
-    this.updatedValues=function(){
+    this.selectedAreaValues=function(){
     	this.lblArea.innerHTML = 'Area Seleccionada: '+this.organigrama.descripcionSeleccionado;
     	this.lblArea.style.color = 'blue';
     }

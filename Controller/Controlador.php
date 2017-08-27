@@ -258,7 +258,6 @@ class Controlador{
 
 	private function savePuesto($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Puesto.php';
-		echo $params;
 		$params = json_decode($params);
 		$puesto = new Puesto($params->codigo,$params->nombre,$params->descripcion,$params->objetivoGeneral,$params->funcionesEspecificas,
 			$params->competenciasRequeridas,$params->conocimientosRequeridos,$params->idArea);

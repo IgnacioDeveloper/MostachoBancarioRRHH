@@ -24,7 +24,7 @@ function DataHandler(){
 					case "getAreas":callContext.updateAreas(ajax_request.responseText);break;
 					case "savePuesto": callContext.confirmacion(ajax_request.responseText,1);break; 
 					case "modifyPuesto": callContext.confirmacion(ajax_request.responseText,2);break;
-					case "deletePuesto": callContext.updatePuestos(ajax_request.responseText,1);break; 
+					case "deletePuesto": callContext.updatePuestos(ajax_request.responseText);break; 
 					case "getPuesto": callContext.setFormData(ajax_request.responseText);break;
 					case "getPuestos": callContext.updatePuestos(ajax_request.responseText);break;
 					case "savePersona":callContext.subirCV(ajax_request.responseText);break; 

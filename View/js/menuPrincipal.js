@@ -25,6 +25,7 @@ function MenuPrincipal(){
 	this.content;
 	this.main;
 	this.dataHandler=null;
+	this.organigrama = null;
 	this.registers=[];
 
 	this.startMenuPrincipal=function(){
@@ -143,7 +144,7 @@ function MenuPrincipal(){
 			this.addElement(this.main,'p','titulo',
 				undefined,'Organigrama de Mostacho Bancario');
 			try{
-				new Organigrama(this,this.main,this.dataHandler);
+				this.organigrama = new Organigrama(this,this.main,this.dataHandler);
 			}catch(e){
 				if(e instanceof ReferenceError){
 					console.log(e);
@@ -234,6 +235,15 @@ function MenuPrincipal(){
 				}
 			}
 		}.bind(this);
+	}
+
+	this.selectedAreaValues=function(){
+		var idAreaSeleccionada = this.organigrama.idSeleccionado;
+		var descripcionAreaSuperior = this.organigrama.descripcionManagerSeleccionado; 
+		new FormArea(this.dataHandler,
+					{modal:this.modal,tipo:3,
+						idBuscado:idAreaSeleccionada,descripcionAreaSuperior:descripcionAreaSuperior},
+						this.organigrama);
 	}
 
 	this.startDataHandlerMainOperations=function(){
