@@ -329,9 +329,9 @@ function Validacion(formulario){
 	}
 
 	this.valChooser=function(chooserElement){
-		if(chooserElement.element.firstChild.innerHTML === 'Ninguna Area Seleccionada'){
+		if(chooserElement.element.firstChild.innerHTML === 'Ninguna Opcion Seleccionada'){
 			chooserElement.element.firstChild.style.color='red';
-			chooserElement.errorMessage.innerHTML ='Debe seleccionar un Area';
+			chooserElement.errorMessage.innerHTML ='Debe seleccionar una Opcion';
 			return false;
 		}else{
 			chooserElement.element.firstChild.style.color='black';

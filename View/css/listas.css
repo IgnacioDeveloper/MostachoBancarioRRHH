@@ -42,6 +42,7 @@
 
 .tablaLista tbody{
 	display:block;
+	max-height:100%;
 	overflow:auto;
 }
 

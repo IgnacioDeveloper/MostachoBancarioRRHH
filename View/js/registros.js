@@ -211,7 +211,7 @@ function Registro(sector,dataHandler,modeloTabla){
 		console.log(registros);
 		registros = JSON.parse(registros);
 		this.modeloTabla.updateTable(registros);
-		this.searchBar.modeloSearchBar.updateResultInfo(this.modeloTabla.getRowCount());
+		this.searchBar.modeloSearchBar.updateResultInfo(registros.length);
 	}
 
 	this.startRegistro();
@@ -460,10 +460,11 @@ function TableModelUsuario(tableElement){
 
 }
 
-function TableModelPersona(tableElement){
+function TableModelPersona(tableElement,usuario){
 	TableModel.call(this,tableElement,
 		['Nro','Legajo','Cuil','Apellido','Nombre','Puesto','Area'],
 		['2%','2%','2%','5%','5%','8%','8%']);
+	this.usuario = usuario;
 	this.modulo = 'Persona';
 	this.titulo = 'Registros de Personas del Sistema'
 	this.metodoEntities = 'getPersonas';
@@ -474,6 +475,63 @@ function TableModelPersona(tableElement){
 	this.dataConsult = 'Consultar Persona Seleccionada';
 	this.options = ['Legajo','Cuil','Apellido','Nombre','Puesto','Area'];
 	this.optionsValue = ['LEGAJO','CUIL','APELLIDO','NOMBRE','PUESTO','AREA'];
+	this.personas=null;
+	this.puestos=null;
+	this.areas=null;
+
+	this.getAllAreas=function(){
+		var params = 'metodo=getAreas&params={"condicion":"1"}';
+		var metodo = 'getAreas';
+		new DataHandler().ejecutarOperacionAJAX(this,metodo,params);
+	}
+
+	this.updateAreas=function(areas){
+		areas = JSON.parse(areas);
+		this.areas = areas;
+		this.getAllPuestos();
+	}
+
+	this.getAllPuestos=function(){
+		var params = 'metodo=getPuestos&params={"condicion":"1"}';
+		var metodo = 'getPuestos';
+		new DataHandler().ejecutarOperacionAJAX(this,metodo,params);
+	}
+
+	this.updatePuestos=function(puestos){
+		puestos = JSON.parse(puestos);
+		this.puestos = puestos;
+		console.log(this.areas);
+		console.log(this.puestos);
+		this.updateRows(this.setRows(this.personas),true);
+	}
+
+	this.traducirIdArea=function(id){
+		var puestoTarget=null;
+		id = id.toString();
+		for(k in this.puestos){
+			if(this.puestos[k].idPuesto === id){
+				puestoTarget=this.puestos[k];
+				break;
+			}
+		}
+		if(puestoTarget !== null){
+			for(k in this.areas){
+				if(this.areas[k].idArea === puestoTarget.Area_idArea){
+					return this.areas[k].descripcion;
+				}
+			}	
+		}
+		return 'No Asignada';
+	}
+
+	this.traducirIdPuesto=function(id){
+		for(k in this.puestos){
+			if(this.puestos[k].idPuesto === id){
+				return this.puestos[k].nombrePuesto;
+			}
+		}
+		return 'No Asignado ';
+	}
 
 	this.setRows=function(personas){
 		var i=0,j=0;
@@ -486,14 +544,35 @@ function TableModelPersona(tableElement){
 			rows[i][3]=personas[i].cuil;
 			rows[i][4]=personas[i].apellido;
 			rows[i][5]=personas[i].nombre;
-			rows[i][6]='No Asignado';
-			rows[i][7]='No Asignada';
+			rows[i][6]=this.traducirIdPuesto(personas[i].Puesto_idPuesto);
+			rows[i][7]=this.traducirIdArea(personas[i].Puesto_idPuesto);
 		}
 		return rows;
 	}
 
-	this.updateTable=function(personas){
-		this.updateRows(this.setRows(personas),true);
+	this.updateTable=function(personas,all){
+		this.personas=personas;
+		if(this.areas=== null)this.getAllAreas();
+		else this.updateRows(this.setRows(this.personas),true);
+	}
+
+	this.getSelectedPuesto=function(){
+		var idPersona = this.selectedRow.getAttribute('data-value');
+		var idPuesto;
+		for(i in this.personas){
+			if(this.personas[i].idPersona === idPersona ){
+				idPuesto = this.personas[i].Puesto_idPuesto;
+				break;
+			}
+		}
+		for(i in this.puestos){
+			console.log(idPuesto);
+			console.log(this.puestos[i]);
+			if(this.puestos[i].idPuesto === idPuesto){
+				console.log(this.puestos[i]);
+				return this.puestos[i];
+			}
+		}
 	}
 
 	this.confirmDelete=function(extra){
@@ -511,13 +590,13 @@ function TableModelPersona(tableElement){
 		var self = this;
 		dataBarModel.buttons[0].onclick=function(){
 			new FormPersona(dataBarModel.registro.dataHandler,
-				{modal:modal,tipo:1,dateActions:new DateActions()},dataBarModel.registro);
+				{modal:modal,tipo:1,dateActions:new DateActions(),usuario:self.usuario},dataBarModel.registro);
 		}
 		dataBarModel.buttons[1].onclick=function(){
 			if(self.checkSelected()){
 				new FormPersona(dataBarModel.registro.dataHandler,
 				{modal:modal,tipo:2,
-					idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions()},
+					idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions(),usuario:self.usuario,puesto:self.getSelectedPuesto()},
 					dataBarModel.registro);
 			}
 			else{
@@ -528,7 +607,7 @@ function TableModelPersona(tableElement){
 			if(self.checkSelected()){
 				new FormPersona(dataBarModel.registro.dataHandler,
 					{modal:modal,tipo:3,
-						idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions(),descripcionAreaSuperior:dataBarModel.registro.modeloTabla.selectedRow.lastChild.value},
+						idBuscado:dataBarModel.registro.modeloTabla.selectedRow.getAttribute('data-value'),dateActions:new DateActions(),usuario:self.usuario,puesto:self.getSelectedPuesto()},
 						dataBarModel.registro);
 			}
 			else{
@@ -544,6 +623,7 @@ function TableModelPersona(tableElement){
 			}
 		}
 	}
+
 }
 
 function TableModelArea(tableElement,sectorInfo){
@@ -716,7 +796,7 @@ function TableModelPuesto(tableElement){
 	this.dataDelete = 'Eliminar Puesto';
 	this.dataConsult = 'Consultar Puesto';
 	this.options = ['Codigo','Nombre','Area'];
-	this.optionsValue = ['CODIGO','NOMBRE','AREA'];
+	this.optionsValue = ['CODIGO','NOMBREPUESTO','AREA'];
 	this.puestos = null;
 	this.areas = null;
 	//this.sectorInfo=sectorInfo;

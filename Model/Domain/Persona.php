@@ -35,8 +35,8 @@
 			$this->idPersona=$idPersona;
 		}
 
-		function __construct10($legajo,$cuil,$nombre,$apellido,$fechaNacimiento,$mail,$telefono,
-			$domicilio,$localidad,$provincia){
+		function __construct12($legajo,$cuil,$nombre,$apellido,$fechaNacimiento,$mail,$telefono,
+			$domicilio,$localidad,$provincia,$idPuesto,$idUsuario){
 			$this->legajo = $legajo;
 			$this->cuil = $cuil;
 			$this->nombre = $nombre;
@@ -47,10 +47,11 @@
 			$this->domicilio = $domicilio;
 			$this->localidad = $localidad;
 			$this->provincia = $provincia;
-
+			$this->idPuesto = $idPuesto;
+			$this->idUsuario = $idUsuario;
 		}
 
-		function __construct11($idPersona,$legajo,$cuil,$nombre,$apellido,$fechaNacimiento,$mail,$telefono,$domicilio,$localidad,$provincia){
+		function __construct11($idPersona,$legajo,$cuil,$nombre,$apellido,$fechaNacimiento,$mail,$telefono,$domicilio,$localidad,$provincia,$idPuesto,$idUsuario){
 			$this->idPersona = $idPersona;
 			$this->legajo = $legajo;
 			$this->cuil = $cuil;
@@ -61,6 +62,8 @@
 			$this->domicilio = $domicilio;
 			$this->localidad = $localidad;
 			$this->mail = $mail;
+			$this->idPuesto = $idPuesto;
+			$this->idUsuario = $idUsuario;
 		}
 
 		function getIdPersona(){
@@ -115,6 +118,10 @@
     		return $this->cv;
     	}
 
+    	function getIdPuesto(){
+    		return $this->idPuesto;
+    	}
+
 		function setIdPersona($valor){
 			$this->idPersona = $valor;
 		}
@@ -167,6 +174,10 @@
 			$this->idUsuario = $valor;
 		}
 
+		function setIdPuesto($valor){
+			$this->idPuesto = $valor;
+		}
+
     	function autocompletar($registro){
 			$this->idPersona = $registro[0]->idPersona;
 			$this->legajo = $registro[0]->legajo;
@@ -189,7 +200,7 @@
 			$valores = "'$this->legajo',
 			'$this->cuil','$this->nombre','$this->apellido',
 			'$this->fechaNacimiento','$this->mail',
-			'$this->telefono','$this->domicilio','$this->localidad','$this->provincia','waiting',0,0";
+			'$this->telefono','$this->domicilio','$this->localidad','$this->provincia','waiting','$this->idUsuario','$this->idPuesto'";
 			$this->persistencia->aniadir('PERSONA',$valores);
 			return true;
 		}
@@ -198,7 +209,7 @@
 			$set="LEGAJO = '$this->legajo', CUIL = '$this->cuil', 
 			NOMBRE =  '$this->nombre', APELLIDO = '$this->apellido', FECHANAC = '$this->fechaNacimiento',
 			MAIL = '$this->mail', TELEFONO = '$this->telefono', DOMICILIO = '$this->domicilio', 
-			LOCALIDAD = '$this->localidad', PROVINCIA = '$this->provincia',CV = '$this->cv'";
+			LOCALIDAD = '$this->localidad', PROVINCIA = '$this->provincia',CV = '$this->cv',PUESTO_IDPUESTO = '$this->idPuesto', USUARIO_IDUSUARIO = '$this->idUsuario'";
 			$condicion = "IDPERSONA = '$this->idPersona'";
 			$this->persistencia->modificar('PERSONA',$set,$condicion);
 		}
@@ -228,7 +239,7 @@
 
 		function getJSON(){
 			return '{"idPersona":"'.$this->idPersona.'","legajo":"'.$this->legajo.'","cuil":"'.$this->cuil.
-			'","nombre":"'.$this->nombre.'","apellido":"'.$this->apellido.'","fechaNacimiento":"'.$this->fechaNacimiento.'","mail":"'.$this->mail.'","telefono":"'.$this->telefono.'","domicilio":"'.$this->domicilio.'","localidad":"'.$this->localidad.'","provincia":"'.$this->provincia.'","cv":"'.$this->cv.'"}';
+			'","nombre":"'.$this->nombre.'","apellido":"'.$this->apellido.'","fechaNacimiento":"'.$this->fechaNacimiento.'","mail":"'.$this->mail.'","telefono":"'.$this->telefono.'","domicilio":"'.$this->domicilio.'","localidad":"'.$this->localidad.'","provincia":"'.$this->provincia.'","cv":"'.$this->cv.'","idPuesto":"'.$this->idPuesto.'","idUsuario":"'.$this->idUsuario.'"}';
 		}
 
 	}

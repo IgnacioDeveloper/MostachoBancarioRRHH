@@ -88,9 +88,9 @@ function ModalWindowModel(modal){
 					node[0].id=elementId;
 					node[0].className = "chooser";
 					node[1]=document.createElement("p");
-					node[1].innerHTML = "Ninguna Area Seleccionada";
+					node[1].innerHTML = "Ninguna Opcion Seleccionada";
 					node[2]=document.createElement("button");
-					node[2].innerHTML = "Seleccione un Area";
+					node[2].innerHTML = elementInsideText;
 					node[0].appendChild(node[1]);
 					node[0].appendChild(node[2]);
 					node=node[0];
@@ -424,7 +424,7 @@ function FormPersona(dataHandler,conf,registro){
 	//Elementos del Formulario
 	Formulario.call(this,conf.modal);
 	this.dataHandler = dataHandler;
-	this.txtLegajo;this.txtCuil;this.txtNombre,this.txtApellido;this.dateFechaNac;this.txtMail;this.txtTelefono;this.txtDomicilio; this.txtLocalidad;this.txtProvincia;this.cv;
+	this.txtLegajo;this.txtCuil;this.txtNombre,this.txtApellido;this.dateFechaNac;this.txtMail;this.txtTelefono;this.txtDomicilio; this.txtLocalidad;this.txtProvincia;this.cv;this.chooserPuesto;
 	this.bodyNodes=[new Node("lblLegajo","p","Legajo"),
 			new Node("txtLegajo","input_text",""),
 			new Node("errorLegajo","error_text",""),
@@ -467,17 +467,24 @@ function FormPersona(dataHandler,conf,registro){
 			//
 			new Node("lblUrlCV","p","Curriculum Vitae"),
 			new Node("inputFileArea","file",""),
-			new Node("errorCV","error_text","")];
-
+			new Node("errorCV","error_text",""),
+			//
+			new Node("lblPuesto","p","Seleccion de Puesto"),
+			new Node("puestoSelector","chooser","Seleccione Puesto"),
+			new Node("errorPuesto","error_text","")]
+			//
 	this.conf=conf;
 	this.fileName;
 	this.registro=registro;
 	this.uploadFileOption;
+	this.usuario=this.conf.usuario;
+	this.puestoSeleccionado=this.conf.puesto;
 	
 
 	//End Elementos del Formulario
 
 	this.startUserForm=function(){
+		//console.log(this.usuario);
 		//Maquetacion y referenciacion de Elementos del Formulario
 		this.bodyElements = this.appendElements(this.bodyNodes,this.modalBody);
 		////console.log(this.bodyElements[13]);
@@ -492,9 +499,10 @@ function FormPersona(dataHandler,conf,registro){
 		this.txtLocalidad = new FormBodyElement(this.bodyElements[25],this.bodyElements[26],"textOnly",true); 
 		this.txtProvincia = new FormBodyElement(this.bodyElements[28],this.bodyElements[29],"textOnly",true); 
 		this.cv = new FormBodyElement(this.bodyElements[31],this.bodyElements[32],"PDF",true);
+		this.chooserPuesto = new FormBodyElement(this.bodyElements[34],this.bodyElements[35],"chooser",false);
 		this.button1 = this.footerElements[0];
 		this.button2 = this.footerElements[1];
-		this.formBodyElements = [this.txtLegajo,this.txtCuil,this.txtNombre,this.txtApellido,this.dateFechaNac,this.txtMail,this.txtTelefono,this.txtDomicilio, this.txtLocalidad,this.txtProvincia,this.cv];
+		this.formBodyElements = [this.txtLegajo,this.txtCuil,this.txtNombre,this.txtApellido,this.dateFechaNac,this.txtMail,this.txtTelefono,this.txtDomicilio, this.txtLocalidad,this.txtProvincia,this.cv,this.chooserPuesto];
 		this.uploadFileOption = this.cv.element.lastChild;
 		this.fileLink = this.cv.element.previousSibling;
 		//End Maquetacion y referenciacion de ELementos del Formulario
@@ -534,6 +542,7 @@ function FormPersona(dataHandler,conf,registro){
 		var self = this;
 		if(!flag)this.getData(this.conf.idBuscado);
 		this.unlockInfo();
+		if(this.puestoSeleccionado!==undefined)this.chooserPuesto.element.firstChild.innerHTML = this.puestoSeleccionado.nombrePuesto;
 		this.conf.dateActions.unlockDateSelects(this.dateFechaNac.element);
 		this.cv.element.firstChild.innerHTML='Cambiar Archivo';
 		this.title.innerHTML = "Modificar Informacion de Persona";
@@ -548,6 +557,7 @@ function FormPersona(dataHandler,conf,registro){
 	this.setConfConsulta=function(){
 		var self = this;
 		this.lockInfo();
+		if(this.puestoSeleccionado!==undefined)this.chooserPuesto.element.firstChild.innerHTML = this.puestoSeleccionado.nombrePuesto;
 		this.conf.dateActions.lockDateSelects(this.dateFechaNac.element);
 		this.cv.element.style.display='none';
 		this.getData(this.conf.idBuscado);
@@ -565,7 +575,7 @@ function FormPersona(dataHandler,conf,registro){
 		if(val){
 			var persona = this.getJSonData();
 			var params="metodo=savePersona&params="+persona;
-			//console.log(params);
+			console.log(params);
 			this.dataHandler.ejecutarOperacionAJAX(this,"savePersona",params);
 		}
 	}
@@ -585,6 +595,7 @@ function FormPersona(dataHandler,conf,registro){
 		if(val){
 			var persona = this.getJSonData();
 			var params="metodo=modifyPersona&params="+persona;
+			console.log(params);
 			this.dataHandler.ejecutarOperacionAJAX(this,"modifyPersona",params);
 		}
 	}
@@ -624,7 +635,7 @@ function FormPersona(dataHandler,conf,registro){
 		if(this.conf.tipo!==1){
 			idPersona = '"idPersona":'+this.conf.idBuscado+',';
 		}
-		return '{'+idPersona+'"legajo":"'+this.txtLegajo.element.value+'","cuil":"'+this.txtCuil.element.value+'","nombre":"'+this.txtNombre.element.value+'","apellido":"'+this.txtApellido.element.value+'","fechaNacimiento":"'+this.conf.dateActions.getDateString(this.dateFechaNac.element)+'","mail":"'+this.txtMail.element.value+'","telefono":"'+this.txtTelefono.element.value+'","domicilio":"'+this.txtDomicilio.element.value+'","localidad":"'+this.txtLocalidad.element.value+'","provincia":"'+this.txtProvincia.element.value+'"}';
+		return '{'+idPersona+'"legajo":"'+this.txtLegajo.element.value+'","cuil":"'+this.txtCuil.element.value+'","nombre":"'+this.txtNombre.element.value+'","apellido":"'+this.txtApellido.element.value+'","fechaNacimiento":"'+this.conf.dateActions.getDateString(this.dateFechaNac.element)+'","mail":"'+this.txtMail.element.value+'","telefono":"'+this.txtTelefono.element.value+'","domicilio":"'+this.txtDomicilio.element.value+'","localidad":"'+this.txtLocalidad.element.value+'","provincia":"'+this.txtProvincia.element.value+'","idPuesto":"'+this.puestoSeleccionado.idPuesto+'","idUsuario":"'+this.usuario.idUsuario+'"}';
 	}
 
 	this.getData=function(idBuscado){
@@ -658,7 +669,16 @@ function FormPersona(dataHandler,conf,registro){
 	}
 
 	this.eventosFormulario=function(){
+		var self = this;
+		this.chooserPuesto.element.lastChild.onclick=function(){
+			new ChooserPuesto(self);
+		}
+	}
 
+	this.setPuestoSeleccionado=function(puesto){
+		this.puestoSeleccionado = puesto;
+		this.chooserPuesto.element.firstChild.innerHTML=puesto.descripcion;
+		this.chooserPuesto.element.firstChild.style.color='blue';
 	}
 
 	this.closeForm = function(){
@@ -682,9 +702,7 @@ function FormArea(dataHandler,conf,registro){
 			new Node("errorDescripcion","error_text",""),
 			//
 			new Node("lblAreaSuperior","p","Area Superior Inmediata"),
-			//new Node("lblWhich","input-text","No se ha seleccionado un area"),
-			//new Node("buttonAreaSuperior","button","Seleccione el Area"),
-			new Node("chooserAreaSuperior","chooser",""),
+			new Node("chooserAreaSuperior","chooser","Seleccione Area"),
 			new Node("errorAreaSuperior","error_text","")];
 
 	this.conf=conf;
@@ -777,7 +795,6 @@ function FormArea(dataHandler,conf,registro){
 		if(val){
 			var area = this.getJSonData();
 			var params="metodo=saveArea&params="+area;
-			console.log(params);
 			this.dataHandler.ejecutarOperacionAJAX(this,"saveArea",params);
 		}
 	}
@@ -787,7 +804,6 @@ function FormArea(dataHandler,conf,registro){
 		if(val){
 			var area= this.getJSonData();
 			var params="metodo=modifyArea&params="+area;
-			console.log(params);
 			this.dataHandler.ejecutarOperacionAJAX(this,"modifyArea",params);
 		}
 	}
@@ -797,7 +813,6 @@ function FormArea(dataHandler,conf,registro){
 	}
 
 	this.confirmacion=function(resultado,tipo){
-		console.log(resultado);
 		if(resultado==1){
 			this.operacionExitosa(tipo);
 		}
@@ -867,7 +882,7 @@ function FormPuesto(dataHandler,conf,registro){
 			new Node("errorNombre","error_text",""),
 			//
 			new Node("lblAreaSuperior","p","Area del Puesto"),
-			new Node("chooserArea","chooser",""),
+			new Node("chooserArea","chooser","SeleccioneArea"),
 			new Node("errorAreaSuperior","error_text",""),
 			//
 			new Node("lblDescripcion","p","Descripcion"),
@@ -996,7 +1011,7 @@ function FormPuesto(dataHandler,conf,registro){
 		if(val){
 			var puesto = this.getJSonData();
 			var params="metodo=modifyPuesto&params="+puesto;
-			//console.log(params);
+			console.log(params);
 			this.dataHandler.ejecutarOperacionAJAX(this,"modifyPuesto",params);
 		}
 	}

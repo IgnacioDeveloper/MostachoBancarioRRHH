@@ -44,6 +44,7 @@ function MenuPrincipal(){
 		this.loadScript('http://localhost/MostachoRRHH/View/js/dataHandler.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/registros.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/listas.js');
+		this.loadScript('http://localhost/MostachoRRHH/View/js/chooserPuesto.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/organigrama.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/menuAreas.js');
 		this.loadScript('http://localhost/MostachoRRHH/View/js/dateActions.js');
@@ -100,9 +101,12 @@ function MenuPrincipal(){
 
 	this.openAddForm=function(modulo){
 		var Configuracion = {modal:this.modal,tipo:1};
-		if(modulo === 'personas') Configuracion.dateActions = new DateActions();
+		if(modulo === 'personas') {
+			Configuracion.dateActions = new DateActions();
+			Configuracion.usuario = this.usuario;
+		}
 		switch(modulo){
-			case 'areas': new FormArea(this.dataHandler,Configuracion);break;
+			case 'areas': new FormArea(this.dataHandler,Configuracion,this.organigrama);break;
 			case 'puestos':new FormPuesto(this.dataHandler,Configuracion);break;
 			case 'personas':new FormPersona(this.dataHandler,Configuracion);break;
 			case 'usuarios':new FormUsuario(this.dataHandler,Configuracion);break;
@@ -128,7 +132,7 @@ function MenuPrincipal(){
 							new TableModelPuesto(tabla))); break;
 			case 'personas':this.registers.push(new Registro(this.main,
 							this.dataHandler,
-							new TableModelPersona(tabla))); break;
+							new TableModelPersona(tabla,this.usuario))); break;
 			case 'usuarios':this.registers.push(new Registro(this.main,
 							this.dataHandler,				
 							new TableModelUsuario(tabla))); break;

@@ -136,7 +136,7 @@ class Controlador{
 	private function savePersona($params){
 		require $_SERVER['DOCUMENT_ROOT'].'/MostachoRRHH/Model/Domain/Persona.php';
 		$params = json_decode($params);
-		$persona = new Persona($params->legajo,$params->cuil,$params->nombre,$params->apellido,$params->fechaNacimiento,$params->mail,$params->telefono,$params->domicilio,$params->localidad,$params->provincia);
+		$persona = new Persona($params->legajo,$params->cuil,$params->nombre,$params->apellido,$params->fechaNacimiento,$params->mail,$params->telefono,$params->domicilio,$params->localidad,$params->provincia,$params->idPuesto,$params->idUsuario);
 		$persona->guardar();
 		$persona->getPersona("LEGAJO = '$params->legajo' AND CUIL = '$params->cuil'");
 		return $persona->getIdPersona();
@@ -173,6 +173,8 @@ class Controlador{
 		$persona->setDomicilio($params->domicilio);
 		$persona->setLocalidad($params->localidad);
 		$persona->setProvincia($params->provincia);
+		$persona->setIdPuesto($params->idPuesto);
+		$persona->setIdUsuario($params->idUsuario);
 		$persona->modificar();
 		return $persona->getIdPersona();
 	}
