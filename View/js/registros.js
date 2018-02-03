@@ -107,6 +107,16 @@ function TableModel(tableElement,headers,widths){
 		return this.rows.length;
 	}
 
+	this.getVisibleRowCount=function(){
+		var countRowsVisibles=0;
+		for(i=0;i<this.rows.length;i++){
+			if(this.rows[i].style.display==='table-row'){
+				countRowsVisibles++;
+			}
+		}
+		return countRowsVisibles;
+	}
+
 	//width es un string que puede estar en pixeles o en porcentajes.
 
 	this.setColumnWidth=function(width,column){
@@ -186,7 +196,7 @@ function Registro(sector,dataHandler,modeloTabla){
 	this.updateAreas=function(registros){
 		if(registros!=='1'){
 			registros = JSON.parse(registros);
-			this.modeloTabla.updateTable(registros,this.all);
+			this.modeloTabla.updateTable(registros,this.searchBar.modeloSearchBar,this.all);
 			this.searchBar.modeloSearchBar.updateResultInfo(registros.length);
 		}
 		else{
@@ -199,7 +209,7 @@ function Registro(sector,dataHandler,modeloTabla){
 		console.log(registros);
 		if(registros !== '1'){
 			registros = JSON.parse(registros);
-			this.modeloTabla.updateTable(registros,this.all);
+			this.modeloTabla.updateTable(registros,this.searchBar.modeloSearchBar,this.all);
 			this.searchBar.modeloSearchBar.updateResultInfo(registros.length);
 		}
 		else{
@@ -210,7 +220,7 @@ function Registro(sector,dataHandler,modeloTabla){
 	this.updateTableInfo=function(registros){
 		console.log(registros);
 		registros = JSON.parse(registros);
-		this.modeloTabla.updateTable(registros);
+		this.modeloTabla.updateTable(registros,this.searchBar.modeloSearchBar);
 		this.searchBar.modeloSearchBar.updateResultInfo(registros.length);
 	}
 
@@ -230,11 +240,15 @@ function SearchBarModel(registro,searchBarElement){
 	this.btnUpdate;
 	this.inputCriterio;
 	this.selectCampo;
+	this.lblFiltro;
+	this.selectFiltro;
+	this.selectValores;
 	this.lblTotal;
 
 	this.startSearchBarModel=function(){
 		this.clearSearchBarModel();
 		this.renderSearchBarModel();
+		this.prepareFiltro()
 		this.eventos();
 	}
 
@@ -245,6 +259,12 @@ function SearchBarModel(registro,searchBarElement){
 		this.lblTotal=null;
 		while(this.searchBarElement.hasChildNodes()){
 			this.searchBarElement.removeChild(searchBarElement.lastChild);
+		}
+	}
+
+	this.prepareFiltro=function(){
+		for(i=0;i<this.registro.modeloTabla.optionsFilter.length;i++){
+			this.selectFiltro.options[i] = new Option(this.registro.modeloTabla.optionsFilter[i],this.registro.modeloTabla.optionsFilter[i]);
 		}
 	}
 
@@ -267,7 +287,14 @@ function SearchBarModel(registro,searchBarElement){
 		this.inputCriterio = document.createElement('input');
 		var lblCriterio = document.createElement('p');
 		var lblCampo = document.createElement('p');
+		this.lblFiltro = document.createElement('p');
+		this.selectFiltro=document.createElement('select');
+		this.selectValores=document.createElement('select');
 		this.lblTotal = document.createElement('p');
+		this.lblFiltro.innerHTML = 'Filtrar por: ';
+		this.lblFiltro.id = 'lbl-filtro';
+		this.selectFiltro.id = 'select-filtro';
+		this.selectValores.id = 'select-valores';
 		lblCriterio.id = 'lblCriterio-'+this.registro.modeloTabla.modulo;;
 		this.inputCriterio.id = 'inputCriterio-'+this.registro.modeloTabla.modulo;
 		this.btnBuscar.id = 'btnBuscar-'+this.registro.modeloTabla.modulo;
@@ -291,6 +318,9 @@ function SearchBarModel(registro,searchBarElement){
 		sector1.appendChild(lblCriterio);
 		sector1.appendChild(this.inputCriterio);
 		sector1.appendChild(this.btnBuscar);
+		sector1.appendChild(this.lblFiltro);
+		sector1.appendChild(this.selectValores);
+		sector1.appendChild(this.selectFiltro);
 		subSector1.appendChild(lblCampo);
 		subSector1.appendChild(this.selectCampo);
 		subSector2.appendChild(this.lblTotal);
@@ -302,13 +332,14 @@ function SearchBarModel(registro,searchBarElement){
 		}
 
 	this.eventos=function(){
-		self = this;
+		var self = this;
 		this.btnUpdate.onclick=function(){
 			self.registro.getData(self.selectCampo.options[self.selectCampo.selectedIndex].value,self.inputCriterio.value);
 		}
 		this.btnBuscar.onclick=function(){
 			self.registro.getData(self.selectCampo.options[self.selectCampo.selectedIndex].value,self.inputCriterio.value);
 		}
+		this.registro.modeloTabla.eventosSelects(this);
 	}
 }
 
@@ -377,8 +408,10 @@ function TableModelUsuario(tableElement){
 	this.dataModify = 'Modificar Usuario Seleccionado';
 	this.dataDelete = 'Habilitar/Deshabilitar Usuario Seleccionado';
 	this.dataConsult = 'Consultar Usuario Seleccionado';
-	this.options = ['Nombre','Username','UserType','Estado'];
-	this.optionsValue = ['NOMBRE','USERNAME','USERTYPE','ESTADO'];
+	this.options = ['Nombre','Username'];
+	this.optionsValue = ['NOMBRE','USERNAME'];
+	this.optionsFilter = ['Tipo de Usuario','Estado'];
+	this.searchBarModel = null;
 
 	this.setRows=function(usuarios){
 		var i=0,j=0;
@@ -395,8 +428,54 @@ function TableModelUsuario(tableElement){
 		return rows;
 	}
 
-	this.updateTable=function(usuarios){
+	this.updateTable=function(usuarios,searchBarModel){
 		this.updateRows(this.setRows(usuarios),true);
+		this.searchBarModel = searchBarModel;
+		this.setSelectValores();
+	}
+
+	this.setSelectValores=function(){
+		this.searchBarModel.selectValores.options[0] = new Option('Todos',0);
+		if(this.searchBarModel.selectFiltro.value === "Tipo de Usuario"){
+			this.searchBarModel.selectValores.options[1] = new Option('Jefe de RRHH','J');
+			this.searchBarModel.selectValores.options[2] = new Option('Empleado de RRHH','E');
+		}
+		if(this.searchBarModel.selectFiltro.value === "Estado"){
+			this.searchBarModel.selectValores.options[1] = new Option('Habilitado','H');
+			this.searchBarModel.selectValores.options[2] = new Option('Deshabilitado','D');
+		}
+	}
+
+	this.filter=function(columnaFiltro,condicion){
+		console.log(condicion);
+		if(condicion === "0"){
+			for(i=1;i<this.tableElement.rows.length;i++){
+				this.tableElement.rows[i].style.display = 'table-row';
+			}
+		}
+		else if(columnaFiltro === 0){
+			for(i=1;i<this.tableElement.rows.length;i++){
+				console.log(this.tableElement.rows[i].lastChild.previousSibling.innerHTML.charAt(0));
+				if(this.tableElement.rows[i].lastChild.previousSibling.innerHTML.charAt(0) === condicion){
+					this.tableElement.rows[i].style.display = 'table-row';
+				}
+				else{
+					this.tableElement.rows[i].style.display = 'none';
+				}
+			}
+		} else{
+			if(columnaFiltro === 1){
+				for(i=1;i<this.tableElement.rows.length;i++){
+				console.log(this.tableElement.rows[i].lastChild.innerHTML.charAt(0));
+				if(this.tableElement.rows[i].lastChild.innerHTML.charAt(0) === condicion){
+					this.tableElement.rows[i].style.display = 'table-row';
+				}
+				else{
+					this.tableElement.rows[i].style.display = 'none';
+				}
+			}
+			}
+		}
 	}
 
 	this.confirmDeleteOperation=function(registro){
@@ -415,6 +494,18 @@ function TableModelUsuario(tableElement){
 		console.log(registro);
 		var params='metodo=setUsuarioPermit&params={"idUsuario":'+id+',"permit":0}';
 		registro.dataHandler.ejecutarOperacionAJAX(registro,'setUsuarioPermit',params);
+	}
+
+	this.eventosSelects=function(searchBarModel){
+		var self = this;
+		searchBarModel.selectFiltro.onchange=function(){
+			self.setSelectValores();
+		}
+		searchBarModel.selectValores.onchange=function(){
+			var columna = (searchBarModel.selectFiltro.value === 'Estado')? 1 : 0;
+			self.filter(columna,this.value);
+			searchBarModel.updateResultInfo(self.getVisibleRowCount());
+		}
 	}
 
 	this.eventosBotones=function(dataBarModel,modal){
@@ -473,11 +564,31 @@ function TableModelPersona(tableElement,usuario){
 	this.dataModify = 'Modificar Persona Seleccionada';
 	this.dataDelete = 'Eliminar Persona Seleccionada';
 	this.dataConsult = 'Consultar Persona Seleccionada';
-	this.options = ['Legajo','Cuil','Apellido','Nombre','Puesto','Area'];
-	this.optionsValue = ['LEGAJO','CUIL','APELLIDO','NOMBRE','PUESTO','AREA'];
+	this.options = ['Legajo','Cuil','Apellido','Nombre'];
+	this.optionsValue = ['LEGAJO','CUIL','APELLIDO','NOMBRE'];
+	this.optionsFilter = ['Puesto','Area'];
 	this.personas=null;
 	this.puestos=null;
 	this.areas=null;
+	this.searchBarModel = null;
+
+	this.setSelectValores=function(){
+		if(this.searchBarModel.selectFiltro.value === "Puesto"){
+			this.searchBarModel.selectValores.options[0] = new Option('Todos',0);
+			this.searchBarModel.selectValores.options[1] = new Option('No Asignado','No Asignado');
+			console.log(this.puestos.length)
+			for(i=0;i<this.puestos.length;i++){
+				this.searchBarModel.selectValores.options[i+2] = new Option(this.puestos[i].nombrePuesto,this.puestos[i].nombrePuesto);
+			}
+		}
+		if(this.searchBarModel.selectFiltro.value === "Area"){
+			this.searchBarModel.selectValores.options[0] = new Option('Todas',0);
+			this.searchBarModel.selectValores.options[1] = new Option('No Asignada','No Asignada');
+			for(i=0;i<this.areas.length;i++){
+				this.searchBarModel.selectValores.options[i+2] = new Option(this.areas[i].descripcion,this.areas[i].descripcion);
+			}
+		}
+	}
 
 	this.getAllAreas=function(){
 		var params = 'metodo=getAreas&params={"condicion":"1"}';
@@ -500,8 +611,7 @@ function TableModelPersona(tableElement,usuario){
 	this.updatePuestos=function(puestos){
 		puestos = JSON.parse(puestos);
 		this.puestos = puestos;
-		console.log(this.areas);
-		console.log(this.puestos);
+		this.setSelectValores();
 		this.updateRows(this.setRows(this.personas),true);
 	}
 
@@ -530,7 +640,7 @@ function TableModelPersona(tableElement,usuario){
 				return this.puestos[k].nombrePuesto;
 			}
 		}
-		return 'No Asignado ';
+		return 'No Asignado';
 	}
 
 	this.setRows=function(personas){
@@ -550,8 +660,9 @@ function TableModelPersona(tableElement,usuario){
 		return rows;
 	}
 
-	this.updateTable=function(personas,all){
+	this.updateTable=function(personas,searchBarModel,all){
 		this.personas=personas;
+		this.searchBarModel = searchBarModel;
 		if(this.areas=== null)this.getAllAreas();
 		else this.updateRows(this.setRows(this.personas),true);
 	}
@@ -575,6 +686,38 @@ function TableModelPersona(tableElement,usuario){
 		}
 	}
 
+	this.filter=function(columnaFiltro,condicion){
+		console.log(condicion);
+		if(condicion === "0"){
+			for(i=1;i<this.tableElement.rows.length;i++){
+				this.tableElement.rows[i].style.display = 'table-row';
+			}
+		}
+		else if(columnaFiltro === 0){
+			for(i=1;i<this.tableElement.rows.length;i++){
+				console.log(this.tableElement.rows[i].lastChild.previousSibling.innerHTML);
+				if(this.tableElement.rows[i].lastChild.previousSibling.innerHTML === condicion){
+					this.tableElement.rows[i].style.display = 'table-row';
+				}
+				else{
+					this.tableElement.rows[i].style.display = 'none';
+				}
+			}
+		} else{
+			if(columnaFiltro === 1){
+				for(i=1;i<this.tableElement.rows.length;i++){
+					console.log(this.tableElement.rows[i].lastChild.innerHTML);
+					if(this.tableElement.rows[i].lastChild.innerHTML === condicion){
+						this.tableElement.rows[i].style.display = 'table-row';
+					}
+					else{
+						this.tableElement.rows[i].style.display = 'none';
+					}
+				}
+			}
+		}
+	}
+
 	this.confirmDelete=function(extra){
 		new Mensaje(this,'¿Esta seguro que desea borrar este registro?','condicion','delete',extra);
 	}
@@ -584,6 +727,18 @@ function TableModelPersona(tableElement,usuario){
 		var params = 'metodo=deletePersona&params={"idPersona":'+id+'}';
 		registro.dataHandler.ejecutarOperacionAJAX(registro,'deletePersona',params);
 		registro.dataHandler.ejecutarOperacionArchivoAJAX(registro,'deleteFile',id);
+	}
+
+	this.eventosSelects=function(searchBarModel){
+		var self = this;
+		searchBarModel.selectFiltro.onchange=function(){
+			self.setSelectValores();
+		}
+		searchBarModel.selectValores.onchange=function(){
+			var columna = (searchBarModel.selectFiltro.value === 'Area')? 1 : 0;
+			self.filter(columna,this.value);
+			searchBarModel.updateResultInfo(self.getVisibleRowCount());
+		}
 	}
 
 	this.eventosBotones=function(dataBarModel,modal){
@@ -638,11 +793,15 @@ function TableModelArea(tableElement,sectorInfo){
 	this.dataModify = 'Modificar Area';
 	this.dataDelete = 'Eliminar Area';
 	this.dataConsult = 'Consultar Area';
-	this.options = ['Codigo','Descripcion','Area Superior'];
-	this.optionsValue = ['CODIGO','DESCRIPCION','AREA_IDAREASUPERIOR'];
+	this.options = ['Codigo','Descripcion'];
+	this.optionsValue = ['CODIGO','DESCRIPCION'];
+	this.optionsFilter = ['Area Superior'];
 	this.areas = null;
 	this.listaPuestos = null;
 	this.sectorInfo=sectorInfo;
+	this.searchBarModel=null;
+	this.lblCountPuestos=null;
+	this.lblSubAreas=null;
 
 	this.setListaPuestos=function(listaPuestos){
 		this.listaPuestos = listaPuestos;
@@ -665,6 +824,20 @@ function TableModelArea(tableElement,sectorInfo){
 		this.tableElement.style.marginBottom="1%";
 	}
 
+	this.getSubAreas=function(id){
+		var subAreas = [];
+		for(i=0;i<this.areas.length;i++){
+			if(this.areas[i].Area_idAreaSuperior === id){
+				subAreas.push(this.areas[i].descripcion);
+			}
+		}
+		if(subAreas.length > 0)
+			return subAreas.toString();
+		else{
+			return 'Sin SubAreas';
+		}
+	}
+
 	this.setRows=function(areas){
 		var i=0,j=0;
 		var rows=[];
@@ -679,6 +852,13 @@ function TableModelArea(tableElement,sectorInfo){
 		return rows;
 	}
 
+	this.setSelectValores=function(){
+		this.searchBarModel.selectValores.options[0] = new Option('Todas',0);
+		for(i=0;i<this.areas.length;i++){
+			this.searchBarModel.selectValores.options[i+1] = new Option(this.areas[i].descripcion,this.areas[i].descripcion);
+		}
+	}
+
 	this.traducirIdArea=function(id){
 		if(id==='0') return '-';
 		for(i in this.areas){
@@ -688,7 +868,8 @@ function TableModelArea(tableElement,sectorInfo){
 		}
 	}
 
-	this.updateTable=function(areas,all){
+	this.updateTable=function(areas,searchBarModel,all){
+		this.searchBarModel=searchBarModel;
 		if(all){this.areas=areas;this.startListaPuestos()};
 		this.updateRows(this.setRows(areas),true);
 		this.setFullAreaInfo();
@@ -706,10 +887,32 @@ function TableModelArea(tableElement,sectorInfo){
 		var cantAreas = document.createElement('p');
 		if(id===null){
 			this.sectorInfo.firstChild.innerHTML = 'Informacion de Areas del Sistema';
-			cantAreas.innerHTML = 'Cantidad de Areas de Mostacho Bancario: '+this.areas.length;
+			cantAreas.innerHTML = '<b>Cantidad de Areas de Mostacho Bancario:<b> '+this.areas.length;
 			this.sectorInfo.nextSibling.firstChild.innerHTML = 'Todos los puestos';
 			this.listaPuestos.filter('');
+			this.setSelectValores();
 			this.sectorInfo.appendChild(cantAreas);
+			this.lblCountPuestos = cantAreas;
+		}
+	}
+
+	this.filter=function(columnaFiltro,condicion){
+		console.log(condicion);
+		if(condicion === "0"){
+			console.log('hi');
+			for(i=1;i<this.tableElement.rows.length;i++){
+				this.tableElement.rows[i].style.display = 'table-row';
+			}
+		}else{
+			for(i=1;i<this.tableElement.rows.length;i++){
+			console.log(this.tableElement.rows[i].lastChild.innerHTML);
+				if(this.tableElement.rows[i].lastChild.innerHTML === condicion){
+					this.tableElement.rows[i].style.display = 'table-row';
+				}
+				else{
+					this.tableElement.rows[i].style.display = 'none';
+				}
+			}
 		}
 	}
 
@@ -722,6 +925,17 @@ function TableModelArea(tableElement,sectorInfo){
 		var params = 'metodo=deleteArea&params={"idArea":'+id+'}';
 		registro.dataHandler.ejecutarOperacionAJAX(registro,'deleteArea',params);
 		registro.dataHandler.ejecutarOperacionArchivoAJAX(registro,'deleteFile',id);
+	}
+
+	this.eventosSelects=function(searchBarModel){
+		var self = this;
+		searchBarModel.selectFiltro.onchange=function(){
+			self.setSelectValores();
+		}
+		searchBarModel.selectValores.onchange=function(){
+			self.filter(1,this.value);
+			searchBarModel.updateResultInfo(self.getVisibleRowCount());
+		}
 	}
 
 	this.eventosBotones=function(dataBarModel,modal){
@@ -767,12 +981,17 @@ function TableModelArea(tableElement,sectorInfo){
 	this.eventosLista=function(){
 		this.tableElement.addEventListener('click',function(e){
 			if(this.checkSelected()){
+				console.log(this.lblSubAreas);
+				if(this.lblSubAreas!=undefined) this.sectorInfo.removeChild(this.lblSubAreas);
 				var areaTarget = e.target.parentNode.lastChild.previousSibling.innerHTML;
 				this.sectorInfo.firstChild.innerHTML = 'Informacion del Area: '+ areaTarget;
 				this.listaPuestos.barraBusqueda.lastChild.previousSibling.value='';
 				this.listaPuestos.areaTarget = areaTarget;
 				var cantPuestos = this.listaPuestos.filterArea();
-				this.sectorInfo.lastChild.innerHTML = 'Cantidad de Puestos comprendidos: '+ cantPuestos;
+				this.lblCountPuestos.innerHTML = '<b>Cantidad de Puestos comprendidos:</b> '+ cantPuestos;
+				this.lblSubAreas = document.createElement('p');
+				this.lblSubAreas.innerHTML = '<b>SubAreas inmediatas:</b> '+this.getSubAreas(e.target.parentNode.getAttribute('data-value'));
+				this.sectorInfo.appendChild(this.lblSubAreas);
 				this.sectorInfo.nextSibling.firstChild.innerHTML = 'Puestos que componen esta Area';
 			}
 			
@@ -795,10 +1014,12 @@ function TableModelPuesto(tableElement){
 	this.dataModify = 'Modificar Puesto';
 	this.dataDelete = 'Eliminar Puesto';
 	this.dataConsult = 'Consultar Puesto';
-	this.options = ['Codigo','Nombre','Area'];
-	this.optionsValue = ['CODIGO','NOMBREPUESTO','AREA'];
+	this.options = ['Codigo','Nombre'];
+	this.optionsValue = ['CODIGO','NOMBREPUESTO'];
+	this.optionsFilter = ['Area'];
 	this.puestos = null;
 	this.areas = null;
+	this.searchBarModel=null;
 	//this.sectorInfo=sectorInfo;
 
 	this.startModeloTabla = function(){
@@ -815,6 +1036,7 @@ function TableModelPuesto(tableElement){
 		areas = JSON.parse(areas);
 		this.areas = areas;
 		this.updateRows(this.setRows(this.puestos),true);
+		this.setSelectValores();
 	}
 
 	this.setDimensions=function(){
@@ -843,6 +1065,13 @@ function TableModelPuesto(tableElement){
 		return rows;
 	}
 
+	this.setSelectValores=function(){
+		this.searchBarModel.selectValores.options[0] = new Option('Todas',0);
+		for(i=0;i<this.areas.length;i++){
+			this.searchBarModel.selectValores.options[i+1] = new Option(this.areas[i].descripcion,this.areas[i].descripcion);
+		}
+	}
+
 	this.traducirIdArea=function(id){
 		for(i in this.areas){
 			if(this.areas[i].idArea === id){
@@ -851,7 +1080,8 @@ function TableModelPuesto(tableElement){
 		}
 	}
 
-	this.updateTable=function(puestos,all){
+	this.updateTable=function(puestos,searchBarModel,all){
+		this.searchBarModel = searchBarModel;
 		if(all)this.puestos=puestos;
 		if(this.areas=== null)this.getAllAreas();
 		else this.updateRows(this.setRows(puestos),true);
@@ -873,6 +1103,26 @@ function TableModelPuesto(tableElement){
 		}
 	}
 
+	this.filter=function(columnaFiltro,condicion){
+		console.log(condicion);
+		if(condicion === "0"){
+			console.log('hi');
+			for(i=1;i<this.tableElement.rows.length;i++){
+				this.tableElement.rows[i].style.display = 'table-row';
+			}
+		}else{
+			for(i=1;i<this.tableElement.rows.length;i++){
+			console.log(this.tableElement.rows[i].lastChild.innerHTML);
+				if(this.tableElement.rows[i].lastChild.innerHTML === condicion){
+					this.tableElement.rows[i].style.display = 'table-row';
+				}
+				else{
+					this.tableElement.rows[i].style.display = 'none';
+				}
+			}
+		}
+	}
+
 	this.confirmDelete=function(extra){
 		new Mensaje(this,'¿Esta seguro que desea borrar este registro?','condicion','delete',extra);
 	}
@@ -881,6 +1131,17 @@ function TableModelPuesto(tableElement){
 		var id = this.selectedRow.getAttribute('data-value')
 		var params = 'metodo=deletePuesto&params={"idPuesto":'+id+'}';
 		registro.dataHandler.ejecutarOperacionAJAX(registro,'deletePuesto',params);
+	}
+
+	this.eventosSelects=function(searchBarModel){
+		var self = this;
+		searchBarModel.selectFiltro.onchange=function(){
+			self.setSelectValores();
+		}
+		searchBarModel.selectValores.onchange=function(){
+			self.filter(1,this.value);
+			searchBarModel.updateResultInfo(self.getVisibleRowCount());
+		}
 	}
 
 	this.eventosBotones=function(dataBarModel,modal){

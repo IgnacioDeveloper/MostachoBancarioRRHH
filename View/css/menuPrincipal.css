@@ -220,6 +220,7 @@ div.lateral-derecho-superior{
 	height:29.9%;
 	float:top;
 	border-bottom:5px solid orange;
+	overflow:auto;
 }
 
 div.lateral-derecho-inferior{

@@ -33,9 +33,7 @@ function MenuPrincipal(){
 		this.loadAllScripts();
 		this.startDataHandlerMainOperations(); //Enlaza con el archivo servidor.js y setea los eventos
 		this.lblUser.innerHTML = 'Nombre de Usuario: '+this.usuario.nombre+' // Tipo de Usuario: '+this.translateProfile(this.usuario.usertype);
-		//
-		
-		//
+		if(this.usuario.usertype !== 'J') this.hideUsuariosOperations();
 		this.renderMainMenu('organigrama');
 	}
 
@@ -59,6 +57,10 @@ function MenuPrincipal(){
 	    script.type = 'text/javascript';
 	    script.src = url;
 	    this.body.appendChild(script);
+	}
+
+	this.hideUsuariosOperations=function(){
+		this.menuUsuarios.style.display = 'none';
 	}
 
 	this.initComponents=function(){

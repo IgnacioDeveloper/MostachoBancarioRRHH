@@ -184,6 +184,14 @@ function Formulario(modal){
 		this.setButtons();
 	}
 
+	this.convertEnhancedLiteralJSON=function(jsonString){
+		return jsonString.replace(/\n/g, "\\\\n").replace(/\r/g, "\\\\r").replace(/\t/g, "\\\\t");
+	}
+
+	this.translateEnhancedLiteralJSON=function(jsonString){
+		return jsonString.replace(/\n/g,'\\n');
+	}
+
 	this.setButtons=function(){
 		this.footerElements = this.appendElements(this.footerNodes,this.modalFooter);
 		this.button1=this.footerElements[0];
@@ -1054,7 +1062,7 @@ function FormPuesto(dataHandler,conf,registro){
 		if(this.conf.tipo!==1){
 			idPuesto = '"idPuesto":'+this.conf.idBuscado+',';
 		}
-		return '{'+idPuesto+'"codigo":"'+this.txtCodigo.element.value+'","nombre":"'+this.txtNombre.element.value+'","idArea":"'+this.area.id+'","descripcion":"'+this.txtDescripcion.element.value+'","objetivoGeneral":"'+this.txtObjetivo.element.value+'","funcionesEspecificas":"'+this.txtFunciones.element.value+'","competenciasRequeridas":"'+this.txtCompetencias.element.value+'","conocimientosRequeridos":"'+this.txtConocimientos.element.value+'"}';
+		return this.convertEnhancedLiteralJSON('{'+idPuesto+'"codigo":"'+this.txtCodigo.element.value+'","nombre":"'+this.txtNombre.element.value+'","idArea":"'+this.area.id+'","descripcion":"'+this.txtDescripcion.element.value+'","objetivoGeneral":"'+this.txtObjetivo.element.value+'","funcionesEspecificas":"'+this.txtFunciones.element.value+'","competenciasRequeridas":"'+this.txtCompetencias.element.value+'","conocimientosRequeridos":"'+this.txtConocimientos.element.value+'"}');
 	}
 
 	this.getData=function(idBuscado){
@@ -1064,6 +1072,8 @@ function FormPuesto(dataHandler,conf,registro){
 	}
 
 	this.setFormData=function(puesto){
+		console.log(puesto);
+		var puesto = this.translateEnhancedLiteralJSON(puesto);
 		console.log(puesto);
 		puesto = JSON.parse(puesto);
 		this.txtCodigo.element.value = puesto.codigo;

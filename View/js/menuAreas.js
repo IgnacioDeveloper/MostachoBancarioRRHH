@@ -22,14 +22,6 @@ function MenuAreas(parent,sector,dataHandler){
 	}
 
 	this.renderRegistroPuestos=function(){
-		/*parent.addElement(this.sectorPuestos,'div','searchBar-puestos','searchBar')
-		parent.addElement(this.sectorPuestos,'table','tabla-puestos','table');
-		parent.addElement(this.sectorPuestos,'div','dataBar-puestos','dataBar');
-		var searchBar = document.getElementById('searchBar-puestos');
-		var tabla = document.getElementById('tabla-puestos');
-		var dataBar = document.getElementById('dataBar-puestos');
-		console.log(this.sectorPuestos);
-		this.registroPuestos = new Registro(this.sectorPuestos,this.dataHandler,new TableModelPuesto(tabla));*/
 		this.listaPuestos = new ListaPuestos(this.sectorPuestos,this.dataHandler);
 		this.registroAreas.modeloTabla.setListaPuestos(this.listaPuestos);
 	}
